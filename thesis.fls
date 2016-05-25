@@ -283,6 +283,7 @@ INPUT /usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/ts1bch.fd
 INPUT /usr/local/texlive/2015/texmf-dist/fonts/tfm/bitstrea/charter/bchr8c.tfm
 INPUT /usr/local/texlive/2015/texmf-dist/fonts/tfm/bitstrea/charter/bchr8t.tfm
 INPUT /usr/local/texlive/2015/texmf-dist/fonts/tfm/bitstrea/charter/bchr8t.tfm
+INPUT /usr/local/texlive/2015/texmf-dist/fonts/tfm/public/lm/ec-lmssbx10.tfm
 INPUT /usr/local/texlive/2015/texmf-dist/fonts/tfm/public/tex-gyre/ec-qhvr.tfm
 INPUT /usr/local/texlive/2015/texmf-dist/fonts/tfm/public/tex-gyre/ec-qhvb.tfm
 INPUT thesis.lof
