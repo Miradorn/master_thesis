@@ -3,12 +3,21 @@
 \chapter{System}
 \label{sec:system}
 
-Let \(E\) be the Set of valid input events and \(e \in E\), where each event carries a value, a timestamp and the
+\section{Definitions}
+\label{sec:system:defs}
+
+There are three Types of Events: Input, Output and Internal.
+
+Let \(E\) be the Set of valid input events (E for external) and \(e \in E\), where each event carries a value, a timestamp and the
 channel it is perceived on (e.g.\ a function call of a specific function).
 Further let \(O\) be the Set of valid output events and \(o \in O\), which have the same properties than input events.
 
+Internal events are only used by the asynchronous system: Let the Set of valid internal events be \(N\).
+Internal events also carry a value and a timestamp, but their channel is implicitly given by the node that produces the event.
+
 % \cleanchapterquote{Innovation distinguishes between a leader and a follower.}{Steve Jobs}{(CEO Apple Inc.)}
 \section{Semantics of TeSSLa functions}
+\label{sec:system:semantics_tessla_functions}
 Think of semantics of thinks like add, mrv, etc.
 Can these be defined independent of async/synchronous or for each.
 For synchronous they are partly defined in the TeSSLa spec
@@ -42,14 +51,39 @@ The output is specified by the concatination of outputs of the nodes that are ma
 In contrast to \(I\) the asynchronous implementation takes multiple steps to produce an output from an input.
 During a step multiple things can happen at once:
 \begin{itemize}
-    \item A new, external input Event can be consumed by a source in the DAG and is propagated to it's children
-    \item Multiple internal Nodes, which have at least one new input buffered on their input queue can perform
-        their computation and propagete their new output to their children.
-    \item Multiple output nodes, which have at least one new input buffered on their input queue, can produce a
-        new output.
+    \item A new, external input Event can be consumed by a source in the DAG, which generates an internal event that is propagated to it's children
+    \item An internal Node which has at least one new input buffered on its input queue can perform
+        it's computation, generate a new internal event, which is propagated to the children of that node, which therefore could compute in the next step.
+    \item An output node, which has at least one new input buffered on its input queue, can produce a new output.
 \end{itemize}
 
-The semantic of the implementation is given by the product of the semantics of it's nodes.
+To reason about the steps $A$ takes while performing a computation, we have to define a schedule of the computations of the nodes.
+This schedule has to be fair, otherwise it's possible that no output would ever be created, because the output nodes will be never scheduled.
+Such a schedule is given by the following algorithm:
+
+\begin{itemize}
+    \item Number the nodes in reversed topological order
+    \item schedule the node with the lowest number that has an input event buffered
+\end{itemize}
+
+As shown in Section~\ref{TODO} this is a fair schedule.
+
+\begin{figure}
+    \begin{tikzpicture}
+        [pre/.style={<-,shorten <=1pt,>=stealth,semithick},
+		post/.style={->,shorten >=1pt,>=stealth,semithick}]
+
+        \node [shape=circle,draw=black] (A) {A};
+        \node [shape=circle,draw=black] (B) [below left=of A] {B}
+			edge [pre] (A);
+        \node [shape=circle,draw=black] (C) [below right=of A] {C}
+			edge [pre] (A);
+        \node [shape=circle,draw=black] (D) [below right=of C] {D}
+			edge [pre] (C);
+    \end{tikzpicture}
+    \caption{Visualization of a simple asynchronous system}
+\label{fig:async_dag}
+\end{figure}
 
 \section{Equality of Semantics}
 \(A\) and \(S\) are considered equal if for a Series of input Events they produce the same output Events, or stated otherwise:
@@ -92,9 +126,9 @@ When taking the first step and \(A_{1,0}\) is reached, the event \(e_1\) is cons
 Note that there is no alternative to this bahivour, because there were no prior events and therefore no internal Node
 have an event to process on it's input queue, therefore the Source consuming the external event is the only node that can,
 and therefore must, compute anything.
-Afterwards all Nodes thar are direct children of the source that consumed event will have one input event buffered and
+Afterwards all Nodes that are direct children of the source that consumed the external event will have one input event buffered and
 are able to perform their computation in the next step.
-At least until step \(h_{\min}\) every step one or more Nodes, that are no outputs will perform a computation, therefore
+At least until step \(h_{\min}\) every step one or more Nodes, that are no outputs, will perform a computation, therefore
 pushing internal events closer to the output nodes.
 Somewhere between step \(h_{\min}\) and \(k\) all internal events will reach an output node and produce an output.
 
