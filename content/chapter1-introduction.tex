@@ -9,6 +9,28 @@
 \section{Motivation and Problem Statement}
 \label{sec:intro:motivation}
 
+Program verification is a field of computer sience that is widely researched and has multiple approaches.
+While pure verification approaches try to proof the correct behaviour of a system under all possible executions,
+Runtime Verifications limits itself to single, finite runs of a system, trying to proof it conforms to a given specification
+under specific conditions, like input sequences or scheduling.
+These specifications can be given in various ways, like LTL formulas or in specification languages that are specifically developed for
+runtime verification.
+A specific field of RV is looking at verifying behviour of streams of data, specifying relationships of values on those streams.
+Examples for this are RMoR, Lola and TeSSLa, which we will look at more closely in Section~\ref{sec:related}.
+
+The language TeSSLa aims to make it easy to specify behaviour of streams.
+To gain this it introduces a number of language features and sintax sugare to expressively describe the conditions a stream should fulfill.
+The evaluation of TeSSLa specifications is done in two steps: first the specification is compiled by a compiler written at the ISP of the University of Luebeck.
+The output is a canonical representation of the operations on the streams in the specification.
+In the second step the compiled specification is connected with a system that produces some kind of traces, which are treated as the input streams of the specification.
+
+The second step can be done in different ways: online or offline, interweaving the monitors into the monitored program (see RMoR) or having a standalone system.
+At the beginning of this thesis there was one implementation of a runtime for this monitor that is based on FPGAs that have to be manually reconfigured for each new specification.
+While this is a very performant approach for the actual monitoring it isn't usable for testing and prototyping.
+Therefore it is wanted to implement a runtime for TeSSLa specifications that can be run independent of specific hardware.
+
+During the Thesis it is proofen that the actual approach of this runtime, a functional, actor based, asynchronous system,
+will generate the same observations on input traces as an ideal evaluation of the specification.
 
 \section{Results}
 \label{sec:intro:results}
