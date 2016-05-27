@@ -131,6 +131,8 @@ extending the trace in a obious way.
 \label{fig:async_dag}
 \end{figure}
 
+TODO Proove equality between different topological orders
+TODO also sth\. about multiple nodes computing at once == (one node at a time + fairness)
 \section{Equality of Semantics for a topological schedule}
 \label{sec:sysyem:equal_semantics_topological}
 
@@ -205,6 +207,9 @@ states it could take to process \(\vec{e}\) are equal to \(\vec{I}\).
 
 \section{Semantics between different schedules for an asynchronous system}
 \label{sec:semantics_schedules}
+
+Idea: each step is a commutation of two internal events in regard to the rev top order.
+=> show commutativity of traces (note: only valid commutations, no two events, where one depends one the other, can be commuted, this is ensured by the scheduling of nodes that have input buffered)
 
 % \begin{figure}[htb]
 %     \includegraphics[width=\textwidth]{gfx/Clean-Thesis-Figure}
