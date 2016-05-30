@@ -4,9 +4,59 @@
 \label{sec:related}
 
 % \cleanchapterquote{A picture is worth a thousand words. An interface is worth a thousand pictures.}{Ben Shneiderman}{(Professor for Computer Science)}
+As Runtime Verification is a widely researched field there are many different approaches towards monitoring programs.
+TeSSLa itself and the implemented runtime builds on concepts and results of many of them.
+In the following section some of them are highlighted to give a better understanding of choices made during this thesis.
 
+\section{LOLA}
+\label{sec:related:lola}
 
-\section{Related Work Section 1}
-\label{sec:related:sec1}
+LOLA~\cite{DAngelo2005} may arguably have the biggest influence on TeSSLa and the theoretical work of this thesis.
+LOLA defines a very small core language to describe streams as the result of combinations of other streams of events.
+In contrast to TeSSLa it is defined in regards of a discrete timing model.
+
+Lola defines a notion of efficiently monitorable properties and an approach to monitor these properties.
+
+TeSSLa takes concepts of LOLA and applies them to a continuous model of time and introduces a language and a rich
+set of functions that can be applies to streams.
+
+\section{Copilot}
+\label{sec:related:copilot}
+
+The realtime runtime monitor system Copilot was introduced in~\cite{Pike2010}.
+Copilot is designed to overcome the shortcomings of existing RV tools in regards to hard-realtime software written in C.
+
+To do so they first define characteristics a monitoring approach has to fullfill to be considered valuable for this domain.
+The four principles are:
+
+\begin{description}
+  \item[Functionality] Monitors cannot change the functionality of the observed program unless a failure is observed.
+  \item[Schedulability] Monitors cannot alter the schedule of the observed program.
+  \item[Certifiability] Monitors must minimize the difficulty in re-validating the observed program; in particular, we make it our goal to avoid modifying the observed programs source code.
+  \item[SWaP overhead] Monitors must minimize the additional overhead required including size, weight, and power (SWaP).
+\end{description}
+
+The monitors follow a sampling based approach, where at specified steps the values of global variables are observed and the monitors are evaluated
+on that values.
+While sampling based approaches are widely disregarded in RV, because they can lead to both false positives and false negatives,
+they argue:
+
+\begin{quote}
+  In a hard real-time context, sampling is a suitable strategy. Under
+  the assumption that the monitor and the observed program share a global clock and a static periodic schedule, while false positives are possible, false negatives are not.~\cite{Pike2010}
+\end{quote}
+
+A special detail of Copilot is that monitors aren't inlined into the program but can be scheduled as a independet process.
+The implementation of the TeSSLa runtime in this implementation follows a similar approach, by being a totally independent program,
+and therefore also has some of the gains in regard to the specified four characteristics.
+Because the runtime works with all kinds of traces, it is insignificant how they are produced:
+It can work with traces based on sampling, therefore working like Copilot, or by actually instrumenting the code to generate
+the traces, which alters the semantics of the program.
+
+% Another shortcoming of inlining monitors is that certified code (e.g., DO-178B for avionics [Inc92]) is common in this domain.
+% Inlining monitors could necessitate re-certifying the observed program.
+
+\section{RMoR}
+\section{Driver Trace}
 
 

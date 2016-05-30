@@ -384,10 +384,12 @@ OUTPUT thesis.toc
 INPUT content/chapter1-introduction.tex
 INPUT content/chapter1-introduction.tex
 INPUT /usr/local/texlive/2015/texmf-dist/fonts/tfm/adobe/helvetic/phvr8t.tfm
-INPUT content/chapter3-system.tex
-INPUT content/chapter3-system.tex
+INPUT content/chapter2-related-work.tex
+INPUT content/chapter2-related-work.tex
 INPUT /usr/local/texlive/2015/texmf-dist/fonts/tfm/public/tex-gyre/ec-qhvr.tfm
 INPUT /usr/local/texlive/2015/texmf-dist/fonts/tfm/public/tex-gyre/ec-qhvb.tfm
+INPUT content/chapter3-system.tex
+INPUT content/chapter3-system.tex
 INPUT /usr/local/texlive/2015/texmf-dist/fonts/tfm/bitstrea/charter/bchr8t.tfm
 INPUT /usr/local/texlive/2015/texmf-dist/fonts/tfm/bitstrea/charter/bchr8t.tfm
 INPUT /usr/local/texlive/2015/texmf-dist/fonts/tfm/public/lm/ec-lmssbx10.tfm
