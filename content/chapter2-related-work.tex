@@ -46,17 +46,22 @@ they argue:
   the assumption that the monitor and the observed program share a global clock and a static periodic schedule, while false positives are possible, false negatives are not.~\cite{Pike2010}
 \end{quote}
 
-A special detail of Copilot is that monitors aren't inlined into the program but can be scheduled as a independet process.
-The implementation of the TeSSLa runtime in this implementation follows a similar approach, by being a totally independent program,
+A special detail of Copilot is that monitors aren't inlined into the program but can be scheduled as independet processes.
+The implementation of the TeSSLa runtime in this thesis follows a similar approach: It is a totally independent program,
 and therefore also has some of the gains in regard to the specified four characteristics.
 Because the runtime works with all kinds of traces, it is insignificant how they are produced:
-It can work with traces based on sampling, therefore working like Copilot, or by actually instrumenting the code to generate
-the traces, which alters the semantics of the program.
+It can work with traces based on sampling, working in a similar fashion as Copilot, or by actually instrumenting code to generate
+traces, which alters the semantics of the program.
 
 % Another shortcoming of inlining monitors is that certified code (e.g., DO-178B for avionics [Inc92]) is common in this domain.
 % Inlining monitors could necessitate re-certifying the observed program.
 
 \section{RMoR}
+\label{sec:related:rmor}
+
 \section{Driver Trace}
+\section{Debie}
+\section{MaC}
+\section{RiTHM}
 
 
