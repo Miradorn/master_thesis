@@ -94,7 +94,7 @@
 
 
 \DeclareOptionX*{
-	\PackageWarning{cleanthesis}{Unknown option ‘\CurrentOption’}%
+  \PackageWarning{cleanthesis}{Unknown option ‘\CurrentOption’}%
 }
 
 \ProcessOptionsX[ct]<cthesis>
@@ -113,73 +113,73 @@
 % updates all colors regarding the defined main and accessory
 % color, as well as the defined colorize mode (full, reduced, bw)
 \long\def\ct@cthesis@updatecolors{%
-	% sets all colors (like colorize == full)
-	% -- footer colors
-	\colorlet{ctcolorfooterpage}{ctcolorblack}
-	\colorlet{ctcolorfooterline}{ctcolormain}
-	\colorlet{ctcolorfootermark}{ctcolorblack}
-	\colorlet{ctcolorfootertitle}{ctcolormain}
-	% -- sectioning colors
-	\colorlet{ctcolortitle}{ctcolormain}
-	\colorlet{ctcolorpartnum}{ctcolormain}
-	\colorlet{ctcolorpartline}{ctcolorblack}
-	\colorlet{ctcolorparttext}{ctcolorblack}
-	\colorlet{ctcolorchapternum}{ctcolormain}
-	\colorlet{ctcolorchapterline}{ctcolormain}
-	\colorlet{ctcolorsection}{ctcolormain}
-	\colorlet{ctcolorsubsection}{ctcolormain}
-	\colorlet{ctcolorparagraph}{ctcolorblack}
-	% --> text colors
-	\colorlet{ctcolorfloatlabel}{ctcoloraccessory}
-	\colorlet{ctcolorlistlabel}{ctcolormain}
+  % sets all colors (like colorize == full)
+  % -- footer colors
+  \colorlet{ctcolorfooterpage}{ctcolorblack}
+  \colorlet{ctcolorfooterline}{ctcolormain}
+  \colorlet{ctcolorfootermark}{ctcolorblack}
+  \colorlet{ctcolorfootertitle}{ctcolormain}
+  % -- sectioning colors
+  \colorlet{ctcolortitle}{ctcolormain}
+  \colorlet{ctcolorpartnum}{ctcolormain}
+  \colorlet{ctcolorpartline}{ctcolorblack}
+  \colorlet{ctcolorparttext}{ctcolorblack}
+  \colorlet{ctcolorchapternum}{ctcolormain}
+  \colorlet{ctcolorchapterline}{ctcolormain}
+  \colorlet{ctcolorsection}{ctcolormain}
+  \colorlet{ctcolorsubsection}{ctcolormain}
+  \colorlet{ctcolorparagraph}{ctcolorblack}
+  % --> text colors
+  \colorlet{ctcolorfloatlabel}{ctcoloraccessory}
+  \colorlet{ctcolorlistlabel}{ctcolormain}
 
-	\ifcase\cthesis@colorize
-		% case = 0 (colorize == full)
-		% do nothing
-	\or
-		% case = 1 (colorize == reduced)
-		% --> footer colors
-		\colorlet{ctcolorfooterline}{ctcolorgray}
-		\colorlet{ctcolorfootertitle}{ctcolorgray}
-		% --> sectioning colors
-		\colorlet{ctcolorsubsection}{ctcolorblack}
-		\colorlet{ctcolorpartnum}{ctcolorblack}
-		% --> text colors
-		\colorlet{ctcolorlistlabel}{ctcolorblack}
-	\or
-		% case = 2 (colorize == bw)
-		% --> footer colors
-		\colorlet{ctcolorfooterline}{ctcolorgray}
-		\colorlet{ctcolorfootertitle}{ctcolorgray}
-		% --> sectioning colors
-		\colorlet{ctcolortitle}{ctcolorblack}
-		\colorlet{ctcolorpartnum}{ctcolorblack}
-		\colorlet{ctcolorchapternum}{ctcolorblack}
-		\colorlet{ctcolorchapterline}{ctcolorblack}
-		\colorlet{ctcolorsection}{ctcolorblack}
-		\colorlet{ctcolorsubsection}{ctcolorblack}
-		% --> text colors
-		\colorlet{ctcolorfloatlabel}{ctcolorblack}
-		\colorlet{ctcolorlistlabel}{ctcolorblack}
-	\else
-	\fi
+  \ifcase\cthesis@colorize
+  % case = 0 (colorize == full)
+  % do nothing
+  \or
+  % case = 1 (colorize == reduced)
+  % --> footer colors
+  \colorlet{ctcolorfooterline}{ctcolorgray}
+  \colorlet{ctcolorfootertitle}{ctcolorgray}
+  % --> sectioning colors
+  \colorlet{ctcolorsubsection}{ctcolorblack}
+  \colorlet{ctcolorpartnum}{ctcolorblack}
+  % --> text colors
+  \colorlet{ctcolorlistlabel}{ctcolorblack}
+  \or
+  % case = 2 (colorize == bw)
+  % --> footer colors
+  \colorlet{ctcolorfooterline}{ctcolorgray}
+  \colorlet{ctcolorfootertitle}{ctcolorgray}
+  % --> sectioning colors
+  \colorlet{ctcolortitle}{ctcolorblack}
+  \colorlet{ctcolorpartnum}{ctcolorblack}
+  \colorlet{ctcolorchapternum}{ctcolorblack}
+  \colorlet{ctcolorchapterline}{ctcolorblack}
+  \colorlet{ctcolorsection}{ctcolorblack}
+  \colorlet{ctcolorsubsection}{ctcolorblack}
+  % --> text colors
+  \colorlet{ctcolorfloatlabel}{ctcolorblack}
+  \colorlet{ctcolorlistlabel}{ctcolorblack}
+  \else
+  \fi
 }
 
 % sets the main and accessory color for the document
 \def\cthesissetcolor#1#2#3{%
-	\definecolor{ctcolormain}{#1}{#2}%
-	\definecolor{ctcoloraccessory}{#1}{#3}%
-	\ct@cthesis@updatecolors%
+  \definecolor{ctcolormain}{#1}{#2}%
+  \definecolor{ctcoloraccessory}{#1}{#3}%
+  \ct@cthesis@updatecolors%
 }
 
 % sets the blue-magenta color theme (blue/magenta)
 \def\cthesissetcolorbluemagenta{%
-	\cthesissetcolor{cmyk}{1, .50, .10, .01}{.18, .98, .18, 0}%
+  \cthesissetcolor{cmyk}{1, .50, .10, .01}{.18, .98, .18, 0}%
 }
 
 % sets the blue-green color theme (blue/green)
 \def\cthesissetcolorbluegreen{%
-	\cthesissetcolor{cmyk}{.61, .47, .03, 0}{.48, .05, .91, 0}%
+  \cthesissetcolor{cmyk}{.61, .47, .03, 0}{.48, .05, .91, 0}%
 }
 
 % defines general colors
@@ -189,14 +189,14 @@
 
 % sets the color theme regarding the given package option colortheme
 \ifcase\cthesis@colortheme
-	% case 0 (colortheme == bluemagenta)
-	\cthesissetcolorbluemagenta
+% case 0 (colortheme == bluemagenta)
+\cthesissetcolorbluemagenta
 \or
-	% case 1 (colortheme == bluegreen)
-	\cthesissetcolorbluegreen
+% case 1 (colortheme == bluegreen)
+\cthesissetcolorbluegreen
 \else
-	% all other cases
-	\cthesissetcolorbluemagenta
+% all other cases
+\cthesissetcolorbluemagenta
 \fi
 
 
@@ -207,21 +207,21 @@
 %\ifthenelse{\boolean{@sansserif}}%
 \ifct@cthesis@sansserif
 %	{%
-		% Using sans-serif fonts
-		%
-		%\RequirePackage{helvet}	% Font:	Helvetica
-		%\RequirePackage{nimbus}	% Font:	Nimbus Sans, a clone of the Helvetica
-		\RequirePackage{tgheros}	% Font:	TEX Gyre Heros
-		%\RequirePackage{libertine}	% Font:	Biolinum, the standard sans serif typeface with the Libertine package
-		%\RequirePackage[scaled]{berasans} % Font:	Bera Sans, a a version of Bitstream Vera Sans slightly enhanced
-		\renewcommand*\familydefault{\sfdefault}%
+% Using sans-serif fonts
+%
+%\RequirePackage{helvet}	% Font:	Helvetica
+%\RequirePackage{nimbus}	% Font:	Nimbus Sans, a clone of the Helvetica
+\RequirePackage{tgheros}	% Font:	TEX Gyre Heros
+%\RequirePackage{libertine}	% Font:	Biolinum, the standard sans serif typeface with the Libertine package
+%\RequirePackage[scaled]{berasans} % Font:	Bera Sans, a a version of Bitstream Vera Sans slightly enhanced
+\renewcommand*\familydefault{\sfdefault}%
 %	}{%
 \else
-		% Using serif fonts
-		%
-		\RequirePackage{lmodern}	% font set: Latin Modern
-		\RequirePackage{charter}	% font set: Charter
-		%\RequirePackage{fourier}	% font set: (basically improved utopia)
+% Using serif fonts
+%
+\RequirePackage{lmodern}	% font set: Latin Modern
+\RequirePackage{charter}	% font set: Charter
+%\RequirePackage{fourier}	% font set: (basically improved utopia)
 %	}
 \fi
 
@@ -240,64 +240,64 @@
 
 %
 \RequirePackage[					% modify figure and table captions
-	font={small}, 					% 	- small font size
-	labelfont={bf,sf,color=ctcolorfloatlabel},% 	- label in bold, sans-serif and magenta
-	labelsep=\cthesis@figuresep,				% 	- separator: none, colon, period, space, quad, newline, endash
-	singlelinecheck=false			% 	- no centered single-lined captions
+  font={small}, 					% 	- small font size
+  labelfont={bf,sf,color=ctcolorfloatlabel},% 	- label in bold, sans-serif and magenta
+  labelsep=\cthesis@figuresep,				% 	- separator: none, colon, period, space, quad, newline, endash
+  singlelinecheck=false			% 	- no centered single-lined captions
 ]{caption}[2008/08/24]
 %\ifthenelse{\boolean{@figurecaptionoutside}}%
 \ifct@cthesis@hangfigurecaption
 %	{%
-		\DeclareCaptionFormat{llap}{\llap{#1#2}#3\par}%
-		\captionsetup{format=llap,labelsep=quad,singlelinecheck=false}%
+\DeclareCaptionFormat{llap}{\llap{#1#2}#3\par}%
+\captionsetup{format=llap,labelsep=quad,singlelinecheck=false}%
 %	}{}
 \fi
 %
 \RequirePackage[					% page layout modifications
-	paper=a4paper,					% 	- use A4 paper size
-	%scale={0.86,0.94},				% 	- total body size (h,v)
-	%scale={0.86,0.94},				% 	- total body size (h,v)
-	nohead,							% 	- no header
-	includefoot,					% 	- include footer space
-	includemp,						% 	- include side note space
-	bindingoffset=0.5cm,			% 	- binding correction
-	top=2.25cm,						% 	- total body: top margin
-	left=3.75cm,					% 	- total body: left margin (odd pages)
-	right=0.75cm,					% 	- total body: right margin (odd pages)
-	bottom=1.5cm,					% 	- total body: bottom margin
-	marginparwidth=1.75cm,			% 	- width for side note
-	marginparsep=10pt,				% 	- space between notes and body text (content)
-	footskip=2cm,					% 	- footer skip size
+  paper=a4paper,					% 	- use A4 paper size
+  %scale={0.86,0.94},				% 	- total body size (h,v)
+  %scale={0.86,0.94},				% 	- total body size (h,v)
+  nohead,							% 	- no header
+  includefoot,					% 	- include footer space
+  includemp,						% 	- include side note space
+  bindingoffset=0.5cm,			% 	- binding correction
+  top=2.25cm,						% 	- total body: top margin
+  left=3.75cm,					% 	- total body: left margin (odd pages)
+  right=0.75cm,					% 	- total body: right margin (odd pages)
+  bottom=1.5cm,					% 	- total body: bottom margin
+  marginparwidth=1.75cm,			% 	- width for side note
+  marginparsep=10pt,				% 	- space between notes and body text (content)
+  footskip=2cm,					% 	- footer skip size
 ]{geometry}
 %
 \RequirePackage[					% advanced quotes
-	strict=true,					% 	- warning are errors now
-	style=german					% 	- german quotes
+  strict=true,					% 	- warning are errors now
+  style=german					% 	- german quotes
 ]{csquotes}
 %
 \RequirePackage[					% use biblatex for bibliography
-	backend=\cthesis@bibsys,		% 	- use biber backend (bibtex replacement) or bibtex
-	bibencoding=utf8,				% 	- use auto file encode
-	style=\cthesis@bibstyle,		% 	- use alphabetic (or numeric) bib style
-	natbib=true,					% 	- allow natbib commands
-	hyperref=true,					% 	- activate hyperref support
-	backref=true,					% 	- activate backrefs
-	isbn=false,						% 	- don't show isbn tags
-	url=false,						% 	- don't show url tags
-	doi=false,						% 	- don't show doi tags
-	urldate=long,					% 	- display type for dates
-	maxnames=3,%
-	minnames=1,%
-	maxbibnames=5,%
-	minbibnames=3,%
-	maxcitenames=2,%
-	mincitenames=1%
+  backend=\cthesis@bibsys,		% 	- use biber backend (bibtex replacement) or bibtex
+  bibencoding=utf8,				% 	- use auto file encode
+  style=\cthesis@bibstyle,		% 	- use alphabetic (or numeric) bib style
+  natbib=true,					% 	- allow natbib commands
+  hyperref=true,					% 	- activate hyperref support
+  backref=true,					% 	- activate backrefs
+  isbn=false,						% 	- don't show isbn tags
+  url=false,						% 	- don't show url tags
+  doi=false,						% 	- don't show doi tags
+  urldate=long,					% 	- display type for dates
+  maxnames=3,%
+  minnames=1,%
+  maxbibnames=5,%
+  minbibnames=3,%
+  maxcitenames=2,%
+  mincitenames=1%
 ]{biblatex}
 % \bibliography{\cthesis@bibfile}
 \DefineBibliographyStrings{ngerman}{%
-	andothers = {{et\,al\adddot}}, % 'et al.' instead of 'u.a.'
-	backrefpage = {{zitiert auf Seite}},%
-	backrefpages = {{zitiert auf den Seiten}},%
+  andothers = {{et\,al\adddot}}, % 'et al.' instead of 'u.a.'
+  backrefpage = {{zitiert auf Seite}},%
+  backrefpages = {{zitiert auf den Seiten}},%
 }
 
 % **************************************************
@@ -313,110 +313,110 @@
 % List Definitions
 % **************************************************
 \newenvironment{my_list}%
-	{\begin{enumerate}%
-		\setlength{\itemsep}{1pt}%
-		\setlength{\parskip}{0pt}%
-		\setlength{\parsep}{0pt}%
-	}%
-	{\end{enumerate}}
-%
-\newenvironment{my_list_num}
-	{\begin{enumerate}[topsep=-5pt,partopsep=0pt,parsep=2pt,itemsep=3pt]}
-	{\end{enumerate}}%
+{\begin{enumerate}%
+    \setlength{\itemsep}{1pt}%
+    \setlength{\parskip}{0pt}%
+    \setlength{\parsep}{0pt}%
+  }%
+  {\end{enumerate}}
+  %
+  \newenvironment{my_list_num}
+  {\begin{enumerate}[topsep=-5pt,partopsep=0pt,parsep=2pt,itemsep=3pt]}
+  {\end{enumerate}}%
 
-\newenvironment{my_list_item}
-	{\begin{itemize}[topsep=-5pt,partopsep=0pt,parsep=2pt,itemsep=3pt]}
-	{\end{itemize}}%
+  \newenvironment{my_list_item}
+  {\begin{itemize}[topsep=-5pt,partopsep=0pt,parsep=2pt,itemsep=3pt]}
+  {\end{itemize}}%
 
-\newenvironment{ct_version_list}
-	{\begin{itemize}[topsep=-5pt,partopsep=0pt,parsep=2pt,itemsep=3pt]}
-	{\end{itemize}}%
+  \newenvironment{ct_version_list}
+  {\begin{itemize}[topsep=-5pt,partopsep=0pt,parsep=2pt,itemsep=3pt]}
+  {\end{itemize}}%
 
-	\newenvironment{ct_version_list_sub}
-		{\begin{itemize}[topsep=-0pt,partopsep=0pt,parsep=0pt,itemsep=0pt]}
-		{\end{itemize}}%
+  \newenvironment{ct_version_list_sub}
+  {\begin{itemize}[topsep=-0pt,partopsep=0pt,parsep=0pt,itemsep=0pt]}
+  {\end{itemize}}%
 
-\renewcommand{\descriptionlabel}[1]{%
-	\hspace*{\labelsep}%
-	\color{ctcolorlistlabel}%
-	\tgherosfont\textbf{#1}%
-}
-\newenvironment{my_list_desc}
-	{\begin{description}[%
-		style=multiline,%
-		topsep=-5pt,%
-		leftmargin=3cm,%
-		partopsep=0pt,%
-		parsep=2pt,%
-		itemsep=3pt%
-	]}
-	{\end{description}}%
+  \renewcommand{\descriptionlabel}[1]{%
+    \hspace*{\labelsep}%
+    \color{ctcolorlistlabel}%
+    \tgherosfont\textbf{#1}%
+  }
+  \newenvironment{my_list_desc}
+  {\begin{description}[%
+        style=multiline,%
+        topsep=-5pt,%
+        leftmargin=3cm,%
+        partopsep=0pt,%
+        parsep=2pt,%
+        itemsep=3pt%
+    ]}
+{\end{description}}%
 
 % **************************************************
 % Header and Footer
 % **************************************************
 \pagestyle{fancy}
 \renewcommand{\chaptermark}[1]{%
-	\markboth{%
-		\footnotesize%
-		{\color{ctcolorfootermark}\textbf{\chaptername\ \thechapter}}%
-		\quad%
-		{\color{ctcolorfootertitle}#1}%
-	}{}%
+  \markboth{%
+    \footnotesize%
+    {\color{ctcolorfootermark}\textbf{\chaptername\ \thechapter}}%
+    \quad%
+    {\color{ctcolorfootertitle}#1}%
+  }{}%
 }
 \renewcommand{\sectionmark}[1]{%
-	\markright{%
-		\footnotesize%
-		{\color{ctcolorfootermark}\textbf{\thesection}}%
-		\quad%
-		{\color{ctcolorfootertitle}#1}%
-	}%
+  \markright{%
+    \footnotesize%
+    {\color{ctcolorfootermark}\textbf{\thesection}}%
+    \quad%
+    {\color{ctcolorfootertitle}#1}%
+  }%
 }
 %
 \fancypagestyle{plain}{%
-	\fancyhf{}
-	\fancyfootoffset[OR]{1.85cm}
-	\fancyfoot[OR]{%
-		{\ }\tgherosfont%
-		{\color{ctcolorfooterline}\rule[-90pt]{1.25pt}{100pt}}%
-		\hspace*{10pt}\begin{minipage}[b]{1.5cm}%
-			\color{ctcolorfooterpage}\normalsize\textbf{\thepage}%
-		\end{minipage}%
-	}
-	\fancyfootoffset[EL]{1.85cm}
-	\fancyfoot[EL]{%
-		\tgherosfont%
-		\begin{minipage}[b]{1.5cm}%
-			\raggedleft\color{ctcolorfooterpage}\normalsize\textbf{\thepage}%
-		\end{minipage}%
-		\hspace*{10pt}{\color{ctcolorfooterline}\rule[-90pt]{1.25pt}{100pt}}%
-	}
-	\renewcommand{\headrulewidth}{0pt}
-	\renewcommand{\footrulewidth}{0pt}
+  \fancyhf{}
+  \fancyfootoffset[OR]{1.85cm}
+  \fancyfoot[OR]{%
+    {\ }\tgherosfont%
+    {\color{ctcolorfooterline}\rule[-90pt]{1.25pt}{100pt}}%
+    \hspace*{10pt}\begin{minipage}[b]{1.5cm}%
+      \color{ctcolorfooterpage}\normalsize\textbf{\thepage}%
+    \end{minipage}%
+  }
+  \fancyfootoffset[EL]{1.85cm}
+  \fancyfoot[EL]{%
+    \tgherosfont%
+    \begin{minipage}[b]{1.5cm}%
+      \raggedleft\color{ctcolorfooterpage}\normalsize\textbf{\thepage}%
+    \end{minipage}%
+    \hspace*{10pt}{\color{ctcolorfooterline}\rule[-90pt]{1.25pt}{100pt}}%
+  }
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
 }
 %
 \fancypagestyle{maincontentstyle}{%
-	\pagestyle{plain}
-	\fancyhf{}
-	\fancyfootoffset[OR]{1.85cm}
-	\fancyfoot[OR]{%
-		{\ }\tgherosfont\footnotesize%
-		\rightmark%
-		\hspace*{0.75cm}{\color{ctcolorfooterline}\rule[-90pt]{1.25pt}{100pt}}%
-		\hspace*{10pt}\begin{minipage}[b]{1.5cm}%
-			\color{ctcolorfooterpage}\normalsize\textbf{\thepage}%
-		\end{minipage}%
-	}
-	\fancyfootoffset[EL]{1.85cm}
-	\fancyfoot[EL]{%
-		\tgherosfont\footnotesize%
-		\begin{minipage}[b]{1.5cm}%
-			\raggedleft\color{ctcolorfooterpage}\normalsize\textbf{\thepage}%
-		\end{minipage}%
-		\footnotesize%
-		\hspace*{10pt}{\color{ctcolorfooterline}\rule[-90pt]{1.25pt}{100pt}}%
-		\hspace*{0.75cm}\leftmark%
-	}
+  \pagestyle{plain}
+  \fancyhf{}
+  \fancyfootoffset[OR]{1.85cm}
+  \fancyfoot[OR]{%
+    {\ }\tgherosfont\footnotesize%
+    \rightmark%
+    \hspace*{0.75cm}{\color{ctcolorfooterline}\rule[-90pt]{1.25pt}{100pt}}%
+    \hspace*{10pt}\begin{minipage}[b]{1.5cm}%
+      \color{ctcolorfooterpage}\normalsize\textbf{\thepage}%
+    \end{minipage}%
+  }
+  \fancyfootoffset[EL]{1.85cm}
+  \fancyfoot[EL]{%
+    \tgherosfont\footnotesize%
+    \begin{minipage}[b]{1.5cm}%
+      \raggedleft\color{ctcolorfooterpage}\normalsize\textbf{\thepage}%
+    \end{minipage}%
+    \footnotesize%
+    \hspace*{10pt}{\color{ctcolorfooterline}\rule[-90pt]{1.25pt}{100pt}}%
+    \hspace*{0.75cm}\leftmark%
+  }
 }
 
 % **************************************************
@@ -477,7 +477,7 @@
 % **************************************************
 %
 \newcommand*{\ctSetFont}[3]{%
-	arg1=#1, arg2=#2, arg3=#3%
+  arg1=#1, arg2=#2, arg3=#3%
 }
 
 % own font definitions
@@ -527,18 +527,18 @@
 \titleclass{\part}{top} % <-- display:
 \assignpagestyle{\part}{empty}	% <-- no page numbers/decorations
 \titleformat{\part}%
-	[display]%
-	{\usekomafont{part}}%
-	{\raggedleft{%
-		{\thesispartlabelfont%
-			\partname\ \thepart\ \quad}%
-		{\color{ctcolorpartline}%
-			\hspace*{-200pt}\rule[20pt]{600pt}{2pt}}
-		}%
-	}%
-	{0em}%
-	{\raggedleft}%
-	[\phantomsection]
+[display]%
+{\usekomafont{part}}%
+{\raggedleft{%
+    {\thesispartlabelfont%
+    \partname\ \thepart\ \quad}%
+    {\color{ctcolorpartline}%
+    \hspace*{-200pt}\rule[20pt]{600pt}{2pt}}
+  }%
+}%
+{0em}%
+{\raggedleft}%
+[\phantomsection]
 %
 % > formats: \chapter
 %
@@ -549,37 +549,37 @@
 \newcommand\ctformatchapter[1]{\parbox[t]{\dimexpr\textwidth-4em\relax}{\raggedright#1}}
 %
 \titleformat{\chapter}[display]%
-	{\usekomafont{chapter}}%
-	{\vspace{-8em}\raggedleft{%
-		{\color{ctcolorchapterline}%
-			\rule[-5pt]{2pt}{5cm}}\quad%
-		{\color{ctcolorchapternum}
-			\fontsize{60}{60}\selectfont\thechapter}%
-		}%
-	}%
-	{-2.1em}%
-	{\ctformatchapter}%
-	[\phantomsection]
+{\usekomafont{chapter}}%
+{\vspace{-8em}\raggedleft{%
+    {\color{ctcolorchapterline}%
+    \rule[-5pt]{2pt}{5cm}}\quad%
+    {\color{ctcolorchapternum}
+    \fontsize{60}{60}\selectfont\thechapter}%
+  }%
+}%
+{-2.1em}%
+{\ctformatchapter}%
+[\phantomsection]
 %
 % > formats: \section
 \titlespacing{\section}{0em}{.75em}{.2em}%[0pt]
 %\ifthenelse{\boolean{@sectionlabeloutside}}%
 \ifct@cthesis@hangsection
 %	{%
-		\titleformat{\section}[hang]%
-			{\usekomafont{section}}%
-			{\color{ctcolorblack}\thesection\hspace*{10pt}}%
-			{0pt}%
-			{\raggedright}%
-			[\phantomsection]
+\titleformat{\section}[hang]%
+{\usekomafont{section}}%
+{\color{ctcolorblack}\thesection\hspace*{10pt}}%
+{0pt}%
+{\raggedright}%
+[\phantomsection]
 %	}{%
 \else
-		\titleformat{\section}[block]%
-			{\usekomafont{section}}%
-			{\color{ctcolorblack}\thesection\hspace*{10pt}}%
-			{0pt}%
-			{\raggedright}%
-			[\phantomsection]
+\titleformat{\section}[block]%
+{\usekomafont{section}}%
+{\color{ctcolorblack}\thesection\hspace*{10pt}}%
+{0pt}%
+{\raggedright}%
+[\phantomsection]
 %	}
 \fi
 %
@@ -588,31 +588,31 @@
 %\ifthenelse{\boolean{@subsectionlabeloutside}}%
 \ifct@cthesis@hangsubsection
 %	{%
-		\titleformat{\subsection}[hang]%
-			{\usekomafont{subsection}}%
-			{\color{ctcolorblack}\thesubsection\hspace*{10pt}}%
-			{0pt}%
-			{\raggedright}%
-			[\phantomsection]
+\titleformat{\subsection}[hang]%
+{\usekomafont{subsection}}%
+{\color{ctcolorblack}\thesubsection\hspace*{10pt}}%
+{0pt}%
+{\raggedright}%
+[\phantomsection]
 %	}{%
 \else
-		\titleformat{\subsection}[block]%
-			{\usekomafont{subsection}}%
-			{\color{ctcolorblack}\thesubsection\hspace*{10pt}}%
-			{0pt}%
-			{\raggedright}%
-			[\phantomsection]
+\titleformat{\subsection}[block]%
+{\usekomafont{subsection}}%
+{\color{ctcolorblack}\thesubsection\hspace*{10pt}}%
+{0pt}%
+{\raggedright}%
+[\phantomsection]
 %	}
 \fi
 %
 % > formats: \paragraph
 \titlespacing{\paragraph}{0pt}{\parsep}{1em}%[0pt]
 % \titleformat{\paragraph}[runin]%
-	% {\usekomafont{paragraph}}%
-	% {}%
-	% {}%
-	% {}%
-	% []
+% {\usekomafont{paragraph}}%
+% {}%
+% {}%
+% {}%
+% []
 %
 %
 % **************************************************
@@ -641,40 +641,40 @@
 %
 % Clean chapter quotations
 \newcommand{\hugequote}{%
-	{\book\fontsize{75}{80}\selectfont%
-	\hspace*{-.475em}\color{ctcolorgraylight}%
-	\textit{\glqq}%
-	\vskip -.26em}%
+  {\book\fontsize{75}{80}\selectfont%
+    \hspace*{-.475em}\color{ctcolorgraylight}%
+    \textit{\glqq}%
+  \vskip -.26em}%
 }
 \newcommand{\cleanchapterquote}[3]{%
-	\begin{minipage}{.865\textwidth}%
-		\begin{flushright}
-			\begin{minipage}{.65\textwidth}%
-				\begin{flushleft}
-					{\hugequote}\textit{#1}
-				\end{flushleft}
-	    		\begin{flushright}
-    				--- \textbf{#2} \\
-    				#3
-		    	\end{flushright}
-		    \end{minipage}%
-		\end{flushright}
-	\end{minipage}%
-	\bigskip
+  \begin{minipage}{.865\textwidth}%
+    \begin{flushright}
+      \begin{minipage}{.65\textwidth}%
+        \begin{flushleft}
+          {\hugequote}\textit{#1}
+        \end{flushleft}
+        \begin{flushright}
+          --- \textbf{#2} \\
+          #3
+        \end{flushright}
+      \end{minipage}%
+    \end{flushright}
+  \end{minipage}%
+  \bigskip
 }
 %
 % Clean Quotation environment
 \newenvironment{thesis_quotation}%
-	{%
-	\begin{minipage}{.865\textwidth}%
-		\begin{flushright}
-			\begin{minipage}{.95\textwidth}%
-	}%
-	{%
-			\end{minipage}%
-		\end{flushright}
-	\end{minipage}%
-	}%
+{%
+  \begin{minipage}{.865\textwidth}%
+    \begin{flushright}
+      \begin{minipage}{.95\textwidth}%
+      }%
+      {%
+      \end{minipage}%
+    \end{flushright}
+  \end{minipage}%
+}%
 %
 % Clean signs around word origins in definitions
 %\newcommand{\cthesisorigin}[1]{\textsf{\textlangle}#1\textsf{\textrangle}}
