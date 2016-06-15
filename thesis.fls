@@ -398,12 +398,10 @@ INPUT content/chapter3-system.tex
 INPUT content/chapter3-system.tex
 INPUT content/chapter4-concepts.tex
 INPUT content/chapter4-concepts.tex
-INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchr8t.tfm
-INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchr8t.tfm
-INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/public/lm/ec-lmssbx10.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/psnfss/ts1bch.fd
 INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/psnfss/ts1bch.fd
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchr8c.tfm
+INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/public/lm/ec-lmssbx10.tfm
 INPUT thesis.lof
 INPUT thesis.lof
 OUTPUT thesis.lof
@@ -414,6 +412,7 @@ INPUT content/chapter6-appendix.tex
 INPUT content/chapter6-appendix.tex
 INPUT content/colophon.tex
 INPUT content/colophon.tex
+INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchr8t.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/lm/t1lmtt.fd
 INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/lm/t1lmtt.fd
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/public/lm/ec-lmtt10.tfm
