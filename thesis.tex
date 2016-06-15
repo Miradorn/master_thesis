@@ -5,7 +5,7 @@
   paper=A4,         % paper size --> A4 is default in Germany
   twoside=true,       % onesite or twoside printing
   openright,          % doublepage cleaning ends up right side
-  parskip=full,       % spacing value / method for paragraphs
+  parskip=half,       % spacing value / method for paragraphs
   chapterprefix=true,     % prefix for chapter marks
   11pt,           % font size
   headings=normal,      % size of headings
@@ -13,77 +13,16 @@
   listof=totoc,       % include listof entries in toc
   titlepage=on,       % own page for each title page
   captions=tableabove,    % display table captions above the float env
+  chapterprefix=false,    % do not display a prefix for chapters
+  appendixprefix=false,    % but display a prefix for appendix chapter
   draft=false,        % value for draft version
 ]{scrreprt}%
 
 % **************************************************
-% Debug LaTeX Information
+% Setup YOUR thesis document in this file !
 % **************************************************
-%\listfiles
+\input{thesis-setup}
 
-% **************************************************
-% Information and Commands for Reuse
-% **************************************************
-\newcommand{\thesisTitle}{Implementation and Semantics of an asynchronous evaluation engine for stream based specifications}
-\newcommand{\thesisName}{Alexander Schramm}
-\newcommand{\thesisSubject}{Master Thesis}
-\newcommand{\thesisDate}{November 20, 2016}
-\newcommand{\thesisVersion}{My First Draft}
-
-\newcommand{\thesisFirstReviewer}{Prof. Dr. Martin Leucker}
-\newcommand{\thesisFirstReviewerUniversity}{\protect{University of Luebeck}}
-\newcommand{\thesisFirstReviewerDepartment}{Institute For Software Engineering and Programming Languages}
-
-\newcommand{\thesisSecondReviewer}{Who Knöws}
-\newcommand{\thesisSecondReviewerUniversity}{\protect{University of Luebeck}}
-\newcommand{\thesisSecondReviewerDepartment}{We will see}
-
-\newcommand{\thesisFirstSupervisor}{Cesar Sanchez}
-% \newcommand{\thesisSecondSupervisor}{John Smith}
-
-\newcommand{\thesisUniversity}{\protect{University of Luebeck}}
-% \newcommand{\thesisUniversityDepartment}{Institute For Software Engineering and Programming Languages}
-\newcommand{\thesisUniversityInstitute}{Institute For Software Engineering and Programming Languages}
-% \newcommand{\thesisUniversityGroup}{Clean Thesis Group (CTG)}
-\newcommand{\thesisUniversityCity}{Luebeck}
-\newcommand{\thesisUniversityStreetAddress}{Ratzeburger Allee 160}
-\newcommand{\thesisUniversityPostalCode}{23562}
-
-% **************************************************
-% Load and Configure Packages
-% **************************************************
-\usepackage[utf8]{inputenc}   % defines file's character encoding
-\usepackage[english]{babel} % babel system, adjust the language of the content
-\usepackage[          % clean thesis style
-  figuresep=colon,%
-  sansserif=false,%
-  hangfigurecaption=false,%
-  hangsection=true,%
-  hangsubsection=true,%
-  colorize=full,%
-  colortheme=bluegreen,%
-  bibsys=bibtex,%
-  bibfile=Mendeley,%
-  bibstyle=alphabetic,%
-]{cleanthesis}
-\usepackage{amssymb}
-\usepackage{amsmath}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,decorations.pathmorphing,backgrounds,positioning,fit,petri}
-\bibliography{Mendeley}
-\cthesissetcolor{RGB}{0,75,90}{160,187,47}
-
-\hypersetup{% setup the hyperref-package options
-  pdftitle={\thesisTitle},  %   - title (PDF meta)
-  pdfsubject={\thesisSubject},%   - subject (PDF meta)
-  pdfauthor={\thesisName},  %   - author (PDF meta)
-  plainpages=false,     %   -
-  colorlinks=false,     %   - colorize links?
-  pdfborder={0 0 0},      %   -
-  breaklinks=true,      %   - allow line break inside links
-  bookmarksnumbered=true,   %
-  bookmarksopen=true      %
-}
 
 % **************************************************
 % Document CONTENT
@@ -129,7 +68,6 @@
 \input{content/chapter3-system} % INCLUDE: system
 \input{content/chapter4-concepts} % INCLUDE: concepts
 % \input{content/chapter5-conclusion} % INCLUDE: conclusion
-\cleardoublepage
 
 % --------------------------
 % Back matter
@@ -150,6 +88,10 @@
 \listoftables
 \cleardoublepage
 
+\appendix\cleardoublepage
+\input{content/chapter6-appendix}
+
+\cleardoublepage
 \input{content/colophon}
 \cleardoublepage
 

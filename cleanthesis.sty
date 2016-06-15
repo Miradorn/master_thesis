@@ -1,5 +1,5 @@
 %% cleanthesis.sty
-%% Copyright 2015 R. Langner
+%% Copyright 2016 R. Langner
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either version 1.3
@@ -29,7 +29,7 @@
 %
 % **************************************************
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{cleanthesis}[2015/08/26 v0.3.1 Clean-looking thesis style inspired by Apple's user guide documents]
+\ProvidesPackage{cleanthesis}[2015/08/26 v0.3.1 A clean LaTeX style for thesis documents]
 %
 % **************************************************
 % Package options
@@ -92,6 +92,10 @@
 \define@choicekey*[ct]{cthesis}{bibstyle}[\val\bibstylenr]{alphabetic,numeric,authoryear}[alphabetic]{\def\cthesis@bibstyle{#1}}
 \setkeys[ct]{cthesis}{bibstyle=alphabetic}
 
+% OPTION wrapfooter
+% --> values = true|false
+\define@boolkey[ct]{cthesis}{wrapfooter}[false]{}
+\setkeys[ct]{cthesis}{wrapfooter=false}
 
 \DeclareOptionX*{
   \PackageWarning{cleanthesis}{Unknown option ‘\CurrentOption’}%
@@ -99,6 +103,8 @@
 
 \ProcessOptionsX[ct]<cthesis>
 
+% Checks if bib file exists, if not we throw an error
+\IfFileExists{\cthesis@bibfile.bib}{}{\PackageError{cleanthesis}{Unable to find BibTeX file \cthesis@bibfile.bib!}{Please provide the name of your BibTeX file to the cleanthesis package parameter bibfile.}}
 
 % **************************************************
 % Color Definitions
@@ -203,89 +209,88 @@
 % **************************************************
 % Font Definitions (see http://www.tug.dk/FontCatalogue/)
 % **************************************************
-\RequirePackage[T1]{fontenc}		% font types and character verification
+\RequirePackage[T1]{fontenc}    % font types and character verification
 %\ifthenelse{\boolean{@sansserif}}%
 \ifct@cthesis@sansserif
-%	{%
+% {%
 % Using sans-serif fonts
 %
-%\RequirePackage{helvet}	% Font:	Helvetica
-%\RequirePackage{nimbus}	% Font:	Nimbus Sans, a clone of the Helvetica
-\RequirePackage{tgheros}	% Font:	TEX Gyre Heros
-%\RequirePackage{libertine}	% Font:	Biolinum, the standard sans serif typeface with the Libertine package
-%\RequirePackage[scaled]{berasans} % Font:	Bera Sans, a a version of Bitstream Vera Sans slightly enhanced
+%\RequirePackage{helvet}  % Font: Helvetica
+%\RequirePackage{nimbus}  % Font: Nimbus Sans, a clone of the Helvetica
+\RequirePackage{tgheros}  % Font: TEX Gyre Heros
+%\RequirePackage{libertine} % Font: Biolinum, the standard sans serif typeface with the Libertine package
+%\RequirePackage[scaled]{berasans} % Font:  Bera Sans, a a version of Bitstream Vera Sans slightly enhanced
 \renewcommand*\familydefault{\sfdefault}%
-%	}{%
+% }{%
 \else
 % Using serif fonts
 %
-\RequirePackage{lmodern}	% font set: Latin Modern
-\RequirePackage{charter}	% font set: Charter
-%\RequirePackage{fourier}	% font set: (basically improved utopia)
-%	}
+\RequirePackage{lmodern}  % font set: Latin Modern
+\RequirePackage{charter}  % font set: Charter
+%\RequirePackage{fourier} % font set: (basically improved utopia)
+% }
 \fi
 
 % **************************************************
 % Load Packages
 % **************************************************
-\RequirePackage{fixltx2e}			% packages provides fixes to LaTeX2e
-\RequirePackage{microtype}			% typographic tuning
-\RequirePackage{setspace}			% for line spacing, e.g. \onehalfspacing
-\RequirePackage[]{graphicx}			% graphics import features
-\RequirePackage{fancyhdr}			% for header and footer modifications
-\RequirePackage{enumitem}			% for simple list modifications
-\RequirePackage{blindtext}		% package for blind text
-\RequirePackage{textcomp}			% different symbols
-\RequirePackage{hyperref} 			% interactive link inside the document
+\RequirePackage{microtype}      % typographic tuning
+\RequirePackage{setspace}     % for line spacing, e.g. \onehalfspacing
+\RequirePackage[]{graphicx}     % graphics import features
+\RequirePackage{tabularx}     % table features
+\RequirePackage{fancyhdr}     % for header and footer modifications
+\RequirePackage{enumitem}     % for simple list modifications
+\RequirePackage{blindtext}    % package for blind text
+\RequirePackage{textcomp}     % different symbols
+\RequirePackage{hyperref}       % interactive link inside the document
 
 %
-\RequirePackage[					% modify figure and table captions
-  font={small}, 					% 	- small font size
-  labelfont={bf,sf,color=ctcolorfloatlabel},% 	- label in bold, sans-serif and magenta
-  labelsep=\cthesis@figuresep,				% 	- separator: none, colon, period, space, quad, newline, endash
-  singlelinecheck=false			% 	- no centered single-lined captions
+\RequirePackage[          % modify figure and table captions
+  font={small},           %   - small font size
+  labelfont={bf,sf,color=ctcolorfloatlabel},%   - label in bold, sans-serif and magenta
+  labelsep=\cthesis@figuresep,        %   - separator: none, colon, period, space, quad, newline, endash
+  singlelinecheck=false     %   - no centered single-lined captions
 ]{caption}[2008/08/24]
 %\ifthenelse{\boolean{@figurecaptionoutside}}%
 \ifct@cthesis@hangfigurecaption
-%	{%
+% {%
 \DeclareCaptionFormat{llap}{\llap{#1#2}#3\par}%
 \captionsetup{format=llap,labelsep=quad,singlelinecheck=false}%
-%	}{}
+% }{}
 \fi
 %
-\RequirePackage[					% page layout modifications
-  paper=a4paper,					% 	- use A4 paper size
-  %scale={0.86,0.94},				% 	- total body size (h,v)
-  %scale={0.86,0.94},				% 	- total body size (h,v)
-  nohead,							% 	- no header
-  includefoot,					% 	- include footer space
-  includemp,						% 	- include side note space
-  bindingoffset=0.5cm,			% 	- binding correction
-  top=2.25cm,						% 	- total body: top margin
-  left=3.75cm,					% 	- total body: left margin (odd pages)
-  right=0.75cm,					% 	- total body: right margin (odd pages)
-  bottom=1.5cm,					% 	- total body: bottom margin
-  marginparwidth=1.75cm,			% 	- width for side note
-  marginparsep=10pt,				% 	- space between notes and body text (content)
-  footskip=2cm,					% 	- footer skip size
+\RequirePackage[          % page layout modifications
+  paper=a4paper,          %   - use A4 paper size
+  %scale={0.86,0.94},       %   - total body size (h,v)
+  %scale={0.86,0.94},       %   - total body size (h,v)
+  nohead,             %   - no header
+  includefoot,          %   - include footer space
+  includemp,            %   - include side note space
+  bindingoffset=0.5cm,      %   - binding correction
+  top=2.25cm,           %   - total body: top margin
+  left=3.75cm,          %   - total body: left margin (odd pages)
+  right=0.75cm,         %   - total body: right margin (odd pages)
+  bottom=1.5cm,         %   - total body: bottom margin
+  marginparwidth=1.75cm,      %   - width for side note
+  marginparsep=10pt,        %   - space between notes and body text (content)
+  footskip=2cm,         %   - footer skip size
 ]{geometry}
 %
-\RequirePackage[					% advanced quotes
-  strict=true,					% 	- warning are errors now
-  style=german					% 	- german quotes
+\RequirePackage[          % advanced quotes
+  strict=true,          %   - warning are errors now
+  style=german          %   - german quotes
 ]{csquotes}
 %
-\RequirePackage[					% use biblatex for bibliography
-  backend=\cthesis@bibsys,		% 	- use biber backend (bibtex replacement) or bibtex
-  bibencoding=utf8,				% 	- use auto file encode
-  style=\cthesis@bibstyle,		% 	- use alphabetic (or numeric) bib style
-  natbib=true,					% 	- allow natbib commands
-  hyperref=true,					% 	- activate hyperref support
-  backref=true,					% 	- activate backrefs
-  isbn=false,						% 	- don't show isbn tags
-  url=false,						% 	- don't show url tags
-  doi=false,						% 	- don't show doi tags
-  urldate=long,					% 	- display type for dates
+\RequirePackage[          % use biblatex for bibliography
+  backend=\cthesis@bibsys,    %   - use biber backend (bibtex replacement) or bibtex
+  style=\cthesis@bibstyle,    %   - use alphabetic (or numeric) bib style
+  natbib=true,          %   - allow natbib commands
+  hyperref=true,          %   - activate hyperref support
+  backref=true,         %   - activate backrefs
+  isbn=false,           %   - don't show isbn tags
+  url=false,            %   - don't show url tags
+  doi=false,            %   - don't show doi tags
+  urldate=long,         %   - display type for dates
   maxnames=3,%
   minnames=1,%
   maxbibnames=5,%
@@ -293,7 +298,7 @@
   maxcitenames=2,%
   mincitenames=1%
 ]{biblatex}
-% \bibliography{\cthesis@bibfile}
+\bibliography{\cthesis@bibfile}
 \DefineBibliographyStrings{ngerman}{%
   andothers = {{et\,al\adddot}}, % 'et al.' instead of 'u.a.'
   backrefpage = {{zitiert auf Seite}},%
@@ -303,11 +308,11 @@
 % **************************************************
 % Text Format
 % **************************************************
-\setstretch{1.2}					% value for line spacing, use \setstretch{} or \singlespacing or \onehalfspacing or \doublespacing
-\setlength{\parindent}{0em}			% value for paragraph indentation
-\clubpenalty = 10000				% prevent single lines at the beginning of a paragraph (Schusterjungen)
-\widowpenalty = 10000				% prevent single lines at the end of a paragraph (Hurenkinder)
-\displaywidowpenalty = 10000		%
+\setstretch{1.2}          % value for line spacing, use \setstretch{} or \singlespacing or \onehalfspacing or \doublespacing
+%\setlength{\parindent}{0em}      % value for paragraph indentation
+\clubpenalty = 10000        % prevent single lines at the beginning of a paragraph (Schusterjungen)
+\widowpenalty = 10000       % prevent single lines at the end of a paragraph (Hurenkinder)
+\displaywidowpenalty = 10000    %
 
 % **************************************************
 % List Definitions
@@ -359,9 +364,14 @@
 \renewcommand{\chaptermark}[1]{%
   \markboth{%
     \footnotesize%
-    {\color{ctcolorfootermark}\textbf{\chaptername\ \thechapter}}%
+    % use \@chapapp instead of \chaptername to avoid 'Chapter A Appendix ...', thanks to @farbverlust (issue #47)
+    {\color{ctcolorfootermark}\textbf{\@chapapp\ \thechapter}}%
     \quad%
+    \ifct@cthesis@wrapfooter%
+    {\color{ctcolorfootertitle}\protect\parbox[t]{.7\textwidth}{#1}}%
+    \else%
     {\color{ctcolorfootertitle}#1}%
+    \fi%
   }{}%
 }
 \renewcommand{\sectionmark}[1]{%
@@ -369,7 +379,11 @@
     \footnotesize%
     {\color{ctcolorfootermark}\textbf{\thesection}}%
     \quad%
+    \ifct@cthesis@wrapfooter%
+    {\color{ctcolorfootertitle}\protect\parbox[t]{.7\textwidth}{#1}}%
+    \else%
     {\color{ctcolorfootertitle}#1}%
+    \fi%
   }%
 }
 %
@@ -487,10 +501,10 @@
 
 \newcommand{\thesispartlabelfont}{\color{ctcolorpartnum}\book\fontsize{60}{60}\selectfont}
 \newcommand{\thesispartfont}{\color{ctcolorparttext}\huge \tgherosfont\selectfont}
-\newcommand{\thesischapterfont}{\color{ctcolorblack}\huge \fontfamily{phv}\selectfont}
+\newcommand{\thesischapterfont}{\color{ctcolorblack}\normalfont\huge \fontfamily{phv}\selectfont}
 %\newcommand{\thesissectionfont}{\color{ctcolormain}\LARGE\bfseries \tgherosfont}
-\newcommand{\thesissectionfont}{\color{ctcolorsection}\LARGE \tgherosfont}
-\newcommand{\thesissubsectionfont}{\color{ctcolorsubsection}\Large \tgherosfont}
+\newcommand{\thesissectionfont}{\color{ctcolorsection}\normalfont\LARGE \tgherosfont}
+\newcommand{\thesissubsectionfont}{\color{ctcolorsubsection}\normalfont\Large \tgherosfont}
 \newcommand{\thesisparagraphfont}{\color{ctcolorparagraph}\tgherosfont\small\bfseries}
 %
 % headings
@@ -514,105 +528,69 @@
 % -- modifications regarding sectioning (structural) commands,
 %    i.e. \part, \chapter, \section, \subsection, \subsubsection, \paragraph
 %
-%
-% The package titlesec enables us to modify (style) the sectioning commands
-% -- usage: \titlespacing{\command}{left}{before-sep}{after-sep}[right-sep]
-% -- usage: \titleformat{\command}[shape]{format}{label}{sep}{before}[after]
-% -- usage: \titleclass{\command}{class}
-%    -- classes: page (single page), top (like chapters),
-%                straight (title in the middle)
-\RequirePackage{titlesec}
-%
-% > formats: \part
-\titleclass{\part}{top} % <-- display:
-\assignpagestyle{\part}{empty}	% <-- no page numbers/decorations
-\titleformat{\part}%
-[display]%
-{\usekomafont{part}}%
-{\raggedleft{%
-    {\thesispartlabelfont%
-    \partname\ \thepart\ \quad}%
-    {\color{ctcolorpartline}%
-    \hspace*{-200pt}\rule[20pt]{600pt}{2pt}}
-  }%
-}%
-{0em}%
-{\raggedleft}%
-[\phantomsection]
-%
+% ---------------------------
 % > formats: \chapter
+% ---------------------------
+\renewcommand*\chapterheadstartvskip{\vspace*{-8.75em}}
+\renewcommand*\chapterheadendvskip{\vspace*{2.5\baselineskip}}
+\renewcommand*{\chapterformat}{%
+  \ctchapternumber{\thechapter}%
+}
+\renewcommand{\chapterlinesformat}[3]{%
+  \ctchaptertitle{#3}%
+  #2%
+}
+%\renewcommand{\chapterlineswithprefixformat}[3]{%
+%    \ctchaptertitle{\@chapapp\ \thechapter: #3}%
+%    #2%
+%}
+\newcommand{\ctchapternumber}[1]{%
+  \usekomafont{chapter}%
+  \begin{minipage}[t]{0.3\textwidth}%
+    \raggedleft{%
+      {\color{ctcolorchapterline}\rule[-5pt]{2pt}{5cm}}%
+      \quad%
+      {\color{ctcolorchapternum}\fontsize{60}{60}\selectfont#1}%
+    }%
+  \end{minipage}%
+}
+\newcommand{\ctchaptertitle}[1]{%
+  \usekomafont{chapter}%
+  \begin{minipage}[t]{0.7\textwidth}%
+    \vspace*{5.85em}%
+    #1%
+  \end{minipage}%
+}
 %
-% The following command is used to avoid overlapping
-% of the chapter headline text, see bug/ticket #1
-% Solution adapted according to the comment from "Gonzalo Medina" - Thanks
-% http://tex.stackexchange.com/questions/165878/width-of-chapter-section-with-titlesec
-\newcommand\ctformatchapter[1]{\parbox[t]{\dimexpr\textwidth-4em\relax}{\raggedright#1}}
-%
-\titleformat{\chapter}[display]%
-{\usekomafont{chapter}}%
-{\vspace{-8em}\raggedleft{%
-    {\color{ctcolorchapterline}%
-    \rule[-5pt]{2pt}{5cm}}\quad%
-    {\color{ctcolorchapternum}
-    \fontsize{60}{60}\selectfont\thechapter}%
-  }%
-}%
-{-2.1em}%
-{\ctformatchapter}%
-[\phantomsection]
-%
+% ---------------------------
 % > formats: \section
-\titlespacing{\section}{0em}{.75em}{.2em}%[0pt]
-%\ifthenelse{\boolean{@sectionlabeloutside}}%
+% ---------------------------
 \ifct@cthesis@hangsection
-%	{%
-\titleformat{\section}[hang]%
-{\usekomafont{section}}%
-{\color{ctcolorblack}\thesection\hspace*{10pt}}%
-{0pt}%
-{\raggedright}%
-[\phantomsection]
-%	}{%
+\renewcommand*{\sectionformat}{%
+  \usekomafont{section}%
+  \makebox[0pt][r]{\color{ctcolorblack}\thesection\hspace*{10pt}}%
+}
 \else
-\titleformat{\section}[block]%
-{\usekomafont{section}}%
-{\color{ctcolorblack}\thesection\hspace*{10pt}}%
-{0pt}%
-{\raggedright}%
-[\phantomsection]
-%	}
+\renewcommand*{\sectionformat}{%
+  \usekomafont{section}%
+  {\color{ctcolorblack}\thesection\hspace*{10pt}}%
+}
 \fi
 %
+% ---------------------------
 % > formats: \subsection
-\titlespacing{\subsection}{0em}{.5em}{0em}%[0pt]
-%\ifthenelse{\boolean{@subsectionlabeloutside}}%
+% ---------------------------
 \ifct@cthesis@hangsubsection
-%	{%
-\titleformat{\subsection}[hang]%
-{\usekomafont{subsection}}%
-{\color{ctcolorblack}\thesubsection\hspace*{10pt}}%
-{0pt}%
-{\raggedright}%
-[\phantomsection]
-%	}{%
+\renewcommand*{\subsectionformat}{%
+  \usekomafont{subsection}%
+  \makebox[0pt][r]{\color{ctcolorblack}\thesubsection\hspace*{10pt}}%
+}
 \else
-\titleformat{\subsection}[block]%
-{\usekomafont{subsection}}%
-{\color{ctcolorblack}\thesubsection\hspace*{10pt}}%
-{0pt}%
-{\raggedright}%
-[\phantomsection]
-%	}
+\renewcommand*{\subsectionformat}{%
+  \usekomafont{subsection}%
+  {\color{ctcolorblack}\thesubsection\hspace*{10pt}}%
+}
 \fi
-%
-% > formats: \paragraph
-\titlespacing{\paragraph}{0pt}{\parsep}{1em}%[0pt]
-% \titleformat{\paragraph}[runin]%
-% {\usekomafont{paragraph}}%
-% {}%
-% {}%
-% {}%
-% []
 %
 %
 % **************************************************
@@ -626,6 +604,12 @@
 % The tocloft package enables us to control the typographic design of the
 % table of contents, list of figures and list of tables
 \RequirePackage{tocloft}
+% - fixes wrong fonts in the toc, thanks to magnucki
+\renewcommand{\cftchapfont}{\usefont{T1}{bch}{b}{n}\selectfont}
+\renewcommand{\cfttoctitlefont}{\thesischapterfont}
+\renewcommand{\cftloftitlefont}{\thesischapterfont}
+\renewcommand{\cftlottitlefont}{\thesischapterfont}
+%
 %
 % > adjusts the indention for figure and table entries (lof and lot)
 %   -- \cftsetindents{entry}{indent}{numwidth} sets the entry's indent to
