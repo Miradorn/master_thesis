@@ -3,8 +3,18 @@
 \chapter{System}
 \label{sec:system}
 
-\section{Evaluation Engine}
-\label{sec:system:eval_engine}
+Besides the theoretical basics presented in Section~\ref{sec:related} the TeSSLa runtime of this thesis is built upon a number of technologies.
+To better understand decisions made during the implementation this Chapter will give an overview of them and show why they were choosen.
+
+As already mentioned, the implemented runtime itself is independent of the way traces are generated.
+Therefore we will not only look at building blocks for the Runtime but also examine related projects which can be used to obtain traces.
+Because the format of the traces can differ heavily, depending on how and why they were collected, they are not only used to test the runtime but also to determine how it can consume them.
+
+\section{TeSSLa Runtime}
+\label{sec:system:runtime}
+
+The Runtime to evaluate specifications is implemented in the programming language Elixir, which itself is built on top of Erlang.
+To understand why this plattform was choosen we will look at the Erlang ecosystem in the next section.
 
 \subsection{Erlang and Elixir}
 \label{sec:system:eval_engine:erlang_elixir}
@@ -16,6 +26,7 @@ todo: Timing model: reason why events have to carry timestamps in contrast to in
 \section{Trace Generation}
 \label{sec:system:traces}
 
+\subsection{Debie}
 \subsection{TraceBench}
 \subsection{Aspect oriented programming}
 \subsection{CIL}

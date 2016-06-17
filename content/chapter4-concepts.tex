@@ -6,8 +6,7 @@
 \label{sec:concepts:defs}
 
 In the following definitions are given to reason about semantics of implementations of a TeSSLa runtime.
-A TeSSLa specification gives a number of transformations over input streams and a subset of the generated streams as outputs.
-Streams can be queried for the value they hold at a specific time.
+A TeSSLa specification gives a number of transformations over Streams and a subset of the generated streams as outputs.
 
 \subsection{Streams}
 \label{sec:concepts:defs:streams}
@@ -18,7 +17,11 @@ Signals can be described by a sequence of changes, where a change notes that the
 The only difference between a Signal and an EventStreams is that Signals always have a value while an EventStream may return \(\bot\), which denotes, that no event happened at that time.
 Because the similarity of Signals and EventStreams in the following we will mainly reason about EventStreams, but most things can also be applied to Signals.
 
-Futhermore Signals and EventStreams hold the timestamp to which they have progressed, which can be equal or greater than the timestamp of the last Event happened on them.
+Formally a stream \(\sigma\) is defined as a Sequence of Events, the Set of all Streams \(\Sigma\) is defined as all possible finite sequences of Events \(\Sigma = \{\sigma | \sigma \in E^* \}\)
+An input Stream \(\sigma_i\) is a stream consisting of only input events, the set of all input Streams is \(\Sigma_i = \{\sigma_i | \sigma_i \in E_i^*\}\).
+Output and internal Streams are defined analogous.
+
+Furthermore Streams hold the timestamp to which they have progressed, which can be equal or greater than the timestamp of the last Event happened on them.
 
 \subsection{Events}
 \label{sec:concepts:defs:events}
@@ -27,13 +30,14 @@ Streams consists of Events (or changes, which can be modeled the same as events)
 There are three Types of Events: input, output and internal Events.
 
 The Set of all Events is denoted as \(E\).
-Each event carries a value, which can be \emph{nothing}, a timestamp and the channel it's perceived on (e.g.\ a function call of a specific function or the name of an output stream).
+Each event carries a value, which can be \emph{nothing} or a value of a Type (types are formally defined in the TeSSLa speicification but aren't important for this thesis), a timestamp and the channel it's perceived on (e.g.\ a function call of a specific function or the name of an output stream).
 
-\(E_i\) is the Set of all input events, their channel corresponds to a specific trace.
-\(E_o\) is the Set of all output events, their channel is specified by an output name of the TeSSLa specification.
-\(E_n\) is the Set of all internal events.
+\(E_i \subset E\) is the Set of all input events, their channel corresponds to a specific trace.
+\(E_o \subset E\) is the Set of all output events, their channel is specified by an output name of the TeSSLa specification.
+\(E_n \subset E\) is the Set of all internal events.
 Internal events are mostly an implementation detail, which denote steps of computation inside the runtime.
 The channel of internal events is implicitly given by the node that produces the stream of the Event.
+Note that \(E_i, E_o, E_n\) are pairwise disjoint and \(E_i \cup E_o \cup E_n = E\).
 
 \subsection{Functions}
 \label{sec:concepts:defs:functions}
@@ -62,9 +66,8 @@ In Section~\ref{sec:concepts:behaviour_with_timing} the conclusions of earlier s
 Nodes are the atomic unit of computation for the evaluation of a TeSSLa specification.
 A Node implements a single Function, e.g.:\ there is an \emph{AddNode} which takes two input Signals and produces a new Signal.
 Therefore a Node is the concrete implementation of a function in a runtime for TeSSLa specifications.
+Each Node has a set of inputs, which are either input or internal Streams, and one output, which is either an internal or an output Stream.
 
-Because Functions in TeSSLa specifications itself depend on other Functions, and these dependencies have to be circle free,
-the specification can be represented as a DAG and the Nodes are also organized as a DAG\@.
 
 Nodes use a FIFO queue, provided by the Erlang plattform, to process new received Events in multiple steps:
 
@@ -82,7 +85,7 @@ Nodes use a FIFO queue, provided by the Erlang plattform, to process new receive
 \subsubsection{Determination of processable Events}
 \label{sec:concepts:defs:nodes:processable}
 
-Based on the asynchronous nature of Nodes, Events from different channels can be received out of order.
+Based on the asynchronous nature of Nodes, Events from different Streams can be received out of order.
 E.g.\ if a Node C is a child of Node A and B, it can receive Events from Node A at timestamps \(t_1, t_2, t_3, t_4\)
 before receiving an event with timestamp \(t_1\) from Node B.
 Therefore a Node can not compute it's output upto a timestamp unless it has informations from all predecessors that they did progress to that timestamp.
@@ -97,8 +100,9 @@ therefore the \emph{change timestamps} are \(t_2, t_3, t_4\) and the Node will h
 \subsection{TeSSLa Evaluation Engine}
 \label{sec:concepts:def:model}
 
-Based on the format of TeSSLa specifications a specific structure for evaluation is given:
-A DAG that consists of Nodes, where the roots are the ones consuming external Events and the leaves are the ones producing outputs.
+Because Functions in TeSSLa specifications itself depend on other Functions, and these dependencies have to be circle free,
+the specification can be represented as a DAG@.
+This DAG can be directly translated into an evaluation Model for that specification: The Nodes of the DAGs are Nodes representing the functions and the Edges are the input and output Streams between the Nodes.
 
 A Node in the DAG is called \emph{ready} when it has at least one event buffered on all of it's inputs, meaning it is able to perform a computation and produce a new output.
 
@@ -120,7 +124,17 @@ All TeSSLa evaluation Engines have to hold a State, which encodes information ne
 The State of a whole Evaluation Engine is made up of the States of it's Nodes.
 
 Each Node has a State that can hold arbitrary data used for computation.
-One part of the State is the History of a Node, which holds all Events received from it's parents, called it's inputs, and all produced Events of the Node, called it's output.
+One part of the State of every Node is the History of a Node, which holds all Events received from it's parents, called it's inputs, and all produced Events of the Node, called it's output.
+Other information stored in the State may be the number of Events seen by an \emph{eventCountNode} which is incremented everytime the Node consumes a new input.
+
+Formally the State of a Node is a tuple of some arbitrary information, the inputs (a set of internal and input Streams) and the output (an internal or an output Stream).
+Everytime a Node is scheduled it changes it State by:
+
+\begin{itemize}
+  \item Updating it's inputs
+  \item updating it's output
+  \item optionally updating its arbitrary information
+\end{itemize}
 
 \subsection{Transitions}
 \label{sec:concepts:def:transitions}

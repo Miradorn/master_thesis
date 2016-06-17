@@ -2,23 +2,38 @@
 %
 \chapter{Related Work}
 \label{sec:related}
+\todo{Just a collection of thoughts for now, needs to be polished a lot}
 
 % \cleanchapterquote{A picture is worth a thousand words. An interface is worth a thousand pictures.}{Ben Shneiderman}{(Professor for Computer Science)}
 As Runtime Verification is a widely researched field there are many different approaches towards monitoring programs.
-TeSSLa itself and the implemented runtime builds on concepts and results of many of them.
-In the following section some of them are highlighted to give a better understanding of choices made during this thesis.
+As stated in~\cite{Havelund2008} most approaches are geared towards Java, while many critical systems are written in C.
+Because our implementation of a runtime is independent of the environment of the monitored program, this opens up the possibility to investigate this somewhat neglected field.
+Therefore ways to generate traces from C programs are highlighted in this chapter.
+
+TeSSLa itself and the implemented runtime builds on concepts and results of many other Runtime Verification techniques.
+In the following sections some of them are highlighted to give a better understanding of choices made during this thesis.
+
+\section{Distributed Verification Techniques}
+\label{sec:related:distributed}
+
+While most implementations of RV systems don't consider or use modern ways of parallelism and distribution and focus on programs running locally, in~\cite{Mostafa2015} a way to monitor distributed programs is given.
+To do this distributed monitors, which have to communicate with one another, are implemented.
+
+As stated earlier, the TeSSLa runtime doesn't care about the environment of the monitored program, so it doesn't distinguish between traces from distributed and non distributed programs.
+But the runtime itself is highly concurrent and can be distributed easily to many processors or event different computers.
+Therefore many of the definitions for distributed monitors can be used to reason about the behaviour of the Runtime.
 
 \section{LOLA}
 \label{sec:related:lola}
 
-LOLA~\cite{DAngelo2005} may arguably have the biggest influence on TeSSLa and the theoretical work of this thesis.
-LOLA defines a very small core language to describe streams as the result of combinations of other streams of events.
+LOLA~\cite{DAngelo2005} has big influence on TeSSLa and the theoretical work of this thesis.
+LOLA defines a very small core language to describe streams as the result of combinations on other streams.
 In contrast to TeSSLa it is defined in regards of a discrete timing model.
 
 Lola defines a notion of efficiently monitorable properties and an approach to monitor these properties.
 
 TeSSLa takes concepts of LOLA and applies them to a continuous model of time and introduces a language and a rich
-set of functions that can be applies to streams.
+set of functions that can be applied to streams.
 
 \section{Copilot}
 \label{sec:related:copilot}
@@ -59,9 +74,19 @@ traces, which alters the semantics of the program.
 \section{RMoR}
 \label{sec:related:rmor}
 
-\section{Driver Trace}
-\section{Debie}
+RMoR is another approach on monitoring C programs.
+It does so by transforming C code into an \emph{armored} version, which includes monitors to check conformance to a specification.
+
+Specifications are given as a textual representation of state machines.
+The specifications are then interweaved into the programm using CIL~\cite{Necula2002}.
+Specifications work on the level of function calls and state properties like \emph{write may never be called before open was called}.
+Because Software Developers are often working at the same abstraction level (in contrast to e.g.\ assembler or machine instructions), they can define specifications without having to learn new concepts.
+For the TeSSLa runtime support for traces at the same abstraction level (function calls, variable reads and writes) is present and used in most of the tests in Section~\ref{TODO}.
+
+Because RMoR specifications are interweaved into the program, their observations can not only be reported but also used to recover the program or even to prevent errors by calling specified functions when some condition is encountered.
+The TeSSLa runtime doesn't support this out of the box, as it's primary purpose is testing and offline monitoring, but in Section~\ref{TODO:Further_WORK} we will look at ways to support this.
+
+% \section{Driver Trace}
+% \label{sec:related:drivertrace}
 \section{MaC}
-\section{RiTHM}
-
-
+% \section{RiTHM}
