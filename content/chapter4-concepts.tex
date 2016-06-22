@@ -199,13 +199,14 @@ If the Set of Transitions of two Runs are equal, the Runs are equal.
 \label{lemma:equal_runs_with_transitions}
 \end{lemma}
 \begin{proof}
-  Let \(R_1, R_2\) be the Runs of two Systems with the same Set of Transitions \(T'\).
-  Let \(S_1\) be the final State of the run \(R_1\) and \(S_2\) of \(R_2\).
-  If the two States weren't equal, there would have to be at least one \(i\) with \(S_1(i) \neq S_2(i)\).
-  Let \(n_1, n_2\) be the Node States that are different for one \(i\).
-  Theese two States can differ in two ways: One could have one or more input Events than the other or one could have one or more output Events more than the other (or every combination of that).
-  No matter if the States differ in their input or output Events, theese Events would have to be part of Transitions, because States are only updated by Transitions.
-  Because both Runs have the same Transitions, no Transition including this extra Event can exist, therefore there can't be two Nodes with different States.
+  Let \(R_1, R_2\) be the Runs of two Engines with the same Set of Transitions \(T'\).
+  Let \(S_1\) be the final State of the Run \(R_1\) and \(S_2\) of \(R_2\).
+  If the two global States weren't equal, there would have to be at least one \(i\) with \(S_1(i) \neq S_2(i)\), meaning the same Node has to have a different State in both Engines.
+  Let \(n_1, n_2\) be the States of one such Node in both Engines.
+  If the two States are different, one of them has to contain at least one Event on an input or output that isn't on the same Stream in the other State.
+  Let that Event be \(e_d\).
+  To be added to the State, there has to be a Transition \(\tau = (e, e')\) with \(e_d \in e \lor e_d \in e'\).
+  This Transition has to be in \(T'\), which means it was taken by both Engines, therefore \(e_d\) is in the History of the Node in both Runs.
 \end{proof}
 
 \section{Behaviour of different schedules without timing functions}
