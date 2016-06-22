@@ -121,10 +121,16 @@ This DAG can be directly translated into an evaluation Engine for that specifica
 \label{def:equality_eval_engine}
 \end{definition}
 
-A Node in the DAG is called \emph{ready} when it has at least one event buffered on all of it's inputs, meaning it is able to perform a computation and produce a new output.
+\begin{definition}
+A Node in the DAG is called \emph{enabled} when it has at least one event buffered on all of it's inputs, meaning it is able to perform a computation and produce a new output.
+\label{def:node_enabled}
+\end{definition}
 
-A Node in the DAG is called independent of another Node, if it is no descendant of that Node.
-This means the Node doesn't depend on the Events emitted by the other Node.
+\begin{definition}
+A Node in the DAG is called \emph{independent} of another Node, if it is no descendant of that Node.
+\label{def:node_independent}
+\end{definition}
+
 
 To evaluate a specification over Traces, the Evaluation Engine has process the Events that were traced.
 To do so the Nodes have to run their computations until no more Events are present (or the specification found an error in the trace).
@@ -212,28 +218,35 @@ If the Set of Transitions of two Runs are equal, the Runs are equal.
 \section{Behaviour of different schedules without timing functions}
 \label{sec:concepts:behaviour_without_timing}
 
-For a first step we specify and compare behaviours of different approaches to evaluate TeSSLa specifications without timing formulas,
-meaning that only functions, which manipulate values or the presence of events, but not the timestamp of them, are used.
+For a first step we specify and compare behaviours of different approaches to evaluate TeSSLa specifications without timing Functions.
+Without timing Functions, all Nodes work only on values or the presence of Events.
 This leads to behaviours that can be easily reason about, as seen in the next sections.
 
-All Evaluation Engines compute Events in steps.
-At each step a Node is scheduled to perform it's specific operation, therefore one of the following things can happen in each step.
+All Systems to evaluate TeSSLa specifications we will look at are based on the described structure in Section~\ref{sec:concepts:def:model}.
+While there may be other approaches to evaluation, a DAG based approach seems to fit most naturaly and focusing on one structure makes comparing Systems easier.
+
+Each evaluation Engine will work in steps, where each step is synonymous with an index in the Run of the System.
+Therefore at each Step one Node is scheduled to perform it's operation, represented as the Transition in the Run.
+The Transition will encode one of the following three Things that can happen:
 
 \begin{itemize}
-  \item An input Event can be consumed by a source in the DAG, which generates an internal event that is propagated to it's children.
+  \item An input Event can be consumed by a source in the DAG, which generates an internal Event that is propagated to it's children.
   \item An internal Node, which has at least one new input buffered on all of its input queues, can perform
     its computation and generate a new internal Event, which is propagated to the children of that node, which therefore can compute in the next step.
-  \item An output node, which has at least one new input buffered on its input queue, can produce a new output.
+  \item An output node, which has at least one new input buffered on all of its input queues, can produce a new output.
 \end{itemize}
 
-Evaluation Engines are free in the way they are scheduling their Nodes.
-In the following Evaluation Engines are classified by their scheduling approaches.
+Evaluation Engines are free in the way they are scheduling their Nodes, only limited by causality (no Event can be consumed before it's produced).
+In the following evaluation Engines are classified by their scheduling approaches.
 
 \subsection{Synchronous Evaluation Engines}
 \label{sec:concepts:behaviour_without_timing:synchronous}
 
-An synchronous Evaluation Engine is one that has a fixed schedule, build like this:
-Number all Nodes in a reversed topological order, then always schedule the Node with the lowest number that is ready.
+The first class of evaluation Engines are synchronous ones.
+They are characterized by a specific, fixed schedule.
+The scheduling algorithm is as follows: Choose a reversed topological order of the Nodes once and assign numbers to them in that order.
+Then always schedule the enabled Node with lowest Number.
+
 Obviously for many DAGs there is no unique reversed topological order, therefore one can be chosen by the evaluation engine.
 
 This schedule ensures that no Node is scheduled which has a successor that can be scheduled, therefore Events are \emph{pushed} through the DAG towards an output Node as fast as possible.
@@ -288,8 +301,8 @@ Therefore to proof that an evaluation Engine is valid for a specification, one h
 
 Figure~\ref{fig:chap3:sec_sync:visual_dag} visualizes a synchronous evaluation Engine.
 It shows two DAG representations of an evaluation Engine  where the Nodes A to E are labeled in a reversed topological order and \(o\) and \(u\) represents the output Streams with that name.
-The left System is in it's initial State and an input event \(e_1\) is ready to be consumed.
-When a Node is chosen to compute by the scheduler, only Node A is ready, therefore it is scheduled.
+The left System is in it's initial State and an input event \(e_1\) is present and can be consumed by the input Node A.
+When a Node is chosen to compute by the scheduler, only Node A is enabled, therefore it is scheduled.
 The right system is the representation of the next step: Node A has consumed the external event and produced an internal event \(n_{A1}\) which is propagated to all it's children: Node B and D.
 In the next step Node B would be scheduled, because it has the lowest number of any node that can compute (actually it's the only node that can compute at all, because D has to wait for the event from B).
 After B was scheduled, it would have produced the internal Event \(n_{B1}\) which would then be distributed to Nodes C and D.
@@ -315,7 +328,7 @@ It would consume the next input and the following Nodes would be scheduled in th
 An asynchronous evaluation Engine one with a fair, but not fixed schedule.
 
 In contrast to the synchronous evaluation Engine it has no fixed schedule, the only requirement is that the schedule is fair.
-Therefore predecessors of ready Nodes can perform multiple computations before their children are scheduled and Events are not \emph{pushed} through the DAG as fast as possible.
+Therefore predecessors of enabled Nodes can perform multiple computations before their children are scheduled and Events are not \emph{pushed} through the DAG as fast as possible.
 \todo{more later}
 
 \section{Equalitys of different schedules without timing functions}
@@ -337,6 +350,14 @@ As already stated in Section~\ref{sec:concepts:behaviour_without_timing:synchron
 The Equality is shown in two steps: First in Section~\ref{sec:concepts:equalitys_without_timing:synchronous}it is shown, that all possible synchronous Engines for a specification are equal, so there is only one true Evaluation.
 Afterwards in Section~\ref{sec:concepts:equalitys_without_timing:sync_async} it is shown that any asynchronous evaluation Engine is equal to a synchronous one.
 
+\begin{lemma}
+When a Node A is independent of another Node B, than there is no difference in regard to the enabledness of Node A when Node B is scheduled.
+\label{lemma:independence}
+\end{lemma}
+\begin{proof}
+  TODO
+\end{proof}
+
 \subsection{Equality of synchronous Systems}
 \label{sec:concepts:equalitys_without_timing:synchronous}
 
@@ -344,7 +365,7 @@ When given a series of input Events, two synchronous evaluation Engines with dif
 But both will produce all outputs that can be produced after consuming one specific input before the next Input is consumed as reasoned in Section~\ref{sec:concepts:behaviour_without_timing:synchronous}.
 
 To proof the equality of both systems we have to proof the equality of their Runs.
-To do this we will show that any two runs of two synchronous system can be iteratively reordered without changing the State of the last Element of the Run until they are the same Run.
+To do this we will show that any two Runs of two synchronous system can be iteratively reordered without changing the State of the last Element of the Run until they are the same Run.
 When two Runs can be reordered in this way they had to be equal from the beginning, because the last State was never altered.
 \todo{I think this could be stated more clearly, but it's good enough for now}
 
@@ -357,10 +378,10 @@ Let \(R'\) be the finite prefix of both runs that is equal (This will be at leas
 This means that at Step \(i_d\) the second evaluation Engine has taken a different Transition, meaning the two Engines scheduled different Nodes.
 
 Let \(N_1\) be the Node scheduled by the first evaluation Engine and \(N_2\) the one scheduled by the second.
-Because \(N_1\) was scheduled by the first evaluation Engine and upto \(i_d\) the two Engines took the same steps it also has to be ready in the second Engine, and because it wasn't scheduled by it, it has to still be ready after that step.
+Because \(N_1\) was scheduled by the first evaluation Engine and upto \(i_d\) the two Engines took the same steps it also has to be enabled in the second Engine, and because it wasn't scheduled by it, it has to still be enabled after that step.
 The same holds for \(N_2\) in the first evaluation engine.
 
-After step \(i_d\) both system might take a finite number of different transitions, but at some point the first System has to schedule Node \(N_2\) and the second system Node \(N_1\), because there are only a finite number of Nodes with a lower number and a Node can only become \emph{not ready} by performing it's computation.
+After step \(i_d\) both system might take a finite number of different transitions, but at some point the first System has to schedule Node \(N_2\) and the second system Node \(N_1\), because there are only a finite number of Nodes with a lower number and a Node can only become \emph{not enabled} by performing it's computation.
 Let \(i_{N_2} > i_d\) be the index of the step where the first System schedules the Node \(N_2\).
 Let \(N_b\) be the set of all Nodes which were scheduled between \(i_d\) and \(i_{N_2}\).
 All of theese Nodes have to be independent of \(N_2\), because otherwise they couldn't be scheduled before \(N_2\). %, because they would have had to wait for an Event from \(N_2\).
