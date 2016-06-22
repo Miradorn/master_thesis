@@ -2,48 +2,60 @@
 \chapter{Concepts}
 \label{sec:concepts}
 
+In this Chapter different ways to evaluate TeSSLa specifications are given and their equivalence is shown.
+To do so in Section~\ref{sec:concepts:defs} building blocks for evaluation approaches are defined, which are then used in later Sections to define behaviour of them and show their equivalence.
+
 \section{Definitions}
 \label{sec:concepts:defs}
 
-In the following definitions are given to reason about semantics of implementations of a TeSSLa runtime.
-A TeSSLa specification gives a number of transformations over Streams and a subset of the generated streams as outputs.
+While the TeSSLa specification itself defines a set of semantics, for this Thesis we will slightly alter some of it and add some new definitions based on them.
+This is necessary to reason about the specifics how the evaluation engine is built (Note that TeSSLa doesn't define an operational semantic, therefore we will define our own) and how it behaves.
+
+\subsection{Events}
+\label{sec:concepts:defs:events}
+
+Events are the atomic unit of information that all computations are based on.
+There are three Types of Events: input, output and internal Events.
+
+The Set of all Events is denoted as \(E\).
+Each event carries a value, which can be \emph{nothing} or a value of a Type (types are formally defined in the TeSSLa speicification but aren't important for this thesis), a timestamp and the stream it's perceived on (e.g.\ a function call of a specific function or the name of an output stream).
+
+The value of an event can be queried with the function \(\upsilon\), its timestamp with \(\pi\) and its Stream with \(\varsigma\).
+
+\(E_i \subset E\) is the Set of all input events, their Stream corresponds to a specific trace.
+\(E_o \subset E\) is the Set of all output events, their Stream is specified by an output name of the TeSSLa specification.
+\(E_n \subset E\) is the Set of all internal events.
+Internal events are mostly an implementation detail, which denote steps of computation inside the runtime.
+The Stream of internal events is implicitly given by the node that produces the stream of the Event.
+Note that \(E_i, E_o, E_n\) are pairwise disjoint and \(E_i \cup E_o \cup E_n = E\).
 
 \subsection{Streams}
 \label{sec:concepts:defs:streams}
 
-There are two kind of streams: Signals, which carry values at all times and EventStreams, which only hold values at specific times.
+Stream are a collection of Events with some added characteristics.
+While Events are the atomic unit of information, Streams represent the sequence of related Events over time.
+
+There are two kind of Streams: Signals, which carry values at all times, and EventStreams, which only hold values at specific times.
 EventStreams can be described by a sequence of Events.
 Signals can be described by a sequence of changes, where a change notes that the value of a Signal changed at a specific timestamp.
 The only difference between a Signal and an EventStreams is that Signals always have a value while an EventStream may return \(\bot\), which denotes, that no event happened at that time.
 Because the similarity of Signals and EventStreams in the following we will mainly reason about EventStreams, but most things can also be applied to Signals.
 
-Formally a stream \(\sigma\) is defined as a Sequence of Events, the Set of all Streams \(\Sigma\) is defined as all possible finite sequences of Events \(\Sigma = \{\sigma | \sigma \in E^* \}\)
-An input Stream \(\sigma_i\) is a stream consisting of only input events, the set of all input Streams is \(\Sigma_i = \{\sigma_i | \sigma_i \in E_i^*\}\).
+Formally a Stream \(\sigma\) can be represented as a Sequence of Events \(\langle e_1, \dots e_n\rangle\) where \(\pi(e_i) < \pi(e_{i+1}) \forall i < n \in \mathbb{N}\).
+The Set of all Streams \(\Sigma\) is defined as all possible finite sequences of Events \(\Sigma = \{\sigma | \sigma \in E^* \}\).
+An input Stream \(\sigma_i\) is a stream consisting only of input Events, the set of all input Streams is \(\Sigma_i = \{\sigma_i | \sigma_i \in E_i^*\}\).
 Output and internal Streams are defined analogous.
+To get the Event of a Stream \(\sigma\) at a timestamp \(t\) it can be queried like a function: \(\sigma(t) = e\) with \(\pi(e) = t \).
+When working with Signals, the function will return the latest Event that happened at or before t while an EventStream may return \(\bot\).
 
 Furthermore Streams hold the timestamp to which they have progressed, which can be equal or greater than the timestamp of the last Event happened on them.
 
-\subsection{Events}
-\label{sec:concepts:defs:events}
-
-Streams consists of Events (or changes, which can be modeled the same as events).
-There are three Types of Events: input, output and internal Events.
-
-The Set of all Events is denoted as \(E\).
-Each event carries a value, which can be \emph{nothing} or a value of a Type (types are formally defined in the TeSSLa speicification but aren't important for this thesis), a timestamp and the channel it's perceived on (e.g.\ a function call of a specific function or the name of an output stream).
-
-\(E_i \subset E\) is the Set of all input events, their channel corresponds to a specific trace.
-\(E_o \subset E\) is the Set of all output events, their channel is specified by an output name of the TeSSLa specification.
-\(E_n \subset E\) is the Set of all internal events.
-Internal events are mostly an implementation detail, which denote steps of computation inside the runtime.
-The channel of internal events is implicitly given by the node that produces the stream of the Event.
-Note that \(E_i, E_o, E_n\) are pairwise disjoint and \(E_i \cup E_o \cup E_n = E\).
 
 \subsection{Functions}
 \label{sec:concepts:defs:functions}
 
 A TeSSLa specification consists of functions.
-Functions generate new Streams by applying operation on other stream.
+Functions generate new Streams by applying an operation on other Streams.
 TeSSLa itself defines a syntax to write a specification, a set of types and a standard library of functions, but an implementation is free to choose the functions it supports.
 
 An example function is \(add(S_D,S_D) \rightarrow S_D\): It takes two Signals, which have to hold values of some numerical type, and produces a signal which holds values of the same type.
@@ -51,7 +63,7 @@ The produced stream can either be assigned to a named identifier (think: a varia
 
 Functions can be divided into three categories: pure, unpure and timing.
 Pure Functions, also called stateless, are evaluated only on the values their inputs have at the timestamp they are evaluated, therefore they don't have to \emph{remember} anything about earlier events.
-Unpure, or stateful, Functions are evaluatet with additional, stored information, which they can mutate.
+Unpure, or stateful, Functions are evaluatet over the whole input stream, meaning they can look at all Events that happened on its inputs before the time of evaluation and also at all it's previous output events.
 E.g.\ a Function \emph{eventCount} has to \emph{remember} how many events already happened on it's input stream and increment that counter on every new event.
 Timing Functions are evaluated not only on the value of Events but also on their timestamp and can also manipulate it:
 While non timing functions will consume events at a specific timestamp and emit an event with that timestamp, timing functions can emit Events with a different timestamp.
@@ -102,7 +114,12 @@ therefore the \emph{change timestamps} are \(t_2, t_3, t_4\) and the Node will h
 
 Because Functions in TeSSLa specifications itself depend on other Functions, and these dependencies have to be circle free,
 the specification can be represented as a DAG@.
-This DAG can be directly translated into an evaluation Model for that specification: The Nodes of the DAGs are Nodes representing the functions and the Edges are the input and output Streams between the Nodes.
+This DAG can be directly translated into an evaluation Engine for that specification: The Nodes of the DAGs are Nodes representing the functions and the Edges are the input and output Streams between the Nodes.
+
+\begin{definition}
+  Two evaluation Engines are called equal, if they produce the same Relationship between inputs and outputs.
+\label{def:equality_eval_engine}
+\end{definition}
 
 A Node in the DAG is called \emph{ready} when it has at least one event buffered on all of it's inputs, meaning it is able to perform a computation and produce a new output.
 
@@ -123,26 +140,39 @@ In this Thesis it is shown that multiple schedules will lead to the same conclus
 All TeSSLa evaluation Engines have to hold a State, which encodes information necessary to continue the evaluation.
 The State of a whole Evaluation Engine is made up of the States of it's Nodes.
 
-Each Node has a State that can hold arbitrary data used for computation.
+Each Node has a State which holds the History of its input Streams and its output Stream.
 One part of the State of every Node is the History of a Node, which holds all Events received from it's parents, called it's inputs, and all produced Events of the Node, called it's output.
-Other information stored in the State may be the number of Events seen by an \emph{eventCountNode} which is incremented everytime the Node consumes a new input.
 
-Formally the State of a Node is a tuple of some arbitrary information, the inputs (a set of internal and input Streams) and the output (an internal or an output Stream).
+To distinguish between the two types of States, we will call the State of the whole Engine the \emph{global State} and the State of a Node the \emph{Node State}.
+
+Formally the State of a Node is a tuple of the inputs (a Set of internal and input Streams) and the output (an internal or an output Stream).
+The Set of all valid States of a Node is \(N = {(\Sigma_i \cup \Sigma_n)}^*\times(\Sigma_n \cup \Sigma_o)\).
+Based on this, the Set of all valid States is \(S = N^*\).
+A global State can be queried like \(S_1(i) = n_i\) to yield the State of the Node at that position.
+
 Everytime a Node is scheduled it changes it State by:
 
 \begin{itemize}
-  \item Updating it's inputs
-  \item updating it's output
-  \item optionally updating its arbitrary information
+  \item Updating it's inputs (Adding a new Event to the Input Streams)
+  \item Generating a new Event if possible and add it to it's outputs
 \end{itemize}
 
 \subsection{Transitions}
 \label{sec:concepts:def:transitions}
 
-A Transition describes what happens when the evaluation engine switches State by performing a Step:
-The consumption of one Event from each input of a Node and the computation of a new output from that Node.
-Formally a Transition maps a sequence of Events to one Event.
-The empty transition, meaning no input was consumed or produced, is labeled with \(\lambda\).
+A Transition describes what happens when the evaluation Engine switches State by performing a Step:
+The consumption of one Event from each input of a Node and the optional generation of one or more new output Events of that Node.
+Formally Transitions are a Relation between two Sets of Events.
+E.g.\ the Transition \(\tau = (\{e_1,e_2\}, \{e_3\})\) specifies that two Events were consumed by a Node (thereby adding them to its inputs) and one Event was produced based on them (which is added to the output).
+The Set of all Transitions is
+\[
+  T = \{(e, e') | e \subseteq (E_i \cup E_n),e \neq \emptyset, e' \subseteq (E_n \cup E_o), \forall e_i, e_j \in e': \varsigma(e_i) = \varsigma(e_j)\}
+\]
+where the Node which caused the Transition is the one creating the Stream \(\varsigma(e_i)\).
+
+The empty transition, meaning no input was consumed and no output produced, is labeled with \(\lambda\).
+
+To look at it in another way: A Transition is the computation of a Node, therefore when we say `Node A is scheduled' we mean that a Transition is taken which models the computation of that Node.
 
 \subsection{Run}
 \label{sec:concepts:def:run}
@@ -151,6 +181,27 @@ A Run of an Evaluation Engine is a sequence of Transitions and States.
 The first element of the sequence is the empty transition and the initial state of the evaluation engine.
 It is a representation of the steps the Engine takes to evaluate a specification over streams.
 The run \(\langle (\lambda, s_0), (\tau_1, s_1) \rangle\) means, that the Engine was in it's initial State, took the transition \(\tau_1\) and thereby reached the state \(s_1\).
+
+\begin{definition}
+  Two runs are called equal if they have the same State at their last position.
+\label{def:equal_runs}
+\end{definition}
+
+Because the State can be built from the Transitions that were taken, equality can also be defined over Transitions.
+
+\begin{lemma}
+If the Set of Transitions of two Runs are equal, the Runs are equal.
+\label{lemma:equal_runs_with_transitions}
+\end{lemma}
+\begin{proof}
+  Let \(R_1, R_2\) be the Runs of two Systems with the same Set of Transitions \(T\).
+  Let \(S_1\) be the final State of the run \(R_1\) and \(S_2\) of \(R_2\).
+  If the two States weren't equal, there would have to be at least one \(i\) with \(S_1(i) \neq S_2(i)\).
+  Let \(n_1, n_2\) be the node States that are different for one \(i\).
+  Theese two States can differ in two ways: One could have one or more input Events than the other or one could have one or more output Events more than the other (or every combination of that).
+  No matter if the States differ in their input or output Events, that event would have to be part of a Transition, because States are only updated by Transitions.
+  Because both Runs have the same Transitions, no Transition including this extra Event can be existing, therefore there can't be two Nodes with different States.
+\end{proof}
 
 \section{Behaviour of different schedules without timing functions}
 \label{sec:concepts:behaviour_without_timing}
@@ -163,14 +214,14 @@ All Evaluation Engines compute Events in steps.
 At each step a Node is scheduled to perform it's specific operation, therefore one of the following things can happen in each step.
 
 \begin{itemize}
-  \item An input Event can be consumed by a source in the DAG, which generates an internal event that is propagated to it's children
-  \item An internal Node which has at least one new input buffered on all of its input queues can perform
-    it's computation and generate a new internal event, which is propagated to the children of that node, which therefore can compute in the next step.
+  \item An input Event can be consumed by a source in the DAG, which generates an internal event that is propagated to it's children.
+  \item An internal Node, which has at least one new input buffered on all of its input queues, can perform
+    its computation and generate a new internal Event, which is propagated to the children of that node, which therefore can compute in the next step.
   \item An output node, which has at least one new input buffered on its input queue, can produce a new output.
 \end{itemize}
 
 Evaluation Engines are free in the way they are scheduling their Nodes.
-In the following we will classify Evaluation Engines by their scheduling approaches.
+In the following Evaluation Engines are classified by their scheduling approaches.
 
 \subsection{Synchronous Evaluation Engines}
 \label{sec:concepts:behaviour_without_timing:synchronous}
@@ -181,8 +232,14 @@ Obviously for many DAGs there is no unique reversed topological order, therefore
 
 This schedule ensures that no Node is scheduled which has a successor that can be scheduled, therefore Events are \emph{pushed} through the DAG towards an output Node as fast as possible.
 
-A synchronous Evaluation Engine is considered as the \emph{Source of Truth}:
-Any other Evaluation Engine has to be equal to one, else it is not a valid evaluation engine.
+\begin{definition}
+  An evaluation Engine is called \emph{valid} for a specification, if it is equal to a synchronous evaluation Engine for that specification.
+\label{def:valid_eval_engine}
+\end{definition}
+
+As shown in Section~\ref{sec:concepts:equalitys_without_timing} all synchronous evaluation Engines are equal.
+Therefore to proof that an evaluation Engine is valid for a specification, one has to show, that it is equal to any synchronous one.
+
 
 \begin{figure}
   \begin{tikzpicture}
@@ -223,19 +280,19 @@ Any other Evaluation Engine has to be equal to one, else it is not a valid evalu
 % The behaviour for a single input can be described by two functions:
 
 
-Figure~\ref{fig:chap3:sec_sync:visual_dag} visualizes a synchronous System.
-It shows two DAG representations of an evaluation Engine  where the Nodes A to E are labeled in a reversed topological order and \(o\) and \(u\) represents the output channels with that name.
+Figure~\ref{fig:chap3:sec_sync:visual_dag} visualizes a synchronous evaluation Engine.
+It shows two DAG representations of an evaluation Engine  where the Nodes A to E are labeled in a reversed topological order and \(o\) and \(u\) represents the output Streams with that name.
 The left System is in it's initial State and an input event \(e_1\) is ready to be consumed.
 When a Node is chosen to compute by the scheduler, only Node A is ready, therefore it is scheduled.
 The right system is the representation of the next step: Node A has consumed the external event and produced an internal event \(n_{A1}\) which is propagated to all it's children: Node B and D.
 In the next step Node B would be scheduled, because it has the lowest number of any node that can compute (actually it's the only node that can compute at all, because D has to wait for the event from B).
 After B was scheduled, it would have produced the internal Event \(n_{B1}\) which would then be distributed to Nodes C and D.
 
-The complete run of the synchronous Engine for one Input is the following, where the States are not further defined:
+The complete Run of the synchronous Engine for one Input is the following, where the States are not further defined:
 
 \begin{align*}
   \langle
-    (\lambda,                                    s_0),
+    (\lambda,                                           s_0),
     (\langle n_{A1}         \rangle\rightarrow n_{B1},  s_1),
     (\langle n_{B1}         \rangle\rightarrow o_1,     s_2),\\
     (\langle n_{A1}, n_{B1} \rangle\rightarrow n_{D1},  s_3),
@@ -243,8 +300,8 @@ The complete run of the synchronous Engine for one Input is the following, where
   \rangle
 \end{align*}
 
-If there were more than one input event, at this point Node A would be scheduled again.
-It would consume the next input and the following nodes would be scheduled in the same order as before, extending the run in an obvious way.
+If there were more than one input Event, at this point Node A would be scheduled again.
+It would consume the next input and the following Nodes would be scheduled in the same order as before, extending the Run in an obvious way.
 
 \subsection{Asynchronous evaluation}
 \label{sec:concepts:behaviour_without_timing:async}
@@ -253,16 +310,19 @@ An asynchronous evaluation Engine one with a fair, but not fixed schedule.
 
 In contrast to the synchronous evaluation Engine it has no fixed schedule, the only requirement is that the schedule is fair.
 Therefore predecessors of ready Nodes can perform multiple computations before their children are scheduled and Events are not \emph{pushed} through the DAG as fast as possible.
-\todo{later}
+\todo{more later}
 
 \section{Equalitys of different schedules without timing functions}
 \label{sec:concepts:equalitys_without_timing}
 
-Based on the described behaviours of the approaches we now can proof the equality of different Schedules for an Engine.
-Two Engines for a TeSSLa specification are equal, if they produce the same outputs for the same inputs.
-Because the consumed inputs and produced outputs can be reconstructed from a Run, we can show equality by showing that Runs are equal.
+Based on the described behaviours of the approaches we now can proof the equality of different Schedules for the same evaluation Engine for a TeSSLa specification.
 
-Two Runs are assumed to be equal if the State of their last elements are equal.
+\begin{lemma}
+  Two evaluation Engines are equal, if their runs are equal.
+\label{lemma:eval_equal_if_runs_equal}
+\end{lemma}
+
+Two Runs are assumed to be equal if the State of their last elements are equal:
 Because all generated Events are saved in the State of an Engine, if two Runs have the same State in their last element they did produce the same outputs.
 
 
@@ -274,21 +334,21 @@ Afterwards in Section~\ref{sec:concepts:equalitys_without_timing:sync_async} it 
 \subsection{Equality of synchronous Systems}
 \label{sec:concepts:equalitys_without_timing:synchronous}
 
-When given a series of input events, two synchronous evaluation Engines with different schedules will have different Runs.
+When given a series of input Events, two synchronous evaluation Engines with different schedules will have different Runs.
 But both will produce all outputs that can be produced after consuming one specific input before the next Input is consumed as reasoned in Section~\ref{sec:concepts:behaviour_without_timing:synchronous}.
 
 To proof the equality of both systems we have to proof the equality of their Runs.
 To do this we will show that any two runs of two synchronous system can be iteratively reordered without changing the State of the last Element of the Run until they are the same Run.
-When two Runs can be reordered in this way they had to be equal from the beginning, because the last state was never altered.
+When two Runs can be reordered in this way they had to be equal from the beginning, because the last State was never altered.
 \todo{I think this could be stated more clearly, but it's good enough for now}
 
-Let \(\vec{e} = (e_1, e_2, \dots, e_x)\) be the input events both implementations receive.
-Furthermore let \(R_1, R_2\) be the runs of the two Systems for a given TeSSLa specification.
+Let \(\vec{e} = (e_1, e_2, \dots, e_x)\) be the input Events both Engines receive.
+Furthermore let \(R_1, R_2\) be the Runs of the two Engines for a given TeSSLa specification.
 
 Because each TeSSLa specification contains only a finite amount of Functions and works on finite traces, the Runs also have to be finite.
 When two synchronous Engines have a different schedule, their Runs will be different at a finite number of positions.
-Let \(R'\) be the finite prefix of both runs that are equal (This will be at least \((\lambda, s_0)\), but possible more) and \(i_d\) the index of the first difference.
-This means that at Step \(i_d\) the second evaluation Engine has taken a different transition, meaning a different Node was scheduled at that point, than the first Evaluation Engine.
+Let \(R'\) be the finite prefix of both runs that is equal (This will be at least \((\lambda, s_0)\), but possible more) and \(i_d\) the index of the first difference.
+This means that at Step \(i_d\) the second evaluation Engine has taken a different Transition, meaning the two Engines scheduled different Nodes.
 
 Let \(N_1\) be the Node scheduled by the first evaluation Engine and \(N_2\) the one scheduled by the second.
 Because \(N_1\) was scheduled by the first evaluation Engine and upto \(i_d\) the two Engines took the same steps it also has to be ready in the second Engine, and because it wasn't scheduled by it, it has to still be ready after that step.
@@ -322,15 +382,24 @@ the infix of the Run of the first Engine, starting two steps before \(N_2\) was 
 \label{fig:chap3:sec_sync:commutativity_scheduling}
 \end{figure}
 
-\todo{The praragraph is a bit handwavy, needs more theory}
+\todo{The praragraph is a bit handwavy, needs more formal definitions}
 Figure~\ref{fig:chap3:sec_sync:commutativity_scheduling} visualizes how changing the order of the Nodes \(N_c, N_2\) has no influence on the global state after both have executed.
 This follows from the fact, that both Nodes are independent of each other as shown before.
 This means that the computation of one of them can't change the State of the other, thereby having absolutely no consequence on the computation of the other.
-If both Nodes have mutual children, that children will receive their inputs in different order, but because the events are  on different channels it doesn't matter.
+If both Nodes have mutual children, that children will receive their inputs in different order, but because the events are  on different Streams it doesn't matter.
 Therefore it doesn't matter which of the both Nodes is scheduled first: the state of the system will be different only at one position, but afterwards they both will have the same State again.
 If one of the Nodes generate an output event, that event will be emitted one step earlier or later, which is also not relevant for the global State.
 
-\todo{Here the induction step should happen, right?}
+To summarize: The order of computation of the Node \(N_2\) and the one scheduled before it doesn't change the State of the Evaluation Engine after both have run.
+Therefore their order can be changed, which generates a new Run which is equal to the old one.
+
+This reordering can be repeated until \(N_2\) is scheduled right after \(N_1\), because as shown earlier \(N_2\) has to be independent of all Nodes between the two.
+Now \(N_1\) and \(N_2\) also have to be independent, else one of them couldn't have been scheduled before the other.
+Therefore the two can be also reordered without changing the final State.
+After this reordering, both Runs will have a final prefix \(R''\), which length has to be at least one more than \(R'\).
+
+Now the reordering can be repeated for the next index where the first difference between the runs happen.
+Everytime the reordering for one index finishes the finite, equal prefix will has at least one more position, therefore at one Point both runs are equal, because the Prefix is the run itself.
 
 
 \subsection{Equality of synchronous and asynchronous schedules}
@@ -343,4 +412,4 @@ Therefore the reordering of runs has to be performed over wider parts of the run
 
 \section{Behaviour with Timing functions}
 \section{Equalitys with Timing functions}
-section{Parallel computation}
+\section{Parallel computation}
