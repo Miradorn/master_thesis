@@ -117,19 +117,34 @@ the specification can be represented as a DAG@.
 This DAG can be directly translated into an evaluation Engine for that specification: The Nodes of the DAGs are Nodes representing the functions and the Edges are the input and output Streams between the Nodes.
 
 \begin{definition}
-  Two evaluation Engines are called equal, if they produce the same Relationship between inputs and outputs.
+  \emph{Equality of evaluation Engines:} Two evaluation Engines are called equal, if they produce the same Relationship between inputs and outputs for all possible inputs.
 \label{def:equality_eval_engine}
 \end{definition}
 
 \begin{definition}
-A Node in the DAG is called \emph{enabled} when it has at least one event buffered on all of it's inputs, meaning it is able to perform a computation and produce a new output.
+  \emph{Equality of evaluation Engines for one Input:} Two evaluation Engines are called equal for an input, if they produce the same output for that input.
+\label{def:equality_eval_engine_specific}
+\end{definition}
+
+\begin{definition}
+  \emph{Enabledness of Nodes:} A Node in the DAG is called \emph{enabled} when it has at least one Event buffered on all of it's inputs, meaning it is able to perform a computation and produce a new output.
+  In the context of a Run enabledness means, that a Transition can be taken which represents the computation of the enabled Node.
 \label{def:node_enabled}
 \end{definition}
 
 \begin{definition}
-A Node in the DAG is called \emph{independent} of another Node, if it is no descendant of that Node.
+  \emph{Independence of Nodes:} A Node in the DAG is called \emph{independent} of another Node, if it is no descendant of that Node.
 \label{def:node_independent}
 \end{definition}
+
+\begin{lemma}
+  A Node which is enabled Stays enabled until it is scheduled
+\label{lemma:enabled_till_scheduled}
+\end{lemma}
+
+\begin{proof}
+TODO
+\end{proof}
 
 
 To evaluate a specification over Traces, the Evaluation Engine has process the Events that were traced.
@@ -184,17 +199,21 @@ Furthermore it's theoretically possible to create multiple Events in one Transit
 This makes only sense in the context of Timing Nodes, because else the generated Events would have the same timestamp, which is forbidden by the definition of Streams.
 With Timing Nodes one could for example implement an \emph{EchoNode}, which duplicates an input after a specified amount of Time.
 
+\begin{definition}
+  A Transition is called independent of another, if the Node of which it represents the computation, is independent of the Node of the other Transition.
+\end{definition}
+
 
 \subsection{Run}
 \label{sec:concepts:def:run}
 
-A Run of an Evaluation Engine is a sequence of Transitions and States.
-The first element of the sequence is the empty Transition and the initial state of the evaluation Engine.
+A Run of an Evaluation Engine is a Sequence of Transitions and States.
+The first element of the sequence is the empty Transition and the initial State of the evaluation Engine.
 It is a representation of the steps the Engine takes to evaluate a specification over input Streams.
 The Run \(\langle (\lambda, s_0), (\tau_1, s_1) \rangle\) means, that the Engine was in it's initial State, took the transition \(\tau_1\) and thereby reached the state \(s_1\).
 
 \begin{definition}
-  Two runs are called equal if they have the same State at their last position.
+  \emph{Equality of Runs:} Two Runs are called equal if they have the same State at their last position.
 \label{def:equal_runs}
 \end{definition}
 
@@ -204,6 +223,7 @@ Because the State can be built from the Transitions that were taken, equality ca
 If the Set of Transitions of two Runs are equal, the Runs are equal.
 \label{lemma:equal_runs_with_transitions}
 \end{lemma}
+
 \begin{proof}
   Let \(R_1, R_2\) be the Runs of two Engines with the same Set of Transitions \(T'\).
   Let \(S_1\) be the final State of the Run \(R_1\) and \(S_2\) of \(R_2\).
@@ -213,6 +233,44 @@ If the Set of Transitions of two Runs are equal, the Runs are equal.
   Let that Event be \(e_d\).
   To be added to the State, there has to be a Transition \(\tau = (e, e')\) with \(e_d \in e \lor e_d \in e'\).
   This Transition has to be in \(T'\), which means it was taken by both Engines, therefore \(e_d\) is in the History of the Node in both Runs.
+\end{proof}
+
+\begin{definition}
+  \emph{Distance of Runs:} The Distance \(\delta\) of a Run \(R_1\) to a Run \(R_2\) is a pair \(\delta(R_1,R_2) = (x,y)\), where \(x\) is the index before the first position where the two Runs differ and y is the number of Steps between the index of the first difference and the position where \(R_2\) takes the Transition that \(R_1\) took after step \(x\).
+  The Distance of Runs is compared element-wise: \((x,y) < (x',y') \leftrightarrow ((x > x') \lor (x = x' \land y < y))\).
+\label{def:runs_distance}
+\end{definition}
+
+\begin{exmp}
+  Let
+  \[R_1 = \langle (\lambda, S_0), (\tau_1,S_1), (\tau_2,S_2), (\tau_3,S_3), (\tau_4,S_4), (\tau_5,S_5), (\tau_6,S_6) \rangle\]
+  \[R_2 = \langle (\lambda, S_0), (\tau_1,S_1), (\tau_2,S_2), (\tau_5,S_3'), (\tau_4,S_4'), (\tau_6,S_5'), (\tau_3,S_6') \rangle\]
+  \[R_3 = \langle (\lambda, S_0), (\tau_1,S_1), (\tau_2,S_2), (\tau_3,S_3), (\tau_5,S_4''), (\tau_4,S_5''), (\tau_6,S_6'') \rangle\]
+
+  Than is
+  \[\delta_{1,2} = \delta(R_1,R_2) = (3,3),\ \delta_{1,3} = \delta(R_1,R_3) = (4,1)\]
+  \[\delta_{2,1} = \delta(R_2,R_1) = (3,2),\ \delta_{2,3} = \delta(R_2,R_3) = (3,1)\]
+  \[\delta_{3,1} = \delta(R_3,R_1) = (4,1),\ \delta_{3,2} = \delta(R_3,R_2) = (3,2)\]
+
+  And \(\delta_{1,3} < \delta_{2,3} < \delta_{2,1} < \delta_{2,1}\).
+
+
+\end{exmp}
+
+\begin{lemma}
+When a Node A is independent of a Node B, than it has no influence on the enabledness of Node A if Node B is scheduled before or after it.
+\label{lemma:independence}
+\end{lemma}
+\begin{proof}
+  As already shown in Lemma~\ref{lemma:enabled_till_scheduled}, if Node A is enabled, it stays enabled until it's scheduled, so the computation of B can't change A from enabled to disabled.
+  It remains to show, that the computation of Node B can't change Node A from disabled to enabled.
+  A Node becomes enabled when on all of its input at least one new Event is present.
+  New Events on an input are added, when a parent Node performs computation.
+  Because A is independent of B, no input of A is the output of B.
+  Furthermore B is no parent of any predecessor of A, therefore no predecessors input is the output of B.
+  Because of that, when B is scheduled, no Event can be added to the input of any of A's predecessors or A itself.
+  So if A wasn't enabled earlier because it hasn't a new Event at one input, the computation of B can't lead to adding that Event.
+  Therefore it doesn't at which position B is scheduled in regard to the enabledness of A.
 \end{proof}
 
 \section{Behaviour of different schedules without timing functions}
@@ -252,13 +310,12 @@ Obviously for many DAGs there is no unique reversed topological order, therefore
 This schedule ensures that no Node is scheduled which has a successor that can be scheduled, therefore Events are \emph{pushed} through the DAG towards an output Node as fast as possible.
 
 \begin{definition}
-  An evaluation Engine is called \emph{valid} for a specification, if it is equal to a synchronous evaluation Engine for that specification.
+  \emph{Valid evaluation Engine:} An evaluation Engine is called \emph{valid}, if it is equal to a synchronous evaluation Engine.
 \label{def:valid_eval_engine}
 \end{definition}
 
-As shown in Section~\ref{sec:concepts:equalitys_without_timing} all synchronous evaluation Engines are equal.
-Therefore to proof that an evaluation Engine is valid for a specification, one has to show, that it is equal to any synchronous one.
-
+% As shown in Section~\ref{sec:concepts:equalitys_without_timing} all synchronous evaluation Engines are equal.
+% Therefore to proof that an evaluation Engine is valid for a specification, one has to show, that it is equal to any synchronous one.
 
 \begin{figure}
   \begin{tikzpicture}
@@ -296,8 +353,6 @@ Therefore to proof that an evaluation Engine is valid for a specification, one h
   \caption{Visualization of a simple asynchronous system with a reversed topological order.}
 \label{fig:chap3:sec_sync:visual_dag}
 \end{figure}
-% The behaviour for a single input can be described by two functions:
-
 
 Figure~\ref{fig:chap3:sec_sync:visual_dag} visualizes a synchronous evaluation Engine.
 It shows two DAG representations of an evaluation Engine  where the Nodes A to E are labeled in a reversed topological order and \(o\) and \(u\) represents the output Streams with that name.
@@ -311,11 +366,11 @@ The complete Run of the synchronous Engine for one Input is the following, where
 
 \begin{align*}
   \langle
-    (\lambda,                                           s_0),
-    (\langle n_{A1}         \rangle\rightarrow n_{B1},  s_1),
-    (\langle n_{B1}         \rangle\rightarrow o_1,     s_2),\\
-    (\langle n_{A1}, n_{B1} \rangle\rightarrow n_{D1},  s_3),
-    (\langle n_{D1}         \rangle\rightarrow u_1,     s_4)
+    (\lambda,                             S_0),
+    ((\{ n_{A1}         \}, \{n_{B1}\}),  S_1),
+    ((\{ n_{B1}         \}, \{o_1\}),     S_2),\\
+    ((\{ n_{A1}, n_{B1} \}, \{n_{D1}\}),  S_3),
+    ((\{ n_{D1}         \}, \{u_1\}),     S_4)
   \rangle
 \end{align*}
 
@@ -337,96 +392,128 @@ Therefore predecessors of enabled Nodes can perform multiple computations before
 Based on the described behaviours of the approaches we now can proof the equality of different Schedules for the same evaluation Engine for a TeSSLa specification.
 
 \begin{lemma}
-  Two evaluation Engines are equal, if their runs are equal.
+  Two evaluation Engines are equal for an input, if their Runs are equal for that input.
 \label{lemma:eval_equal_if_runs_equal}
 \end{lemma}
+\begin{proof}
+  Since two Runs are equal if they have the same last State, and all Events which were produced are stored in the State, during both Runs the same output Events had to be generated or else their State would differ.
+\end{proof}
 
-Two Runs are assumed to be equal if the State of their last elements are equal:
-Because all generated Events are saved in the State of an Engine, if two Runs have the same State in their last element they did produce the same outputs.
+% Two Runs are assumed to be equal if the State of their last elements are equal:
+% Because all generated Events are saved in the State of an Engine, if two Runs have the same State in their last element they did produce the same outputs.
 
 
-As already stated in Section~\ref{sec:concepts:behaviour_without_timing:synchronous} a synchronous evaluation Engine is regarded as the source of truth, therefore all other kinds of evaluation Engines have to be equal to one.
+As defined by Definition~\ref{def:valid_eval_engine} any evaluation Engine has to be equal to a synchronous to be valid.
 
-The Equality is shown in two steps: First in Section~\ref{sec:concepts:equalitys_without_timing:synchronous}it is shown, that all possible synchronous Engines for a specification are equal, so there is only one true Evaluation.
+The Equality is shown in two steps: First in Section~\ref{sec:concepts:equalitys_without_timing:synchronous} it is shown, that all possible synchronous Engines for a specification are equal, so there is only one valid Evaluation.
 Afterwards in Section~\ref{sec:concepts:equalitys_without_timing:sync_async} it is shown that any asynchronous evaluation Engine is equal to a synchronous one.
 
-\begin{lemma}
-When a Node A is independent of another Node B, than there is no difference in regard to the enabledness of Node A when Node B is scheduled.
-\label{lemma:independence}
-\end{lemma}
-\begin{proof}
-  TODO
-\end{proof}
 
 \subsection{Equality of synchronous Systems}
 \label{sec:concepts:equalitys_without_timing:synchronous}
 
-When given a series of input Events, two synchronous evaluation Engines with different schedules will have different Runs.
+When given a series of input Events, two synchronous evaluation Engines for a specification with different schedules will have different Runs.
 But both will produce all outputs that can be produced after consuming one specific input before the next Input is consumed as reasoned in Section~\ref{sec:concepts:behaviour_without_timing:synchronous}.
+Also both Runs will obviously have the same length (both Engines are the same DAG, so they have the same number of Nodes), let that length be \(l\).
 
-To proof the equality of both systems we have to proof the equality of their Runs.
-To do this we will show that any two Runs of two synchronous system can be iteratively reordered without changing the State of the last Element of the Run until they are the same Run.
-When two Runs can be reordered in this way they had to be equal from the beginning, because the last State was never altered.
-\todo{I think this could be stated more clearly, but it's good enough for now}
+To proof the equality of both Engines we have to proof the equality of their Runs.
+To show the equality we will show that there is always another Run, which is equal to the second one, that has a smaller Distance from the first one.
+If such a closer Run always exist, we will show that the Run with Distance \(l, 0\) to the first Run, which has to be the first Run itself, is also an equal Run to the second Run.
+
+\begin{theorem}
+  \emph{Equality of different synchronous evaluation Engines:} Two synchronous evaluation Engines for a specification with different schedules are equal.
+\label{theorem:equal_sync_eval_engines}
+\end{theorem}
+\begin{proof}
 
 Let \(\vec{e} = (e_1, e_2, \dots, e_x)\) be the input Events both Engines receive.
 Furthermore let \(R_1, R_2\) be the Runs of the two Engines for a given TeSSLa specification.
 
 Because each TeSSLa specification contains only a finite amount of Functions and works on finite traces, the Runs also have to be finite.
-When two synchronous Engines have a different schedule, their Runs will be different at a finite number of positions.
-Let \(R'\) be the finite prefix of both runs that is equal (This will be at least \((\lambda, s_0)\), but possible more) and \(i_d\) the index of the first difference.
-This means that at Step \(i_d\) the second evaluation Engine has taken a different Transition, meaning the two Engines scheduled different Nodes.
 
-Let \(N_1\) be the Node scheduled by the first evaluation Engine and \(N_2\) the one scheduled by the second.
-Because \(N_1\) was scheduled by the first evaluation Engine and upto \(i_d\) the two Engines took the same steps it also has to be enabled in the second Engine, and because it wasn't scheduled by it, it has to still be enabled after that step.
-The same holds for \(N_2\) in the first evaluation engine.
+If the two Runs aren't equal, they must have a Distance which is bigger than \((l, 0)\).
+Let \([R_2]\) be the Set of all Runs that are equal to \(R_2\).
+All of those Runs will also have a Distance from \(R_1\) which is bigger than \((l, 0)\).
+Select one Run \(R_2' \in [R_2]\) which has a minimal Distance from \(R_1\).
+Let \((d,k) = \delta(R_1, R_2')\).
 
-After step \(i_d\) both system might take a finite number of different transitions, but at some point the first System has to schedule Node \(N_2\) and the second system Node \(N_1\), because there are only a finite number of Nodes with a lower number and a Node can only become \emph{not enabled} by performing it's computation.
-Let \(i_{N_2} > i_d\) be the index of the step where the first System schedules the Node \(N_2\).
-Let \(N_b\) be the set of all Nodes which were scheduled between \(i_d\) and \(i_{N_2}\).
-All of theese Nodes have to be independent of \(N_2\), because otherwise they couldn't be scheduled before \(N_2\). %, because they would have had to wait for an Event from \(N_2\).
-On the other hand \(N_2\) has to be independent of all Nodes in \(N_b\) because otherwise it couldn't have been scheduled before them in the second evaluation Engine.
+This means that at Step \(d\) the Run \(R_2'\) has taken a different Transition than Run \(R_1\).
+Let the Transitions the Runs have taken be \(\tau_1\) for \(R_1\) and \(\tau_2\) for \(R_2'\).
+Run \(R_2'\) will take Transition \(\tau_1\) at step \(d+k\) (as per the definition of the Distance).
+Obviously the two Transitions have to be independent of each other, else they couldn't have been taken in different order by the two Runs.
 
-Now let \(N_c \in N_b\) be the Node that was scheduled at step \(i_{N_2} - 1\) and
-\(r_s = (\langle \tau_{i_{N_2} - 2}, s_{i_{N_2} - 2}\rangle, \langle\tau_{i_{N_2} - 1}, s_{i_{N_2} - 1}\rangle \langle\tau_{i_{N_2}}, s_{i_{N_2}}\rangle)\)
-the infix of the Run of the first Engine, starting two steps before \(N_2\) was scheduled upto the point where it was scheduled.
+If \(k > 1\) there will be a Transition \(\tau_2' \neq \tau_1\) which is taken by the Run \(R_2'\) at Step \(d+(k-1)\).
+While this Transition \(\tau_2'\) must also be taken in the first Run as per Lemma~\ref{lemma:enabled_till_scheduled}, it's not possible, that it was taken before \(\tau_1\), beause than the two runs wouldn't have been the same upto the point where \(\tau_1\) was taken.
+Therefore \(\tau_1\) has to be independent of \(\tau_2'\), and because \(\tau_2'\) was scheduled by the second Run before \(\tau_1\) both Transitions are independent of each other.
+
+As of Lemma~\ref{lemma:independence} which one of them is taken first can't change the enabledness of the Node of the second Transition.
+Therefore there is a Run \(R_2''\) which is exactly the same to \(R_2'\), except that the Transitions \(\tau_1, \tau_2'\) are scheduled the other way around.
+Figure~\ref{fig:chap3:sec_sync:commutativity_scheduling} visualizes how changing the order of the two Transitions can't change the global State of the Engine after both were taken.
+Therefore the Runs \(R_2'\) and \(R_2''\) are equal and the Distance to \(R_1\) is \(d, k-1\), which contradicts the initial statement that \(R_1'\) was a Run with a minimal Distance.
+This means that there is an equal Run to \(R_2\) which has at most the Distance \((d, 1)\).
+
+If \(k = 1\) the Transition \(\tau_2'\) from the previous case is equal to \(\tau_2\).
+Based on the same reasoning there also exist a Run \(R_2''\) which is exactly the same to \(R_2'\) except that the order of \(\tau_2\) and \(\tau_1\) is changed, and which is also equal to \(R_2'\) and to \(R_2\).
+This Run has the Distance \((d, 0)\) from \(R_1\).
+This obviously doesn't make Sense: The first element of the Distance is the last Step where both Runs are equal, the second element describes how many Steps afterwards the differing Transition was taken.
+But if it was taken right in the Step after the last equal Step, there is no difference at that position, so the Difference of \(R_1\) and \(R_2''\) can be at most \((d+1, x), x \in \mathbb{N}_{>0}\).
+This also contradicts our initial Statement that \(R_2'\) was the Run with the smallest Distance from \(R_1\) which is equal to \(R_2\).
+
+Combined we can now say, that there is no lower bound on the Distance of equal Runs of \(R_2\) to \(R_1\), therefore the Run with the Distance \((l, 0)\) also has to be equal to \(R_2\).
+
+\end{proof}
+
+
+% Let \(N_1\) be the Node scheduled by the first evaluation Engine and \(N_2\) the one scheduled by the second.
+% Because \(N_1\) was scheduled by the first evaluation Engine and upto \(i_d\) the two Engines took the same steps it also has to be enabled in the second Engine, and because it wasn't scheduled by it, it has to still be enabled after that step.
+% The same holds for \(N_2\) in the first evaluation engine.
+
+% After step \(i_d\) both system might take a finite number of different transitions, but at some point the first System has to schedule Node \(N_2\) and the second system Node \(N_1\), because there are only a finite number of Nodes with a lower number and a Node can only become \emph{not enabled} by performing it's computation.
+% Let \(i_{N_2} > i_d\) be the index of the step where the first System schedules the Node \(N_2\).
+% Let \(N_b\) be the set of all Nodes which were scheduled between \(i_d\) and \(i_{N_2}\).
+% All of theese Nodes have to be independent of \(N_2\), because otherwise they couldn't be scheduled before \(N_2\). %, because they would have had to wait for an Event from \(N_2\).
+% On the other hand \(N_2\) has to be independent of all Nodes in \(N_b\) because otherwise it couldn't have been scheduled before them in the second evaluation Engine.
+
+% Now let \(N_c \in N_b\) be the Node that was scheduled at step \(i_{N_2} - 1\) and
+% \(r_s = (\langle \tau_{i_{N_2} - 2}, s_{i_{N_2} - 2}\rangle, \langle\tau_{i_{N_2} - 1}, s_{i_{N_2} - 1}\rangle \langle\tau_{i_{N_2}}, s_{i_{N_2}}\rangle)\)
+% the infix of the Run of the first Engine, starting two steps before \(N_2\) was scheduled upto the point where it was scheduled.
 
 \begin{figure}
   \begin{tikzpicture}
     [pre/.style={<-,shorten <=1pt,>=stealth,semithick}]
     \node (A) at (0,0) {};
-    \node [shape=circle,draw=black] (B) at (2, 0) {\(s_{i_{N_2}-2}\)}
-      edge [pre] node[above] {\(\tau_{i_{N_2}-2}\)} (A);
-    \node [shape=circle,draw=black] (C) at (2, -3) {\(s_{i_{N_2}-1}\)}
-      edge [pre] node[left] {\(\tau_{i_{N_2}-1}\)} (B);
-    \node [shape=circle,draw=black] (D) at (5, 0) {\(s_{n}\)}
-      edge [pre] node[above] {\(\tau_{i_{N_2}}\)} (B);
-    \node [shape=circle,draw=black] (E) at (5, -3) {\(s_{i_{N_2}}\)}
-      edge [pre] node[right] {\(\tau_{i_{N_2}-1}\)} (D)
-      edge [pre] node[above] {\(\tau_{i_{N_2}}\)} (C);
+    \node [shape=circle,draw=black] (B) at (2, 0) {\(s_{d+k-2}\)}
+      edge [pre] node[above] {\(\tau_{x}\)} (A);
+    \node [shape=circle,draw=black] (C) at (2, -3) {\(s_{d+k-1}\)}
+      edge [pre] node[left] {\(\tau_{2}'\)} (B);
+    \node [shape=circle,draw=black] (D) at (5, 0) {\(s_{d+k-1}'\)}
+      edge [pre] node[above] {\(\tau_{1}\)} (B);
+    \node [shape=circle,draw=black] (E) at (5, -3) {\(s_{d+k}\)}
+      edge [pre] node[right] {\(\tau_{2}'\)} (D)
+      edge [pre] node[above] {\(\tau_{1}\)} (C);
   \end{tikzpicture}
   \caption{Commutativity Diagramm of Node scheduling}
 \label{fig:chap3:sec_sync:commutativity_scheduling}
 \end{figure}
 
-\todo{The praragraph is a bit handwavy, needs more formal definitions}
-Figure~\ref{fig:chap3:sec_sync:commutativity_scheduling} visualizes how changing the order of the Nodes \(N_c, N_2\) has no influence on the global state after both have executed.
-This follows from the fact, that both Nodes are independent of each other as shown before.
-This means that the computation of one of them can't change the State of the other, thereby having absolutely no consequence on the computation of the other.
-If both Nodes have mutual children, that children will receive their inputs in different order, but because the events are  on different Streams it doesn't matter.
-Therefore it doesn't matter which of the both Nodes is scheduled first: the state of the system will be different only at one position, but afterwards they both will have the same State again.
-If one of the Nodes generate an output event, that event will be emitted one step earlier or later, which is also not relevant for the global State.
+% \todo{The praragraph is a bit handwavy, needs more formal definitions}
+% Figure~\ref{fig:chap3:sec_sync:commutativity_scheduling} visualizes how changing the order of the Nodes \(N_c, N_2\) has no influence on the global State after both have executed.
+% This follows from the fact, that both Nodes are independent of each other as shown before.
+% This means that the computation of one of them can't change the State of the other, thereby having absolutely no consequence on the computation of the other.
+% If both Nodes have mutual children, that children will receive their inputs in different order, but because the events are  on different Streams it doesn't matter.
+% Therefore it doesn't matter which of the both Nodes is scheduled first: the state of the system will be different only at one position, but afterwards they both will have the same State again.
+% If one of the Nodes generate an output event, that event will be emitted one step earlier or later, which is also not relevant for the global State.
 
-To summarize: The order of computation of the Node \(N_2\) and the one scheduled before it doesn't change the State of the Evaluation Engine after both have run.
-Therefore their order can be changed, which generates a new Run which is equal to the old one.
+% To summarize: The order of computation of the Node \(N_2\) and the one scheduled before it doesn't change the State of the Evaluation Engine after both have run.
+% Therefore their order can be changed, which generates a new Run which is equal to the old one.
 
-This reordering can be repeated until \(N_2\) is scheduled right after \(N_1\), because as shown earlier \(N_2\) has to be independent of all Nodes between the two.
-Now \(N_1\) and \(N_2\) also have to be independent, else one of them couldn't have been scheduled before the other.
-Therefore the two can be also reordered without changing the final State.
-After this reordering, both Runs will have a final prefix \(R''\), which length has to be at least one more than \(R'\).
+% This reordering can be repeated until \(N_2\) is scheduled right after \(N_1\), because as shown earlier \(N_2\) has to be independent of all Nodes between the two.
+% Now \(N_1\) and \(N_2\) also have to be independent, else one of them couldn't have been scheduled before the other.
+% Therefore the two can be also reordered without changing the final State.
+% After this reordering, both Runs will have a final prefix \(R''\), which length has to be at least one more than \(R'\).
 
-Now the reordering can be repeated for the next index where the first difference between the runs happen.
-Everytime the reordering for one index finishes the finite, equal prefix will has at least one more position, therefore at one Point both runs are equal, because the Prefix is the run itself.
+% Now the reordering can be repeated for the next index where the first difference between the runs happen.
+% Everytime the reordering for one index finishes the finite, equal prefix will has at least one more position, therefore at one Point both runs are equal, because the Prefix is the run itself.
 
 
 \subsection{Equality of synchronous and asynchronous schedules}
