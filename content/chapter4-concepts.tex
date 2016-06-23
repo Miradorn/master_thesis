@@ -116,30 +116,25 @@ Because Functions in TeSSLa specifications itself depend on other Functions, and
 the specification can be represented as a DAG@.
 This DAG can be directly translated into an evaluation Engine for that specification: The Nodes of the DAGs are Nodes representing the functions and the Edges are the input and output Streams between the Nodes.
 
-\begin{definition}
-  \emph{Equality of evaluation Engines:} Two evaluation Engines are called equal, if they produce the same Relationship between inputs and outputs for all possible inputs.
-\label{def:equality_eval_engine}
+\begin{definition}[name=Equality of evaluation Engines]\label{def:equality_eval_engine}
+  Two evaluation Engines are called equal, if they produce the same Relationship between inputs and outputs for all possible inputs.
 \end{definition}
 
-\begin{definition}
-  \emph{Equality of evaluation Engines for one Input:} Two evaluation Engines are called equal for an input, if they produce the same output for that input.
-\label{def:equality_eval_engine_specific}
+\begin{definition}[name=Equality of evaluation Engines]\label{def:equality_eval_engine_specific}
+  Two evaluation Engines are called equal for an input, if they produce the same output for that input.
 \end{definition}
 
-\begin{definition}
-  \emph{Enabledness of Nodes:} A Node in the DAG is called \emph{enabled} when it has at least one Event buffered on all of it's inputs, meaning it is able to perform a computation and produce a new output.
+\begin{definition}[name = Enabledness of Nodes]\label{def:node_enabled}
+  A Node in the DAG is called \emph{enabled} when it has at least one Event buffered on all of it's inputs, meaning it is able to perform a computation and produce a new output.
   In the context of a Run enabledness means, that a Transition can be taken which represents the computation of the enabled Node.
-\label{def:node_enabled}
 \end{definition}
 
-\begin{definition}
-  \emph{Independence of Nodes:} A Node in the DAG is called \emph{independent} of another Node, if it is no descendant of that Node.
-\label{def:node_independent}
+\begin{definition}[name = Equality of evaluation Engines]\label{def:node_independent}
+  A Node in the DAG is called \emph{independent} of another Node, if it is no descendant of that Node.
 \end{definition}
 
-\begin{lemma}
-  A Node which is enabled Stays enabled until it is scheduled
-\label{lemma:enabled_till_scheduled}
+\begin{lemma}[name = Duration of Enabledness]\label{lemma:enabled_till_scheduled}
+  A Node which is enabled stays enabled until it is scheduled
 \end{lemma}
 
 \begin{proof}
@@ -199,7 +194,7 @@ Furthermore it's theoretically possible to create multiple Events in one Transit
 This makes only sense in the context of Timing Nodes, because else the generated Events would have the same timestamp, which is forbidden by the definition of Streams.
 With Timing Nodes one could for example implement an \emph{EchoNode}, which duplicates an input after a specified amount of Time.
 
-\begin{definition}
+\begin{definition}[name = Independence of Transitions]\label{def:independence_transitions}
   A Transition is called independent of another, if the Node of which it represents the computation, is independent of the Node of the other Transition.
 \end{definition}
 
@@ -212,16 +207,14 @@ The first element of the sequence is the empty Transition and the initial State 
 It is a representation of the steps the Engine takes to evaluate a specification over input Streams.
 The Run \(\langle (\lambda, s_0), (\tau_1, s_1) \rangle\) means, that the Engine was in it's initial State, took the transition \(\tau_1\) and thereby reached the state \(s_1\).
 
-\begin{definition}
-  \emph{Equality of Runs:} Two Runs are called equal if they have the same State at their last position.
-\label{def:equal_runs}
+\begin{definition}[name = Equality of Runs]\label{def:equal_runs}
+  Two Runs are called equal if they have the same State at their last position.
 \end{definition}
 
 Because the State can be built from the Transitions that were taken, equality can also be defined over Transitions.
 
-\begin{lemma}
-If the Set of Transitions of two Runs are equal, the Runs are equal.
-\label{lemma:equal_runs_with_transitions}
+\begin{lemma}[name = Equality of Runs over Transitions]\label{lemma:equal_runs_with_transitions}
+  If the Set of Transitions of two Runs are equal, the Runs are equal.
 \end{lemma}
 
 \begin{proof}
@@ -235,10 +228,9 @@ If the Set of Transitions of two Runs are equal, the Runs are equal.
   This Transition has to be in \(T'\), which means it was taken by both Engines, therefore \(e_d\) is in the History of the Node in both Runs.
 \end{proof}
 
-\begin{definition}
-  \emph{Distance of Runs:} The Distance \(\delta\) of a Run \(R_1\) to a Run \(R_2\) is a pair \(\delta(R_1,R_2) = (x,y)\), where \(x\) is the index before the first position where the two Runs differ and y is the number of Steps between the index of the first difference and the position where \(R_2\) takes the Transition that \(R_1\) took after step \(x\).
+\begin{definition}[name = Distance of Runs]\label{def:runs_distance}
+  The Distance \(\delta\) of a Run \(R_1\) to a Run \(R_2\) is a pair \(\delta(R_1,R_2) = (x,y)\), where \(x\) is the index before the first position where the two Runs differ and y is the number of Steps between the index of the first difference and the position where \(R_2\) takes the Transition that \(R_1\) took after step \(x\).
   The Distance of Runs is compared element-wise: \((x,y) < (x',y') \leftrightarrow ((x > x') \lor (x = x' \land y < y))\).
-\label{def:runs_distance}
 \end{definition}
 
 \begin{exmp}
@@ -257,10 +249,10 @@ If the Set of Transitions of two Runs are equal, the Runs are equal.
 
 \end{exmp}
 
-\begin{lemma}
-When a Node A is independent of a Node B, than it has no influence on the enabledness of Node A if Node B is scheduled before or after it.
-\label{lemma:independence}
+\begin{lemma}[name = Influence of independent Nodes]\label{lemma:independence}
+  When a Node A is independent of a Node B, than it has no influence on the enabledness of Node A if Node B is scheduled before or after it.
 \end{lemma}
+
 \begin{proof}
   As already shown in Lemma~\ref{lemma:enabled_till_scheduled}, if Node A is enabled, it stays enabled until it's scheduled, so the computation of B can't change A from enabled to disabled.
   It remains to show, that the computation of Node B can't change Node A from disabled to enabled.
@@ -309,9 +301,8 @@ Obviously for many DAGs there is no unique reversed topological order, therefore
 
 This schedule ensures that no Node is scheduled which has a successor that can be scheduled, therefore Events are \emph{pushed} through the DAG towards an output Node as fast as possible.
 
-\begin{definition}
-  \emph{Valid evaluation Engine:} An evaluation Engine is called \emph{valid}, if it is equal to a synchronous evaluation Engine.
-\label{def:valid_eval_engine}
+\begin{definition}[name = Equality of evaluation Engines]\label{def:valid_eval_engine}
+  An evaluation Engine is called \emph{valid}, if it is equal to a synchronous evaluation Engine.
 \end{definition}
 
 % As shown in Section~\ref{sec:concepts:equalitys_without_timing} all synchronous evaluation Engines are equal.
@@ -391,10 +382,10 @@ Therefore predecessors of enabled Nodes can perform multiple computations before
 
 Based on the described behaviours of the approaches we now can proof the equality of different Schedules for the same evaluation Engine for a TeSSLa specification.
 
-\begin{lemma}
+\begin{lemma}[name = Equality of Engines for one Input]\label{lemma:eval_equal_if_runs_equal}
   Two evaluation Engines are equal for an input, if their Runs are equal for that input.
-\label{lemma:eval_equal_if_runs_equal}
 \end{lemma}
+
 \begin{proof}
   Since two Runs are equal if they have the same last State, and all Events which were produced are stored in the State, during both Runs the same output Events had to be generated or else their State would differ.
 \end{proof}
@@ -420,9 +411,8 @@ To proof the equality of both Engines we have to proof the equality of their Run
 To show the equality we will show that there is always another Run, which is equal to the second one, that has a smaller Distance from the first one.
 If such a closer Run always exist, we will show that the Run with Distance \(l, 0\) to the first Run, which has to be the first Run itself, is also an equal Run to the second Run.
 
-\begin{theorem}
-  \emph{Equality of different synchronous evaluation Engines:} Two synchronous evaluation Engines for a specification with different schedules are equal.
-\label{theorem:equal_sync_eval_engines}
+\begin{theorem}[name = Equality of different synchronous evaluation Engines]\label{theorem:equal_sync_eval_engines}
+  Two synchronous evaluation Engines for a specification with different schedules are equal.
 \end{theorem}
 \begin{proof}
 
@@ -455,7 +445,7 @@ This means that there is an equal Run to \(R_2\) which has at most the Distance 
 If \(k = 1\) the Transition \(\tau_2'\) from the previous case is equal to \(\tau_2\).
 Based on the same reasoning there also exist a Run \(R_2''\) which is exactly the same to \(R_2'\) except that the order of \(\tau_2\) and \(\tau_1\) is changed, and which is also equal to \(R_2'\) and to \(R_2\).
 This Run has the Distance \((d, 0)\) from \(R_1\).
-This obviously doesn't make Sense: The first element of the Distance is the last Step where both Runs are equal, the second element describes how many Steps afterwards the differing Transition was taken.
+This obviously doesn't make sense: The first element of the Distance is the last step where both Runs are equal, the second element describes how many Steps afterwards the differing Transition was taken.
 But if it was taken right in the Step after the last equal Step, there is no difference at that position, so the Difference of \(R_1\) and \(R_2''\) can be at most \((d+1, x), x \in \mathbb{N}_{>0}\).
 This also contradicts our initial Statement that \(R_2'\) was the Run with the smallest Distance from \(R_1\) which is equal to \(R_2\).
 
