@@ -11,6 +11,11 @@ To do so in Section~\ref{sec:concepts:defs} building blocks for evaluation appro
 While the TeSSLa specification itself defines a set of semantics, for this Thesis we will slightly alter some of it and add some new definitions based on them.
 This is necessary to reason about the specifics how the evaluation engine is built (Note that TeSSLa doesn't define an operational semantic, therefore we will define our own) and how it behaves.
 
+\subsection{Time}
+\label{sec:concepts:defs:time}
+
+TeSSLa has a model of continuous Time, where timestamps \(t \in \mathbb{T} \) are used to represent a certain point in Time and \(\mathbb{T}\) has to be isomorphic to \(\mathbb{R}\).
+
 \subsection{Events}
 \label{sec:concepts:defs:events}
 
@@ -32,16 +37,16 @@ Note that \(E_i, E_o, E_n\) are pairwise disjoint and \(E_i \cup E_o \cup E_n = 
 \subsection{Streams}
 \label{sec:concepts:defs:streams}
 
-Stream are a collection of Events with some added characteristics.
+Streams are a collection of Events with specific characteristics.
 While Events are the atomic unit of information, Streams represent the sequence of related Events over time.
 
-There are two kind of Streams: Signals, which carry values at all times, and EventStreams, which only hold values at specific times.
+There are two kind of Streams: Signals, which carry values at all times, and Event\-streams, which only hold values at specific times.
 EventStreams can be described by a sequence of Events.
-Signals can be described by a sequence of changes, where a change notes that the value of a Signal changed at a specific timestamp.
-The only difference between a Signal and an EventStreams is that Signals always have a value while an EventStream may return \(\bot\), which denotes, that no event happened at that time.
-Because the similarity of Signals and EventStreams in the following we will mainly reason about EventStreams, but most things can also be applied to Signals.
+Signals can be described by a sequence of changes, where a change denotes that the value of a Signal changed at a specific timestamp.
+The only difference between a Signal and an EventStreams is that Signals always have a value while an EventStream may return \(\bot\) when queried for its value at a specific time, which denotes, that no event happened at that time.
+Based on the similarity of Signals and Eventstreams in the following we will mainly reason about Eventstreams, but most things can also be applied to Signals.
 
-Formally a Stream \(\sigma\) can be represented as a Sequence of Events \(\langle e_1, \dots e_n\rangle\) where \(\pi(e_i) < \pi(e_{i+1}) \forall i < n \in \mathbb{N}\).
+Formally a Stream \(\sigma\) can be represented as a Sequence of Events \(\langle e_1, \dots e_n\rangle\) where \(\pi(e_i) < \pi(e_{i+1}),\ \forall i < n \in \mathbb{N}\).
 The Set of all Streams \(\Sigma\) is defined as all possible finite sequences of Events \(\Sigma = \{\sigma | \sigma \in E^* \}\).
 An input Stream \(\sigma_i\) is a stream consisting only of input Events, the set of all input Streams is \(\Sigma_i = \{\sigma_i | \sigma_i \in E_i^*\}\).
 Output and internal Streams are defined analogous.
@@ -49,27 +54,29 @@ To get the Event of a Stream \(\sigma\) at a timestamp \(t\) it can be queried l
 When working with Signals, the function will return the latest Event that happened at or before t while an EventStream may return \(\bot\).
 
 Furthermore Streams hold the timestamp to which they have progressed, which can be equal or greater than the timestamp of the last Event happened on them.
+The progress of a Stream can be obtained with \(p(\sigma) = t \in T\).
 
+Internal and output Streams can be queried for the Node that produced them with \(\eta(\sigma) = n \in N\).
 
 \subsection{Functions}
 \label{sec:concepts:defs:functions}
 
-A TeSSLa specification consists of functions.
+A TeSSLa specification consists of Functions.
 Functions generate new Streams by applying an operation on other Streams.
-TeSSLa itself defines a syntax to write a specification, a set of types and a standard library of functions, but an implementation is free to choose the functions it supports.
+TeSSLa itself defines a syntax to write a specification, a set of types and a standard library of Functions, but an implementation is free to choose the functions it supports.
 
-An example function is \(add(S_D,S_D) \rightarrow S_D\): It takes two Signals, which have to hold values of some numerical type, and produces a signal which holds values of the same type.
-The produced stream can either be assigned to a named identifier (think: a variable) or directly be given to another function (function composition).
+An example Function is \(add(S_D,S_D) \rightarrow S_D\): It takes two Signals, which have to hold values of some numerical type, and produces a signal which holds values of the same type.
+The produced stream can either be assigned to a named identifier (think: a variable) or consumed by another function (function composition).
 
 Functions can be divided into three categories: pure, unpure and timing.
-Pure Functions, also called stateless, are evaluated only on the values their inputs have at the timestamp they are evaluated, therefore they don't have to \emph{remember} anything about earlier events.
-Unpure, or stateful, Functions are evaluatet over the whole input stream, meaning they can look at all Events that happened on its inputs before the time of evaluation and also at all it's previous output events.
+Pure Functions, also called stateless, are evaluated only on the values their inputs have at the timestamp they are evaluated, therefore they don't have to \emph{remember} anything about earlier Events.
+Unpure, or stateful, Functions are evaluated over the whole input Stream, meaning they can look at all Events that happened on its inputs before the time of evaluation and also at all it's previous output Events.
 E.g.\ a Function \emph{eventCount} has to \emph{remember} how many events already happened on it's input stream and increment that counter on every new event.
 Timing Functions are evaluated not only on the value of Events but also on their timestamp and can also manipulate it:
-While non timing functions will consume events at a specific timestamp and emit an event with that timestamp, timing functions can emit Events with a different timestamp.
+While non timing Functions will consume events at a specific timestamp and emit an event with that timestamp, timing functions can emit Events with a different timestamp.
 
 Timing Functions complicate the reasoning about schedules and causality and therefore aren't included in Section~\ref{sec:concepts:behaviour_without_timing}.
-In Section~\ref{sec:concepts:behaviour_with_timing} the conclusions of earlier sections will be extended to include timing functions.
+In Section~\ref{sec:concepts:behaviour_with_timing} the conclusions of earlier sections will be extended to include timing Functions.
 
 
 \subsection{Nodes}
@@ -77,10 +84,11 @@ In Section~\ref{sec:concepts:behaviour_with_timing} the conclusions of earlier s
 
 Nodes are the atomic unit of computation for the evaluation of a TeSSLa specification.
 A Node implements a single Function, e.g.:\ there is an \emph{AddNode} which takes two input Signals and produces a new Signal.
-Therefore a Node is the concrete implementation of a function in a runtime for TeSSLa specifications.
+Therefore a Node is the concrete implementation of a Function in a runtime for TeSSLa specifications.
+The set of all Nodes is called \(N\).
+The Function of a Node \(n \in N\) is written as \(f_n\).
+
 Each Node has a set of inputs, which are either input or internal Streams, and one output, which is either an internal or an output Stream.
-
-
 Nodes use a FIFO queue, provided by the Erlang plattform, to process new received Events in multiple steps:
 
 \begin{enumerate}
@@ -106,7 +114,7 @@ When it finally receives the first Event from Node B it can compute all Events u
 To do so it will compute \emph{change timestamps}: The union of all timestamps where an Event occured on any input between the timestamp of the last generated output and the minimal progress of all inputs.
 
 To see why this is necessary lets assume that Node C will receive a new Event from Node B with timestamp \(t_4\):
-All inputs have progressed to \(t_4\), but on the stream from Node A there are changes between \(t_1\) (where the last output was generated) and \(t_4\),
+All inputs have progressed to \(t_4\), but on the Stream from Node A there are changes between \(t_1\) (where the last output was generated) and \(t_4\),
 therefore the \emph{change timestamps} are \(t_2, t_3, t_4\) and the Node will have to compute it's output based on the values of the streams at that timestamps.
 
 \subsection{TeSSLa Evaluation Engine}
@@ -116,61 +124,43 @@ Because Functions in TeSSLa specifications itself depend on other Functions, and
 the specification can be represented as a DAG@.
 This DAG can be directly translated into an evaluation Engine for that specification: The Nodes of the DAGs are Nodes representing the functions and the Edges are the input and output Streams between the Nodes.
 
-\begin{definition}[name=Equality of evaluation Engines]\label{def:equality_eval_engine}
-  Two evaluation Engines are called equal, if they produce the same Relationship between inputs and outputs for all possible inputs.
+\begin{definition}[name=Equivalence of evaluation Engines]\label{def:equivalence_eval_engine}
+  Two evaluation Engines are called equivalent, if they produce the same relationship between inputs and outputs for all possible inputs.
 \end{definition}
 
-\begin{definition}[name=Equality of evaluation Engines]\label{def:equality_eval_engine_specific}
-  Two evaluation Engines are called equal for an input, if they produce the same output for that input.
+\begin{definition}[name=Equivalence of evaluation Engines for an input]\label{def:equivalence_eval_engine_specific}
+  Two evaluation Engines are called equivalent for an input, if they produce the same output for that input.
 \end{definition}
-
-\begin{definition}[name = Enabledness of Nodes]\label{def:node_enabled}
-  A Node in the DAG is called \emph{enabled} when it has at least one Event buffered on all of it's inputs, meaning it is able to perform a computation and produce a new output.
-  In the context of a Run enabledness means, that a Transition can be taken which represents the computation of the enabled Node.
-\end{definition}
-
-\begin{definition}[name = Equality of evaluation Engines]\label{def:node_independent}
-  A Node in the DAG is called \emph{independent} of another Node, if it is no descendant of that Node.
-\end{definition}
-
-\begin{lemma}[name = Duration of Enabledness]\label{lemma:enabled_till_scheduled}
-  A Node which is enabled stays enabled until it is scheduled
-\end{lemma}
-
-\begin{proof}
-TODO
-\end{proof}
-
 
 To evaluate a specification over Traces, the Evaluation Engine has process the Events that were traced.
 To do so the Nodes have to run their computations until no more Events are present (or the specification found an error in the trace).
 This leads to the question in which order Nodes should be scheduled to perform their computation.
 While some schedules are simply not rational (think of unfairness and causality) there are many different schedules that are feasible.
-It has to be prooven that a chosen schedule produces the correct conclusions for a specification, else the Evaluation Engine is not valid.
+It has to be prooven that a chosen schedule produces the correct conclusions for a specification, else the evaluation Engine is not valid.
 
-In this Thesis it is shown that multiple schedules will lead to the same conclusions and therefore an implementation of an Evaluation Engine is free to choose between them.
+In this Thesis it is shown that multiple schedules will lead to the same conclusions and therefore an implementation of an evaluation Engine is free to choose between them.
 
 \subsection{State}
 \label{sec:concepts:def:state}
 
-All TeSSLa evaluation Engines have to hold a State, which encodes information necessary to continue the evaluation.
-The State of a whole Evaluation Engine is made up of the States of it's Nodes.
+All TeSSLa evaluation Engines have to hold a State which encodes information necessary to continue the evaluation.
+The State of a whole evaluation Engine is made up of the States of it's Nodes.
 
 Each Node has a State which holds the History of its input Streams and its output Stream.
 One part of the State of every Node is the History of a Node, which holds all Events received from it's parents, called it's inputs, and all produced Events of the Node, called it's output.
 
 To distinguish between the two types of States, we will call the State of the whole Engine the \emph{global State} and the State of a Node the \emph{Node State}.
 
-Formally the State of a Node is a tuple of the inputs (a Set of internal and input Streams) and the output (an internal or an output Stream).
-The Set of all valid States of a Node is \(N = {(\Sigma_i \cup \Sigma_n)}^*\times(\Sigma_n \cup \Sigma_o)\).
-Based on this, the Set of all valid States is \(S = N^*\).
-A global State can be queried like \(S_1(i) = n_i\) to yield the State of the Node at that position.
+Formally the State of a Node is a  Set of a Sequence of the inputs (which are internal or input Streams) and the output (an internal or an output Stream).
+The Set of all valid Node States \(\widetilde{N} = {(\Sigma_i \cup \Sigma_n)}^*\times(\Sigma_n \cup \Sigma_o)\).
+Based on this, the Set of all valid global States is \(S = \widetilde{N}^*\).
+A global State can be queried like \(S_1(n) = \widetilde{n}_i\) to yield the State of the Node \(n\) and also by its index \(S_1(i),\ i \in \mathbb{N}\) to get the Node State at that index.
 
 Everytime a Node is scheduled it changes it State by:
 
 \begin{itemize}
-  \item Updating it's inputs (Adding a new Event to the Input Streams)
-  \item Generating a new Event if possible and add it to it's outputs
+  \item Updating it's inputs (adding a new Event to the Input Streams)
+  \item Generating a new Event if possible and add it to it's output
 \end{itemize}
 
 \subsection{Transitions}
@@ -183,10 +173,12 @@ To look at it in another way: A Transition is the computation of a Node, therefo
 Formally Transitions are a Relation between two Sets of Events.
 E.g.\ the Transition \(\tau = (\{e_1,e_2\}, \{e_3\})\) specifies that two Events were consumed by a Node (thereby adding them to its inputs) and one Event was produced based on them (which is added to the output).
 The Set of all Transitions is
-\[
-  T = \{(e, e') | e \subseteq (E_i \cup E_n),e \neq \emptyset, e' \subseteq (E_n \cup E_o), \forall e_i, e_j \in e': \varsigma(e_i) = \varsigma(e_j)\}
-\]
-where the Node which caused the Transition is the one creating the Stream \(\varsigma(e_i)\).
+\begin{align*}
+  T = \{(e, e') | &e \subseteq (E_i \cup E_n) \land e \neq \emptyset \land e' \subseteq (E_n \cup E_o)\\
+                  &\land (\forall e_i, e_j \in e': \varsigma(e_i) = \varsigma(e_j)) \land (\forall \widetilde{e}_i, \widetilde{e}_j \in e: \varsigma(\widetilde{e}_i) \neq \varsigma(\widetilde{e}_j)\}
+\end{align*}
+where the Node which caused the Transition is \(\eta(\varsigma(e_i))\).
+For brevity we define \(\eta : T \rightarrow N\) with \(\eta((e, e') = \eta(\varsigma(e_i)),\ e_i \in e'\), which yields the Node that is modeled by the Transition.
 
 The empty Transition, meaning no input was consumed and no output produced, is labeled with \(\lambda\).
 Note that all Transitions, except the empty one, have to consume at least one Event (therefore no Events can be created from nowhere) and that it's possible that no Event was produced based on the consumed Events (think of a \emph{FilterNode}).
@@ -194,43 +186,58 @@ Furthermore it's theoretically possible to create multiple Events in one Transit
 This makes only sense in the context of Timing Nodes, because else the generated Events would have the same timestamp, which is forbidden by the definition of Streams.
 With Timing Nodes one could for example implement an \emph{EchoNode}, which duplicates an input after a specified amount of Time.
 
-\begin{definition}[name = Independence of Transitions]\label{def:independence_transitions}
-  A Transition is called independent of another, if the Node of which it represents the computation, is independent of the Node of the other Transition.
-\end{definition}
+\begin{definition}[name = Application of a Transition on a State]\label{sec:concepts:def:application_transition}
+  Given a global State \(S_0\) and a Transition \(\tau_1 = (e, e') = (\{e_1,e_2,\dots,e_i\}, \{e_1',e_2',\dots,e_i'\})\), when we \emph{apply} \(\tau_1\) to \(S_0\) we get a new global State \(S_1\) with\\
+  \(\forall \widetilde{n}_i = S_0(i):\)
+  \begin{itemize}
+    \item if \(\eta(\widetilde{n}_i) \neq \eta(\tau_1) \rightarrow S_1(i) = \widetilde{n}_i\) (No Node States changes except the one from the Node of the Transition)
+    \item else let \((\{\sigma_1,\dots,\sigma_n\}, \sigma_o) = n_i\). Than is \(S_1(i) = (\widetilde{\sigma}, \sigma_o')\) with
+      \begin{itemize}
+        \item \(\sigma_o' = \sigma_o ++ e'\) with \(++\) defined as appending all Events in \(e'\) to \(\sigma_o\) ordered by their timestamp
+        \item \(\widetilde{\sigma} = \{\sigma_1', \sigma_2', \dots, \sigma_n'\}\) with \(\sigma_l', l \in [1,n]: \sigma_l + \widetilde{e}\) where \(\widetilde{e} \in e \land \eta(\varsigma(\widetilde{e})) = \eta(\sigma_l)\) and \(+\) is the known append operator for sequences.
+      \end{itemize}
+  \end{itemize}
 
+\end{definition}
+This means, that the new global State is built with the old global State by altering only the Node State of the Node identified by the Events in the second element of the Transition.
+The Node State is altered by appending all Events in the second Element of the Transition to the output ordered by their timestamp and by adding each Event in the first element of the Transition to the input corresponding to the Stream of that Event.
 
 \subsection{Run}
 \label{sec:concepts:def:run}
 
-A Run of an Evaluation Engine is a Sequence of Transitions and States.
+A Run of an evaluation Engine is a sequence of Transitions and States.
 The first element of the sequence is the empty Transition and the initial State of the evaluation Engine.
 It is a representation of the steps the Engine takes to evaluate a specification over input Streams.
+The length of a Run can be retrieved with \(l(R_1) = d \in \mathbb{N}\).
+A Run can be queried by it's index to return the element at that index: \(R_1(i)=(\tau_i, S_i),\ i \in [0, l(R_1)]\).
+
 The Run \(\langle (\lambda, s_0), (\tau_1, s_1) \rangle\) means, that the Engine was in it's initial State, took the transition \(\tau_1\) and thereby reached the state \(s_1\).
 
-\begin{definition}[name = Equality of Runs]\label{def:equal_runs}
-  Two Runs are called equal if they have the same State at their last position.
+\begin{definition}[name = Equivalence of Runs]\label{def:equivalence_runs}
+  Two Runs are called equivalent if they have an equal State at their last position.
 \end{definition}
 
-Because the State can be built from the Transitions that were taken, equality can also be defined over Transitions.
+Because the State can be built from the Transitions that were taken, equivalence can also be defined over Transitions.
 
-\begin{lemma}[name = Equality of Runs over Transitions]\label{lemma:equal_runs_with_transitions}
-  If the Set of Transitions of two Runs are equal, the Runs are equal.
+\begin{lemma}[name = Equivalence of Runs over Transitions]\label{lemma:equivalent_runs_with_transitions}
+  If the Set of Transitions of two Runs are equal, the Runs are equivalent.
 \end{lemma}
 
 \begin{proof}
   Let \(R_1, R_2\) be the Runs of two Engines with the same Set of Transitions \(T'\).
   Let \(S_1\) be the final State of the Run \(R_1\) and \(S_2\) of \(R_2\).
   If the two global States weren't equal, there would have to be at least one \(i\) with \(S_1(i) \neq S_2(i)\), meaning the same Node has to have a different State in both Engines.
-  Let \(n_1, n_2\) be the States of one such Node in both Engines.
-  If the two States are different, one of them has to contain at least one Event on an input or output that isn't on the same Stream in the other State.
+  Let \(\widetilde{n}_1, \widetilde{n}_2\) be the Node States of one such Node in both Engines.
+  If the two Node States are different, one of them has to contain at least one Event on an input or output that isn't on the same Stream in the other State.
   Let that Event be \(e_d\).
   To be added to the State, there has to be a Transition \(\tau = (e, e')\) with \(e_d \in e \lor e_d \in e'\).
-  This Transition has to be in \(T'\), which means it was taken by both Engines, therefore \(e_d\) is in the History of the Node in both Runs.
+  This Transition has to be in \(T'\), which means it was taken by both Engines, therefore \(e_d\) is in the History of the Node in both Runs, therefore its the two Node States are equal in both Engines.
 \end{proof}
 
 \begin{definition}[name = Distance of Runs]\label{def:runs_distance}
   The Distance \(\delta\) of a Run \(R_1\) to a Run \(R_2\) is a pair \(\delta(R_1,R_2) = (x,y)\), where \(x\) is the index before the first position where the two Runs differ and y is the number of Steps between the index of the first difference and the position where \(R_2\) takes the Transition that \(R_1\) took after step \(x\).
-  The Distance of Runs is compared element-wise: \((x,y) < (x',y') \leftrightarrow ((x > x') \lor (x = x' \land y < y))\).
+  The Distance of Runs is ordered element-wise: \((x,y) < (x',y') \leftrightarrow ((x > x') \lor (x = x' \land y < y))\).
+  Therefore two Runs with length \(d\) are equal, if their Distance is \(d,0\), which is the minimal Distance two Runs of length \(d\) can have at all.
 \end{definition}
 
 \begin{exmp}
@@ -249,11 +256,62 @@ Because the State can be built from the Transitions that were taken, equality ca
 
 \end{exmp}
 
+\begin{definition}[name = Enabledness of a Node]\label{def:node_enabled}
+  A Node with the input Streams \(\widetilde{\sigma}\) in an evaluation Engine is called \emph{enabled} at a Step \(s\) of a Run \(R_1\) of that Engine, when it satisfies all of the following conditions:
+
+  \begin{itemize}
+    \item All consumed Events are either internal Events that were produced at an earlier step or external Events that are present:
+      \begin{itemize}
+        \item \(\forall \sigma_x \in \widetilde{\sigma} \cap \Sigma_n: \exists j \in [1, s]: R_1(j) = (\tau_j, S_j)\) with
+          \begin{itemize}
+            \item\( (e, e') = \tau_j \land e_x \in e'\) with \(\varsigma(e_x) = \sigma_x \)
+          \end{itemize}
+        \item and \(\forall \sigma_i \in \widetilde{\sigma} \cap\Sigma_i:\exists e_i\) with \(\varsigma(e_i) = \sigma_i\)
+      \end{itemize}
+    \item and weren't consumed earlier
+      \begin{itemize}
+        \item \(\forall e_x\) (the same \(e_x\) as in the steps above)
+          \begin{itemize}
+            \item \(\not\exists h \in [j, s]: (\widetilde{e}, \widetilde{e'}) = \tau_h \land (\tau_h, S_h) = R_1(h) \land e_x \in \widetilde{e}\)
+          \end{itemize}
+      \end{itemize}
+  \end{itemize}
+\end{definition}
+
+\begin{definition}[name = Valid Run]\label{def:valid_run}
+  A Run \(R_1\) is called \emph{valid} if
+  \begin{itemize}
+    \item \(\forall i \in [0,l(R_1)]: R_1(i) = (\tau_i,S_i) \land \eta(\tau_i)\) is enabled at step \(i\)
+    \item and \(S_1\) is built from \(S_{i-1}\) by applying \(\tau_i\)
+  \end{itemize}
+\end{definition}
+
+\begin{definition}[name = Independence of Nodes]\label{def:node_independent}
+  TODO: define over Run, exchange of position
+  A Node in the DAG is called \emph{independent} of another Node, if it is no descendant of that Node.
+\end{definition}
+
+\begin{definition}[name = Independence of Transitions]\label{def:independence_transitions}
+  TODO merge with def before
+  A Transition \(\tau_1\) is called independent of another Transitions \(\tau_2\), if \(\eta(\tau_1))\) is independent of \(\eta(\tau_2))\).
+\end{definition}
+
+
+\begin{lemma}[name = Duration of Enabledness]\label{lemma:enabled_till_scheduled}
+  TODO
+  A Node which is enabled stays enabled until it is scheduled
+\end{lemma}
+
+\begin{proof}
+TODO
+\end{proof}
+
 \begin{lemma}[name = Influence of independent Nodes]\label{lemma:independence}
   When a Node A is independent of a Node B, than it has no influence on the enabledness of Node A if Node B is scheduled before or after it.
 \end{lemma}
 
 \begin{proof}
+  TODO Still valid with new definitions or can be shown nicer?
   As already shown in Lemma~\ref{lemma:enabled_till_scheduled}, if Node A is enabled, it stays enabled until it's scheduled, so the computation of B can't change A from enabled to disabled.
   It remains to show, that the computation of Node B can't change Node A from disabled to enabled.
   A Node becomes enabled when on all of its input at least one new Event is present.
