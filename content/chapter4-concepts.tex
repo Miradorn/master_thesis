@@ -294,7 +294,7 @@ Because the State can be built from the Transitions that were taken, equivalence
   A Transition \(\tau_1\) is called independent of another Transitions \(\tau_2\), if \(\eta(\tau_1))\) is independent of \(\eta(\tau_2))\).
 \end{definition}
 
-\begin{lemma}[name = Exchange of independent Transitions]
+\begin{lemma}[name = Exchange of independent Transitions]\label{lemma:exchange_independent_transitions}
   If a Transition \(\tau_1\) is independent of a Transition \(\tau_2\), than for all Runs of the evaluation Engine that produces the Runs the following holds:
   \begin{align*}
     R_1 = \langle (\lambda, S_0), \dots, (\tau_2, s_i), (\tau_1, s_j), \dots, (\tau_l, s_l) \rangle \text{is a valid Run} \\
@@ -309,31 +309,24 @@ Because the State can be built from the Transitions that were taken, equivalence
   Therefore \(R_2\) also fullfills the requirements for a valid Run.
 \end{proof}
 
+\begin{lemma}[name = Influence of independent Nodes]\label{lemma:independent_nodes}
+  When a Node A is independent of a Node B, than it has no influence on the enabledness of Node A if Node B is scheduled before or after it.
+\end{lemma}
+
+\begin{proof}
+  Follows directly from Lemma~\ref{lemma:exchange_independent_transitions}
+\end{proof}
+
 \begin{lemma}[name = Duration of Enabledness]\label{lemma:enabled_till_scheduled}
-  TODO
-  A Node which is enabled stays enabled until it is scheduled
+  A Node which is enabled stays enabled at least until it is scheduled.
+  Formaly: If a Node \(n\) is enabled at step \(i\) in a Run \(R_1\) it will stay enabled at least until Step \(j > j\) with \(R_1(j) = (\tau,s), \eta(\tau) = n\).
+  Note that it doesn't have to be enabled after step \(j\), because there could have been multiple Events buffered on it's inputs.
 \end{lemma}
 
 \begin{proof}
 TODO
 \end{proof}
 
-\begin{lemma}[name = Influence of independent Nodes]\label{lemma:independence}
-  When a Node A is independent of a Node B, than it has no influence on the enabledness of Node A if Node B is scheduled before or after it.
-\end{lemma}
-
-\begin{proof}
-  TODO Still valid with new definitions or can be shown nicer?
-  As already shown in Lemma~\ref{lemma:enabled_till_scheduled}, if Node A is enabled, it stays enabled until it's scheduled, so the computation of B can't change A from enabled to disabled.
-  It remains to show, that the computation of Node B can't change Node A from disabled to enabled.
-  A Node becomes enabled when on all of its input at least one new Event is present.
-  New Events on an input are added, when a parent Node performs computation.
-  Because A is independent of B, no input of A is the output of B.
-  Furthermore B is no parent of any predecessor of A, therefore no predecessors input is the output of B.
-  Because of that, when B is scheduled, no Event can be added to the input of any of A's predecessors or A itself.
-  So if A wasn't enabled earlier because it hasn't a new Event at one input, the computation of B can't lead to adding that Event.
-  Therefore it doesn't at which position B is scheduled in regard to the enabledness of A.
-\end{proof}
 
 \section{Behaviour of different schedules without timing functions}
 \label{sec:concepts:behaviour_without_timing}
@@ -505,7 +498,7 @@ If \(k > 1\) there will be a Transition \(\tau_2' \neq \tau_1\) which is taken b
 While this Transition \(\tau_2'\) must also be taken in the first Run as per Lemma~\ref{lemma:enabled_till_scheduled}, it's not possible, that it was taken before \(\tau_1\), beause than the two runs wouldn't have been the same upto the point where \(\tau_1\) was taken.
 Therefore \(\tau_1\) has to be independent of \(\tau_2'\), and because \(\tau_2'\) was scheduled by the second Run before \(\tau_1\) both Transitions are independent of each other.
 
-As of Lemma~\ref{lemma:independence} which one of them is taken first can't change the enabledness of the Node of the second Transition.
+As of Lemma~\ref{lemma:independent_nodes} which one of them is taken first can't change the enabledness of the Node of the second Transition.
 Therefore there is a Run \(R_2''\) which is exactly the same to \(R_2'\), except that the Transitions \(\tau_1, \tau_2'\) are scheduled the other way around.
 Figure~\ref{fig:chap3:sec_sync:commutativity_scheduling} visualizes how changing the order of the two Transitions can't change the global State of the Engine after both were taken.
 Therefore the Runs \(R_2'\) and \(R_2''\) are equal and the Distance to \(R_1\) is \(d, k-1\), which contradicts the initial statement that \(R_1'\) was a Run with a minimal Distance.
