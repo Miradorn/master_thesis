@@ -406,6 +406,8 @@ INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/psnfss/ts1bch.fd
 INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/psnfss/ts1bch.fd
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchr8c.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchri8c.tfm
+INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchri8t.tfm
+INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchri8t.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchr8t.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchb8t.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/public/lm/ec-lmssbx10.tfm

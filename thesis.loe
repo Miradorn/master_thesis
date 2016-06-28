@@ -23,12 +23,14 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {definition}{\numberline {9}Definition\thmtformatoptarg {Independence of Transitions}}{8}{definition.9}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {2}Lemma\thmtformatoptarg {Duration of Enabledness}}{9}{lemma.2}
+\contentsline {lemma}{\numberline {2}Lemma\thmtformatoptarg {Exchange of independent Transitions}}{9}{lemma.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {3}Lemma\thmtformatoptarg {Influence of independent Nodes}}{9}{lemma.3}
+\contentsline {lemma}{\numberline {3}Lemma\thmtformatoptarg {Duration of Enabledness}}{9}{lemma.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {lemma}{\numberline {4}Lemma\thmtformatoptarg {Influence of independent Nodes}}{9}{lemma.4}
 \defcounter {refsection}{0}\relax 
 \contentsline {definition}{\numberline {10}Definition\thmtformatoptarg {Equality of evaluation Engines}}{10}{definition.10}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {4}Lemma\thmtformatoptarg {Equality of Engines for one Input}}{12}{lemma.4}
+\contentsline {lemma}{\numberline {5}Lemma\thmtformatoptarg {Equality of Engines for one Input}}{12}{lemma.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {theorem}{\numberline {1}Theorem\thmtformatoptarg {Equality of different synchronous evaluation Engines}}{12}{theorem.1}
+\contentsline {theorem}{\numberline {1}Theorem\thmtformatoptarg {Equality of different synchronous evaluation Engines}}{13}{theorem.1}

@@ -188,7 +188,7 @@ With Timing Nodes one could for example implement an \emph{EchoNode}, which dupl
 
 \begin{definition}[name = Application of a Transition on a State]\label{sec:concepts:def:application_transition}
   Given a global State \(S_0\) and a Transition \(\tau_1 = (e, e') = (\{e_1,e_2,\dots,e_i\}, \{e_1',e_2',\dots,e_i'\})\), when we \emph{apply} \(\tau_1\) to \(S_0\) we get a new global State \(S_1\) with\\
-  \(\forall \widetilde{n}_i = S_0(i):\)
+  \(\forall \widetilde{n}_i = S_0(i)\)
   \begin{itemize}
     \item if \(\eta(\widetilde{n}_i) \neq \eta(\tau_1) \rightarrow S_1(i) = \widetilde{n}_i\) (No Node States changes except the one from the Node of the Transition)
     \item else let \((\{\sigma_1,\dots,\sigma_n\}, \sigma_o) = n_i\). Than is \(S_1(i) = (\widetilde{\sigma}, \sigma_o')\) with
@@ -282,20 +282,32 @@ Because the State can be built from the Transitions that were taken, equivalence
   A Run \(R_1\) is called \emph{valid} if
   \begin{itemize}
     \item \(\forall i \in [0,l(R_1)]: R_1(i) = (\tau_i,S_i) \land \eta(\tau_i)\) is enabled at step \(i\)
-    \item and \(S_1\) is built from \(S_{i-1}\) by applying \(\tau_i\)
+    \item and \(S_i\) is built by applying \(\tau_i\) to \(S_{i-1}\)
   \end{itemize}
 \end{definition}
 
 \begin{definition}[name = Independence of Nodes]\label{def:node_independent}
-  TODO: define over Run, exchange of position
-  A Node in the DAG is called \emph{independent} of another Node, if it is no descendant of that Node.
+  A Node A is called \emph{independent} of Node B in an evaluation Engine, if it is no descendant of that Node
 \end{definition}
 
 \begin{definition}[name = Independence of Transitions]\label{def:independence_transitions}
-  TODO merge with def before
   A Transition \(\tau_1\) is called independent of another Transitions \(\tau_2\), if \(\eta(\tau_1))\) is independent of \(\eta(\tau_2))\).
 \end{definition}
 
+\begin{lemma}[name = Exchange of independent Transitions]
+  If a Transition \(\tau_1\) is independent of a Transition \(\tau_2\), than for all Runs of the evaluation Engine that produces the Runs the following holds:
+  \begin{align*}
+    R_1 = \langle (\lambda, S_0), \dots, (\tau_2, s_i), (\tau_1, s_j), \dots, (\tau_l, s_l) \rangle \text{is a valid Run} \\
+    \rightarrow R_2 = \langle (\lambda, S_0), \dots, (\tau_1, s_i'), (\tau_2, s_j'), \dots, (\tau_l, s_l') \rangle \text{is a valid Run}
+  \end{align*}
+\end{lemma}
+
+\begin{proof}
+  Because \(A = \eta(\tau_1)\) is no descendant of \(B = \eta(\tau_2)\), the Stream \(\sigma\) with \(\eta(\sigma) = \eta(\tau_2)\) can be no input of \(A\).
+  Therefore the enabledness of \(A\) can't be changed by \(\tau_2\) as you can see from the Definition of enabledness.
+  So \(A\) has to be enabled before \(\tau_2\) was taken by \(R_1\), else it couldn't be enabled afterwards.
+  Therefore \(R_2\) also fullfills the requirements for a valid Run.
+\end{proof}
 
 \begin{lemma}[name = Duration of Enabledness]\label{lemma:enabled_till_scheduled}
   TODO
