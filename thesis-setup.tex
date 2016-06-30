@@ -70,8 +70,23 @@
 \usepackage{amsthm}
 \usepackage{thmtools}
 \usepackage{tikz}
+\usepackage{tikz-timing}
+\usetikzlibrary{arrows, arrows.meta,
+  decorations, decorations.pathreplacing, decorations.pathmorphing,
+  shapes.misc,
+  automata,
+  backgrounds,
+  positioning,
+  fit,
+  petri
+}
+\tikzset{ampersand replacement=\&, % alternative to using fragile frames
+  event/.style = {draw, cross out, inner sep = 1pt,xshift=0.75pt},
+  event label/.style = {font = \tiny, label distance = -2pt}
+}
+\newcommand{\n}[1]{N[event, label={[event label]above:#1}]}
+
 \usepackage{todonotes}
-\usetikzlibrary{arrows.meta,decorations.pathmorphing,backgrounds,positioning,fit,petri}
 \cthesissetcolor{RGB}{0,75,90}{160,187,47}
 \addbibresource{bib-refs}
 

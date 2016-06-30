@@ -5,13 +5,46 @@
 \todo{Just a collection of thoughts for now, needs to be polished a lot}
 
 % \cleanchapterquote{A picture is worth a thousand words. An interface is worth a thousand pictures.}{Ben Shneiderman}{(Professor for Computer Science)}
-As Runtime Verification is a widely researched field there are many different approaches towards monitoring programs.
-As stated in~\cite{Havelund2008} most approaches are geared towards Java, while many critical systems are written in C.
-Because our implementation of a runtime is independent of the environment of the monitored program, this opens up the possibility to investigate this somewhat neglected field.
-Therefore ways to generate traces from C programs are highlighted in this chapter.
+As Runtime monitoring and verification is a widely researched field, multiple approaches to attain it's goals were developed.
 
-TeSSLa itself and the implemented runtime builds on concepts and results of many other Runtime Verification techniques.
-In the following sections some of them are highlighted to give a better understanding of choices made during this thesis.
+As stated in~\cite{Havelund2008} most approaches are geared towards software written in Java, while many critical systems are written in C and there are countless other systems that could benefit from monitoring and verification written in all kinds of programming languages.
+With TeSSLa as a specification Language over Streams, which has no assumptions on the environment of the system that produces the Streams,  as the base for our monitoring approach, we recognized the possibility to abstract the monitoring plattform from the monitored program.
+This means that the developed runtime for TeSSLa specifications is not restricted to monitor programs written in a specific language but can monitor anything that can produce Streams.
+
+To show that the runtime is valuable in the context of existing approaches, we will show ways to generate traces from systems that were used to evaluate other monitoring techniques.
+Afterwards we will compare the expressiveness of TeSSLa and the runtime with other approaches, based on the generated traces, to show what kinds of specifications can be monitored with TeSSLa and where the Language or the runtime can be extended.
+
+The following Chapter will highlight the systems against which TeSSLa and the runtime is evaluated, furthermore it will also give insights into other work that TeSSLa and this thesis is based on.
+
+\section{TeSSLa}
+\label{sec:related:tessla}
+
+The implemented Runtime and the theoretic work of this thesis is built upon the TeSSLa project.
+For this project the syntax and a formal semantic for a specification language was defined.
+
+
+
+\begin{figure}\label{fig:tessla_streams}
+  \input{content/figs/tessla_streams}
+  \caption{Visualization of TeSSLas Stream model, taken from~\cite{Decker2016}}
+\end{figure}
+
+
+\section{LOLA}
+\label{sec:related:lola}
+
+The concepts of LOLA~\cite{DAngelo2005} are very similar to the ones of TeSSLa.
+Both approaches built upon streams of events.
+The biggest difference in the modelation is, that while streams in Lola are based on a discrete model of time TeSSLa uses a continuous timing model.
+
+The specification language of Lola is very small (expressions are built upon three operators) but the expressiveness surpasses Temporal Logics and many other Formalisms \citep{DAngelo2005}.
+Expressions in Lola are built by manipulating existing streams to form new ones.
+Therefore streams depend on other streams, so they can be arranged in weighted dependency graph, where the weight describes the amount of steps a generated Stream is delayed compared to the parent.
+
+Based on this graph a notion of efficiently monitorable properties is given and an algorithm to monitor them is presented.
+
+TeSSLa takes concepts of LOLA and applies them to a continuous model of time and introduces a language and a rich set of functions that can be applied to streams.
+The dependency graph is a core concept of TeSSLa and is used to check if specifications are valid (e.g.\ cycle free) and is also the core concept to evaluate specifications over traces in this thesis.
 
 \section{Distributed Verification Techniques}
 \label{sec:related:distributed}
@@ -23,17 +56,6 @@ As stated earlier, the TeSSLa runtime doesn't care about the environment of the 
 But the runtime itself is highly concurrent and can be distributed easily to many processors or event different computers.
 Therefore many of the definitions for distributed monitors can be used to reason about the behaviour of the Runtime.
 
-\section{LOLA}
-\label{sec:related:lola}
-
-LOLA~\cite{DAngelo2005} has big influence on TeSSLa and the theoretical work of this thesis.
-LOLA defines a very small core language to describe streams as the result of combinations on other streams.
-In contrast to TeSSLa it is defined in regards of a discrete timing model.
-
-Lola defines a notion of efficiently monitorable properties and an approach to monitor these properties.
-
-TeSSLa takes concepts of LOLA and applies them to a continuous model of time and introduces a language and a rich
-set of functions that can be applied to streams.
 
 \section{Copilot}
 \label{sec:related:copilot}
