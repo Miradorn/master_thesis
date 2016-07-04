@@ -58,6 +58,107 @@ The progress of a Stream can be obtained with \(p(\sigma) = t \in T\).
 
 Internal and output Streams can be queried for the Node that produced them with \(\eta(\sigma) = n \in N\).
 
+\subsection{Transducers}
+\label{sec:concepts:defs:transducers}
+
+Fundamentally TeSSLa is a special kind of a Transducer.
+Therefore in this Section we will define a model of Transducers which can be used to reason about the evaluation of a TeSSLa specification.
+
+A Transducer is a System, which consumes an input and produces an output.
+
+\begin{definition}[name = Transducer]\label{def:transducer}
+  Let \(\Phi, \Gamma\) be two Alphabets.
+  A Transducer \(t\) is a Relation \(t \subseteq \Phi^* \times \Gamma^*\), \(\Phi\) is called the input Alphabet, \(\Gamma\) the output Alphabet.
+\end{definition}
+
+TeSSLa specifications are deterministic for any input, meaning they should produce the same output for the same input.
+
+\begin{definition}[name = Deterministic Transducer]\label{def:deterministic_transducer}
+  A deterministic Transducer relates each input to at most one output.
+\end{definition}
+
+Transducers can furthermore be categorized as synchronous, asynchronous, causal and clairvoyant Transducers:
+Synchronosity is a property over the behaviour of a Transducer when it's consuming input per element.
+If it is synchronous, it will produce an output element for each input element.
+
+\begin{definition}[name = Synchronous Transducer]\label{def:synchronous_transducer}
+Let \(\vec{\imath} \in \Phi^*, i \in \Phi, \vec{o} \in \Gamma^*, o \in \Gamma\).
+  A Transducer \(t\) is called synchronous, when it satisfies the formula:
+  if \( (\vec{\imath}\circ i,\vec{o}\circ o) \in t\)
+  then \( (\vec{\imath}, \vec{o}) \in t \)
+\end{definition}
+
+An asynchronous Transducer can produce zero, one or many outputs for each input it consumes.
+
+\begin{definition}[name = Asynchronous Transducer]\label{def:asynchronous_transducer}
+  Let \(\vec{\imath}\in \Phi^*, i \in \Phi,\vec{o} \in \Gamma^*\).
+  A Transducer \(t\) is called asynchronous when it satisfies the formula:
+  if \((\vec{\imath}\circ i, \vec{o}) \in t \)
+  then \(\exists \vec{o'},\vec{o''} \in \Gamma^*\text{ so that } \vec{o} = \vec{o'}\circ\vec{o''} \text{ and } (\vec{\imath},\vec{o'}) \in t \)
+\end{definition}
+
+A causal Transducer is one, where the output depends only on consumed inputs and not on future inputs:
+
+\begin{definition}[name = Causal Transducer]\label{def:causal_transducer}
+  A Transducer \(t\) is called causal, when it satiesfies the condition:
+  if \((\vec{\imath},\vec{o}) \in t \)
+  then \( \forall \vec{\imath'} \in \Phi^* \text{ with } (\vec{\imath} \circ \vec{\imath'}, \vec{o'}) \in t \)
+  it holds, that \( \vec{o} \sqsubseteq \vec{o'} \)
+\end{definition}
+
+A Transducer that isn't casual is called \emph{clairvoyant}.
+
+When talking about Transducers, it is interesting to know if two Transducers are \emph{equivalent}.
+There are multiple possible definitions for equivalence of Transducers, we will look at two, which are interesting for this thesis.
+
+\begin{definition}[name = Asynchronous equivalence of Transducers]\label{def:async_equivalence_transducer}
+  Let \(t_1, t_2\) be two asynchronous Transducers from \(\Phi^*\) to \(\Gamma^*\).
+  They are called \emph{asynchronous equivalent}, written \(t_1 \equiv_a t_2\): \\
+  if \(\forall (\vec{\imath},\vec{o}) \in t_1\) \\
+  then \( \forall \vec{\imath'} \in \Phi^*, \vec{o'} \in \Gamma^* \text{ such that } (\vec{\imath}\circ\vec{\imath'},\vec{o}\circ\vec{o'}) \in t_1\) \\
+  it holds, that \( \exists k,j \in \mathbb{N} \text{ with  } \vec{\imath_k} = (\vec{\imath}\circ\vec{\imath'}_{[0,k]}),
+  \vec{o_j} = (\vec{o}\circ\vec{o'}_{[0,j]}) \text{ and } (\vec{\imath_k}, \vec{o_j}) \in t_2\)
+\end{definition}
+
+For the second kind of equivalence we need to introduce \emph{timed Transducers}.
+
+\begin{definition}[name = Timed Transducer]\label{def:timed_transducer}
+  Let \(\mathbb{T}\) be a timing model that is isomorphic to \(\mathbb{R}\).
+  A timed Transducer \(t\) works on timed inputs and produces timed outputs:
+  \[t \subseteq {\left(\Phi \times \mathbb{T}\right)}^* \times {\left(\Gamma \times \mathbb{T}\right)}^*\]
+\end{definition}
+
+The Function \(\text{timed:} {(\Gamma \times \mathbb{T})}^* \rightarrow {(\Gamma \times \mathbb{T})}^* \)
+reorders a timed output sequence \(\vec{o}\) by its timestamps, such that:
+\[
+  \forall i,j \in \mathbb{N}:\text{ if } i < j \text{ then } t_i < t_j \text{ with } (o_i, t_i) = \vec{o}_i \text{ and } (o_j, t_j) = \vec{o}_j
+\]
+
+Based on this function, timed Transducers can be compared with respect to the timestamp of its output:
+
+\begin{definition}[name = Observational Equivalence]\label{def:observational_equivalence}
+  Two timed Transducers \(t_1, t_2\) are called observational equivalent, written \(t_1 \equiv_o t_2\),\\
+  if \(\forall (\vec{\imath},\vec{o}) \in t_1\) \\
+then \( \forall \vec{\imath'} \in {(\Phi\times\mathbb{T})}^*, \vec{o'} \in {(\Gamma\times\mathbb{T})}^* \text{ such that } (\vec{\imath}\circ\vec{\imath'},\vec{o}\circ\vec{o'}) \in t_1\) \\
+it holds, that \( \exists k in \mathbb{N},j \in \mathbb{N}_{\geq\text{length}(\vec{o})} \text{ with  } \vec{\imath_k} = (\vec{\imath}\circ\vec{\imath'}_{[0,k]}),
+  \vec{o_j} = (\vec{o}\circ\vec{o'}) \text{ and } (\vec{\imath_k}, \vec{o_j}) \in t_2\)
+\end{definition}
+
+% \begin{definition}[name = Timed Function]\label{def:timed_function}
+%   Let \(\vec{o},\vec{o'} \in {(\Gamma \times \mathbb{T})}^*, (o_1, t_1), (o_2, t_2) \in {(\Gamma \times \mathbb{T})}, t_1 \neq t_2\).
+%   Then:
+%   \begin{align*}
+%     &\text{timed}((o_1, t_1)) &&= (o_1, t_1) \\
+%     &\text{timed}((o_1, t_1)\circ (o_2, t_2)) &&=
+%     \begin{cases}
+%       (o_1, t_1)\circ (o_2, t_2) \text{, if } t_1 < t_2 \\
+%       (o_2, t_2)\circ (o_1, t_1) \text{, else}
+%     \end{cases} \\
+%     &\text{timed}(\vec{o}\circ(o_1,t_1)\circ\vec{o'}) \text{, } t_1 \text{ has the smallest time of all elements in } \vec{o}, \vec{o'} = (o_1,t_1)\circ\text{timed}(\vec{o}\circ\vec{o'})
+%   \end{align*}
+% \end{definition}
+
+
 \subsection{Functions}
 \label{sec:concepts:defs:functions}
 
@@ -118,7 +219,7 @@ All inputs have progressed to \(t_4\), but on the Stream from Node A there are c
 therefore the \emph{change timestamps} are \(t_2, t_3, t_4\) and the Node will have to compute it's output based on the values of the streams at that timestamps.
 
 \subsection{TeSSLa Evaluation Engine}
-\label{sec:concepts:def:model}
+\label{sec:concepts:def:eval_engine}
 
 Because Functions in TeSSLa specifications itself depend on other Functions, and these dependencies have to be circle free,
 the specification can be represented as a DAG@.
@@ -140,28 +241,41 @@ It has to be prooven that a chosen schedule produces the correct conclusions for
 
 In this Thesis it is shown that multiple schedules will lead to the same conclusions and therefore an implementation of an evaluation Engine is free to choose between them.
 
-\subsection{State}
+\subsection{State and History}
 \label{sec:concepts:def:state}
 
-All TeSSLa evaluation Engines have to hold a State which encodes information necessary to continue the evaluation.
-The State of a whole evaluation Engine is made up of the States of it's Nodes.
+All TeSSLa evaluation Engines have to hold a State, which encodes information necessary to continue the evaluation, and a History, which encodes what happened on all Streams in the evaluation Engine.
+The State of a whole evaluation Engine is made up of the States of its Nodes.
 
-Each Node has a State which holds the History of its input Streams and its output Stream.
-One part of the State of every Node is the History of a Node, which holds all Events received from it's parents, called it's inputs, and all produced Events of the Node, called it's output.
+Each Node has a State, which can hold arbitray information, e.g.\ a counter for a \emph{CountNode}, and its input queues.
+Input queues are Fifo queues, which hold the Events produced by predecessors of the Node, that weren't consumed yet by the Node.
+% Each Node has a State which holds the History of its input Streams and its output Stream.
+% One part of the State of every Node is the History of a Node, which holds all Events received from it's parents, called it's inputs, and all produced Events of the Node, called it's output.
 
 To distinguish between the two types of States, we will call the State of the whole Engine the \emph{global State} and the State of a Node the \emph{Node State}.
+The Set of all valid node States is called \(\widetilde{N}\).
 
-Formally the State of a Node is a  Set of a Sequence of the inputs (which are internal or input Streams) and the output (an internal or an output Stream).
-The Set of all valid Node States \(\widetilde{N} = {(\Sigma_i \cup \Sigma_n)}^*\times(\Sigma_n \cup \Sigma_o)\).
-Based on this, the Set of all valid global States is \(S = \widetilde{N}^*\).
-A global State can be queried like \(S_1(n) = \widetilde{n}_i\) to yield the State of the Node \(n\) and also by its index \(S_1(i),\ i \in \mathbb{N}\) to get the Node State at that index.
+% Formally the State of a Node is a  Set of a Sequence of the inputs (which are internal or input Streams) and the output (an internal or an output Stream).
+% The Set of all valid Node States \(\widetilde{N} = {(\Sigma_i \cup \Sigma_n)}^*\times(\Sigma_n \cup \Sigma_o)\).
 
-Everytime a Node is scheduled it changes it State by:
+The global State of an evaluation Engine at a certain step is a map from its Nodes to their node State.
+We will call the Set of all global States as \(S\).
+A global State can be queried like \(s(n) = \widetilde{n}\) to yield the State of the Node \(n\).
+
+Everytime a Node \(n\) is scheduled, it changes its own node State and the node State of its direct children \(N_c\) by
 
 \begin{itemize}
-  \item Updating it's inputs (adding a new Event to the Input Streams)
-  \item Generating a new Event if possible and add it to it's output
+  \item Take one Event \(e_i\) from each input queue \(q_i\): \(e_i = hd(q_i)\)
+  \item Produce new Events based on the internal information and the taken Events
+  \item Change its children node State by appending the produced Events to the queues of all Nodes in \(N_c\)
+  \item Update its own node State by
+  \begin{itemize}
+    \item Updating the internal information if necessary
+    \item Replace all input queues \(q_i\) with \(q_i' = tl(q_i)\)
+  \end{itemize}
 \end{itemize}
+
+TODO History
 
 \subsection{Transitions}
 \label{sec:concepts:def:transitions}
@@ -337,7 +451,7 @@ For a first step we specify and compare behaviours of different approaches to ev
 Without timing Functions, all Nodes work only on values or the presence of Events.
 This leads to behaviours that can be easily reason about, as seen in the next sections.
 
-All Systems to evaluate TeSSLa specifications we will look at are based on the described structure in Section~\ref{sec:concepts:def:model}.
+All Systems to evaluate TeSSLa specifications we will look at are based on the described structure in Section~\ref{sec:concepts:def:eval_engine}.
 While there may be other approaches to evaluation, a DAG based approach seems to fit most naturaly and focusing on one structure makes comparing Systems easier.
 
 Each evaluation Engine will work in steps, where each step is synonymous with an index in the Run of the System.
@@ -359,19 +473,23 @@ In the following evaluation Engines are classified by their scheduling approache
 
 The first class of evaluation Engines are synchronous ones.
 They are characterized by a specific, fixed schedule.
-The scheduling algorithm is as follows: Choose a reversed topological order of the Nodes once and assign numbers to them in that order.
-Then always schedule the enabled Node with lowest Number.
+The scheduling algorithm is as follows:
+
+\begin{itemize}
+  \item Select all Nodes that are no input Nodes, let their number be \(\i\)
+  \item Label them with unique natural numbers from \([1,i]\) in reversed topological order
+  \item Label the remaining Nodes with unique natural numbers bigger than \(i\)
+  \item Whenever a Node has to be scheduled, schedule the enabled one with the lowest label
+\end{itemize}
 
 Obviously for many DAGs there is no unique reversed topological order, therefore one can be chosen by the evaluation engine.
-
 This schedule ensures that no Node is scheduled which has a successor that can be scheduled, therefore Events are \emph{pushed} through the DAG towards an output Node as fast as possible.
+As shown in Section~\ref{sec:concepts:topological_schedule_is_fair} any schedule built like this is fair.
 
 \begin{definition}[name = Valid evaluation Engines]\label{def:valid_eval_engine}
   An evaluation Engine is called \emph{valid}, if it is equivalent to a synchronous evaluation Engine.
 \end{definition}
 
-% As shown in Section~\ref{sec:concepts:equalitys_without_timing} all synchronous evaluation Engines are equal.
-% Therefore to proof that an evaluation Engine is valid for a specification, one has to show, that it is equal to any synchronous one.
 
 \begin{figure}
   \begin{tikzpicture}

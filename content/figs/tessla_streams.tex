@@ -1,6 +1,6 @@
 \begin{tikzpicture}
 
-\matrix[column sep = 0.5em, draw] (m) {
+\matrix[column sep = 0.5em, draw] (m) {%
   \node[anchor = east] {\small \textit{\textrm{Time}}}; \& \draw[help lines] (0,-0.05) grid[xstep=0.033] (3.7,0.05);
      \draw[gray] (0,-0.075) grid[xstep=0.33] (3.7,0.075); \\[0.5ex]
   \node[anchor = east] (m-1-2) {Value \texttt{x}}; \& \timing[name=m-2-2] at (0,-0.15) {2D{998}N(x1)2D{42}3D{2012}3D{1280}DD{10}DD{1404}};\\
@@ -17,7 +17,7 @@
      \node[anchor = east] (m-1-6) {\texttt{changeOf(x)}};
   \& \timing[name=m-2-6] at (0,-0.15) {2Z \n{} 2Z \n{} 3Z \n{} 3Z \n{} 2Z \n{} 2Z}; \\
 %
-     \node[anchor = east, text width = 14.5em, align = right] (m-1-7) {
+     \node[anchor = east, text width = 14.5em, align = right] (m-1-7) {%
           \texttt{\textbf{on} changeOf(x) \textbf{if} x > 1023}};
   \& \timing[name=m-2-7] at (0,-0.15) {4Z \n{} 3Z \n{} 3Z 2Z \n{} 2Z}; \\
 %
@@ -34,7 +34,7 @@
 \path (m.north west) node[anchor = north east, align = right]
 {\footnotesize{Input streams} \\ \footnotesize{(observations)}};
 
-\path (m.west|-end-inputs.south) node[anchor = north east, align = right] {
+\path (m.west|-end-inputs.south) node[anchor = north east, align = right] {%
   \footnotesize{Derived streams} \\ \footnotesize{(definable)}};
 
 \end{tikzpicture}

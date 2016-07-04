@@ -19,15 +19,32 @@ The following Chapter will highlight the systems against which TeSSLa and the ru
 \section{TeSSLa}
 \label{sec:related:tessla}
 
-The implemented Runtime and the theoretic work of this thesis is built upon the TeSSLa project.
-For this project the syntax and a formal semantic for a specification language was defined.
+The implemented Runtime and the theoretic work of this thesis is built upon the TeSSLa project in~\cite{Decker2016}.
+For the project the syntax and a formal semantic of a specification language was defined.
 
-
+Specifications in TeSSLa are based on streams of data.
+Streams are the representation of things that change over time, e.g.\ a variable in a program.
+To model streams, TeSSLa defines a timing model.
+That model is based on timestamps that are isomorphic to real numbers \(\mathbb{R}\).
+Figure~\ref{fig:tessla_streams} shows how streams behave over time.
 
 \begin{figure}\label{fig:tessla_streams}
   \input{content/figs/tessla_streams}
   \caption{Visualization of TeSSLas Stream model, taken from~\cite{Decker2016}}
 \end{figure}
+
+The syntax of TeSSLa specifications is pretty small, but can be used to define complex functions and specifications:
+
+\begin{align*}
+  spec \text{ ::= } &\textttbf{define } name[\textttbf{:}\ stype] \textttbf{ := } texpr ｜\\
+                    & \textttbf{out } texpr ｜
+                    spec\ spec\\
+  texpr \text{ := } & expr[\textttbf{:}\ type] \\
+  expr \text{ := }  & name \mid literal \mid name\textttbf{(}texpr(\textttbf{, }texpr)^*\textttbf{)}\\
+  type \text{ := } & btype \mid stype \\
+  stype \text{ := } & \textttbf{Signal<}btype\textttbf{>} \mid \textttbf{Events<}btype\textttbf{>}
+\end{align*}
+
 
 
 \section{LOLA}
