@@ -9,7 +9,7 @@ To do so in Section~\ref{sec:concepts:defs} building blocks for evaluation appro
 \label{sec:concepts:defs}
 
 While the TeSSLa specification itself defines a set of semantics, for this Thesis we will slightly alter some of it and add some new definitions based on them.
-This is necessary to reason about the specifics how the evaluation engine is built (Note that TeSSLa doesn't define an operational semantic, therefore we will define our own) and how it behaves.
+This is necessary to reason about the specifics how the evaluation Engine is built (Note that TeSSLa doesn't define an operational semantic, therefore we will define our own) and how it behaves.
 
 \subsection{Time}
 \label{sec:concepts:defs:time}
@@ -20,19 +20,19 @@ TeSSLa has a model of continuous Time, where timestamps \(t \in \mathbb{T} \) ar
 \label{sec:concepts:defs:events}
 
 Events are the atomic unit of information that all computations are based on.
-There are three Types of Events: input, output and internal Events.
+There are three Types of Events: external, output and internal Events.
 
 The Set of all Events is denoted as \(E\).
 Each event carries a value, which can be \emph{nothing} or a value of a Type (types are formally defined in the TeSSLa speicification but aren't important for this thesis), a timestamp and the stream it's perceived on (e.g.\ a function call of a specific function or the name of an output stream).
 
 The value of an event can be queried with the function \(\upsilon\), its timestamp with \(\pi\) and its Stream with \(\varsigma\).
 
-\(E_i \subset E\) is the Set of all input events, their Stream corresponds to a specific trace.
+\(E_e \subset E\) is the Set of all external events, their Stream corresponds to a specific trace.
 \(E_o \subset E\) is the Set of all output events, their Stream is specified by an output name of the TeSSLa specification.
 \(E_n \subset E\) is the Set of all internal events.
 Internal events are mostly an implementation detail, which denote steps of computation inside the runtime.
 The Stream of internal events is implicitly given by the node that produces the stream of the Event.
-Note that \(E_i, E_o, E_n\) are pairwise disjoint and \(E_i \cup E_o \cup E_n = E\).
+Note that \(E_e, E_o, E_n\) are pairwise disjoint and \(E_e \cup E_o \cup E_n = E\).
 
 \subsection{Streams}
 \label{sec:concepts:defs:streams}
@@ -48,7 +48,7 @@ Based on the similarity of Signals and Eventstreams in the following we will mai
 
 Formally a Stream \(\sigma\) can be represented as a Sequence of Events \(\langle e_1, \dots e_n\rangle\) where \(\pi(e_i) < \pi(e_{i+1}),\ \forall i < n \in \mathbb{N}\).
 The Set of all Streams \(\Sigma\) is defined as all possible finite sequences of Events \(\Sigma = \{\sigma | \sigma \in E^* \}\).
-An input Stream \(\sigma_i\) is a stream consisting only of input Events, the set of all input Streams is \(\Sigma_i = \{\sigma_i | \sigma_i \in E_i^*\}\).
+An external Stream \(\sigma_e\) is a stream consisting only of external Events, the set of all external Streams is \(\Sigma_e = \{\sigma_e | \sigma_e \in E_e^*\}\).
 Output and internal Streams are defined analogous.
 To get the Event of a Stream \(\sigma\) at a timestamp \(t\) it can be queried like a function: \(\sigma(t) = e\) with \(\pi(e) = t \).
 When working with Signals, the function will return the latest Event that happened at or before t while an EventStream may return \(\bot\).
@@ -65,17 +65,22 @@ Fundamentally TeSSLa is a special kind of a Transducer.
 Therefore in this Section we will define a model of Transducers which can be used to reason about the evaluation of a TeSSLa specification.
 
 A Transducer is a System, which consumes an input and produces an output.
+Let \(\Phi, \Gamma\) be two Alphabets and \(\epsilon\) the empty word.
 
 \begin{definition}[name = Transducer]\label{def:transducer}
-  Let \(\Phi, \Gamma\) be two Alphabets.
   A Transducer \(t\) is a Relation \(t \subseteq \Phi^* \times \Gamma^*\), \(\Phi\) is called the input Alphabet, \(\Gamma\) the output Alphabet.
 \end{definition}
+
 
 TeSSLa specifications are deterministic for any input, meaning they should produce the same output for the same input.
 
 \begin{definition}[name = Deterministic Transducer]\label{def:deterministic_transducer}
   A deterministic Transducer relates each input to at most one output.
 \end{definition}
+
+\begin{exmp}[name = Deterministic and Nondeterministic Transducers]
+  \(t_d = \{(a,1),(b,2),(ab,12),(ba,21)\}\) is a deterministic Transducer, \(t_{nd} = \{(a,1),(a,2)\}\) is nondeterministic, because it relates \(a\) to \(1\) and \(2\).
+\end{exmp}
 
 Transducers can furthermore be categorized as synchronous, asynchronous, causal and clairvoyant Transducers:
 Synchronosity is a property over the behaviour of a Transducer when it's consuming input per element.
@@ -97,52 +102,191 @@ An asynchronous Transducer can produce zero, one or many outputs for each input 
   then \(\exists \vec{o'},\vec{o''} \in \Gamma^*\text{ so that } \vec{o} = \vec{o'}\circ\vec{o''} \text{ and } (\vec{\imath},\vec{o'}) \in t \)
 \end{definition}
 
+\begin{exmp}[name = Synchronous and Asynchronous Transducers]
+  \(t_s = \{(a,1),(b,2),(ab,12),(ba,21)\}\) is a synchronous Transducer, \(t_{as} = \{(a,\epsilon),(ab,12)\}\) is asynchronous.
+\end{exmp}
+
 A causal Transducer is one, where the output depends only on consumed inputs and not on future inputs:
 
-\begin{definition}[name = Causal Transducer]\label{def:causal_transducer}
+\begin{definition}[name = Causal and Clairvoyant Transducers]\label{def:causal_transducer}
   A Transducer \(t\) is called causal, when it satiesfies the condition:
   if \((\vec{\imath},\vec{o}) \in t \)
   then \( \forall \vec{\imath'} \in \Phi^* \text{ with } (\vec{\imath} \circ \vec{\imath'}, \vec{o'}) \in t \)
   it holds, that \( \vec{o} \sqsubseteq \vec{o'} \)
+
+  A Transducer that isn't casual is called \emph{clairvoyant}.
 \end{definition}
 
-A Transducer that isn't casual is called \emph{clairvoyant}.
+
+\begin{exmp}[name = Causal and Clairvoyant Transducers]
+  \(t_{cl} = \{(a,1),(b,2),(ab,12),(ba,21)\}\) is a causal Transducer, because each output only depends on the inputs seen upto that point, \(t_{cl} = \{(a,1),(ab,22),(aa,11)\}\) is clairvoyant, because the output when the letter \(a\) is seen depends on the next input.
+\end{exmp}
 
 When talking about Transducers, it is interesting to know if two Transducers are \emph{equivalent}.
 There are multiple possible definitions for equivalence of Transducers, we will look at two, which are interesting for this thesis.
+In the following \(\sigma_{[i,j]}\) means the infix of \(\sigma\) which starts at position \(i\) and end at \(j\).
 
 \begin{definition}[name = Asynchronous equivalence of Transducers]\label{def:async_equivalence_transducer}
   Let \(t_1, t_2\) be two asynchronous Transducers from \(\Phi^*\) to \(\Gamma^*\).
-  They are called \emph{asynchronous equivalent}, written \(t_1 \equiv_a t_2\): \\
-  if \(\forall (\vec{\imath},\vec{o}) \in t_1\) \\
-  then \( \forall \vec{\imath'} \in \Phi^*, \vec{o'} \in \Gamma^* \text{ such that } (\vec{\imath}\circ\vec{\imath'},\vec{o}\circ\vec{o'}) \in t_1\) \\
-  it holds, that \( \exists k,j \in \mathbb{N} \text{ with  } \vec{\imath_k} = (\vec{\imath}\circ\vec{\imath'}_{[0,k]}),
-  \vec{o_j} = (\vec{o}\circ\vec{o'}_{[0,j]}) \text{ and } (\vec{\imath_k}, \vec{o_j}) \in t_2\)
+  They are called \emph{asynchronous equivalent}, written \(t_1 \equiv_a t_2\), if they satisfy: \\
+  \(\forall \sigma \in \Phi^*\):
+  \begin{itemize}
+    \item \(\forall (\sigma_{[0,k]}, o) \in t_1\): \(\exists k' \geq k \text{ with } (\sigma_{[0,k']}, o') \in t_2\) and \(o \sqsubseteq o'\)
+    \item and \(\forall (\sigma_{[0,k]}, o) \in t_2\): \(\exists k' \geq k \text{ with } (\sigma_{[0,k']}, o') \in t_1\) and \(o \sqsubseteq o'\)
+  \end{itemize}
 \end{definition}
+
+\begin{lemma}[name=Transitivity of asynchronous equivalence]\label{lemma:transitivity_async_equivalence}
+  Let \(t_1, t_2, t_3\) be asynchronous Transducers.
+  If \(t_1 \equiv_a t_2\) and \(t_2 \equiv_a t_3\) then \(t_1 \equiv_a t_3\).
+\end{lemma}
+\begin{proof}
+  Yep
+\end{proof}
+
+\begin{exmp}[name = Asynchronous equivalence of Transducers]
+  Let \(\Phi = \{a\}, \Gamma = \{1\}\) and \\
+  \(t_1 = \{(a,\epsilon),(aa,\epsilon),(aaa,111)\}\), \\
+  \(t_2 = \{(a,1),(aa,1),(aaa,111)\}\), \\
+  \(t_3 = \{(a,\epsilon),(aa,1),(aaa,11)\}\).\\
+  All three transducers are asynchronous and causal.
+  Let's see which ones are asynchronous equivalent:
+
+  \(t_1 \stackrel{?}{\equiv}_a t_2\)
+  \begin{align*}
+    (a,\epsilon)  &\in t_1, k = 1 \rightarrow k' = 1, &&(a,1)     \in t_2, &&\epsilon  \sqsubseteq 1 \\
+    (aa,\epsilon) &\in t_1, k = 2 \rightarrow k' = 2, &&(aa,1)    \in t_2, &&\epsilon  \sqsubseteq 1 \\
+    (aaa,111)     &\in t_1, k = 3 \rightarrow k' = 3, &&(aaa,111) \in t_2, &&111       \sqsubseteq 111 \\
+    (a,1)         &\in t_2, k = 1 \rightarrow k' = 3, &&(aaa,111) \in t_1, &&1         \sqsubseteq 111 \\
+    (aa,1)        &\in t_2, k = 2 \rightarrow k' = 3, &&(aaa,111) \in t_1, &&1         \sqsubseteq 111 \\
+    (aaa,111)     &\in t_2, k = 3 \rightarrow k' = 3, &&(aaa,111) \in t_1, &&111       \sqsubseteq 111 \\
+  \end{align*}
+  \(\Rightarrow t_1 \equiv_a t_2\)
+
+  \(t_1 \stackrel{?}{\equiv}_a t_3\)
+  \begin{align*}
+    (aaa,111)     &\in t_1, k = 3 \rightarrow \not\exists k'
+  \end{align*}
+  \(\Rightarrow t_1 \not\equiv_a t_3\)
+
+  Because of Lemma~\ref{lemma:transitivity_async_equivalence} \(\Rightarrow t_2 \not\equiv_a t_3\).
+
+\end{exmp}
+
+\subsection{Timed Transducers}\label{sec:concepts:def:timed_transducer}
 
 For the second kind of equivalence we need to introduce \emph{timed Transducers}.
+Let \(\mathbb{T}\) be a timing model that is isomorphic to \(\mathbb{R}\).
+For the examples we will use \(\mathbb{R}\) for \(\mathbb{T}\).\\
 
 \begin{definition}[name = Timed Transducer]\label{def:timed_transducer}
-  Let \(\mathbb{T}\) be a timing model that is isomorphic to \(\mathbb{R}\).
-  A timed Transducer \(t\) works on timed inputs and produces timed outputs:
+  A timed Transducer \(t\) with input Alphabet \(\Phi\) and output Alphabet \(\Gamma\) works on timed inputs and produces timed outputs:
   \[t \subseteq {\left(\Phi \times \mathbb{T}\right)}^* \times {\left(\Gamma \times \mathbb{T}\right)}^*\]
+  % Furthermore a timed Transducer has to be causal and asynchronous.
 \end{definition}
 
+\begin{exmp}[name=Timed Transducers]
+  \(t_{tsc} = \{((a,0.0), (1,0.0)),((a,0.0)(a,1.0), (1,0.0)(1,1.0))\}\) is a timed, causal and synchronous Transducer.
+  \(t_{tac} = \{((a,0.0), \epsilon),((a,0.0)(a,1.0), (1,0.0)(1,1.0))\}\) is a timed, causal and asynchronous Transducer.
+\end{exmp}
+
 The Function \(\text{timed:} {(\Gamma \times \mathbb{T})}^* \rightarrow {(\Gamma \times \mathbb{T})}^* \)
-reorders a timed output sequence \(\vec{o}\) by its timestamps, such that:
+reorders a timed sequence \(\vec{o}\) by its timestamps, such that:
 \[
   \forall i,j \in \mathbb{N}:\text{ if } i < j \text{ then } t_i < t_j \text{ with } (o_i, t_i) = \vec{o}_i \text{ and } (o_j, t_j) = \vec{o}_j
 \]
 
-Based on this function, timed Transducers can be compared with respect to the timestamp of its output:
+
+\begin{exmp}[name=Timed Function]
+  Let \(\sigma = (a,1.0)(a,0.5)(a,1.5)(a,0.0)\). Then is \(\text{timed}(\sigma) =(a,0.0)(a,0.5)(a,1.0)(a,1.5)\)
+\end{exmp}
+
+Furthermore the Function \(\text{upto: } \mathbb{T} \times {(\Gamma\times\mathbb{T})}^* \rightarrow {(\Gamma\times\mathbb{T})}^*\) removes all elements from a timed stream, that have a timestamp bigger than the first argument.
+\begin{exmp}[name=Upto Function]
+  Let \(\sigma = (a,1.0)(a,0.5)(a,1.5)(a,0.0)\). Then is \(\text{upto}(1.3,\sigma) = (a,1.0)(a,0.5)(a,0.0)\)
+\end{exmp}
+
+For the next definitions we have to restrict timed Transducers in two ways:
+
+\begin{definition}[name = Monotonicity of Timed Transducers]\label{def:monotonicity_timed_transducer}
+  QUESTION:\ Should this be part of Timed Transducer or an extra definition?
+  A timed Transducer \(t\) with input Alphabet \(\Phi\) and output Alphabet \(\Gamma\) is called monotonic,
+  if \(\forall (\vec{\imath}, \vec{o}) \in t \text{ it holds, that timed}(\vec{\imath}) = \vec{\imath} \)
+\end{definition}
+
+\begin{definition}[name = Boundedness of Timed Transducers]\label{def:boundedness_timed_transducer}
+  A timed Transducer \(t\) with input Alphabet \(\Phi\) and output Alphabet \(\Gamma\) is called bounded, if it satisfies:
+  \begin{itemize}[label={}]
+    \item \(\forall \sigma \in {(\Phi \times \mathbb{T})}^*\):
+    \item if \((\sigma_{[0,k]}, \vec{o}) \in t\)
+    \item then \(\exists k' > k\) with
+      \begin{itemize}[label={}]
+        \item \((\sigma_{[0,k']}, \vec{o} \circ \vec{o'}) \in t\)
+        \item and \(\forall k'' > k' \text{ with } (\sigma_{[0,k'']}, \vec{o}\circ\vec{o'}\circ\vec{o''}) \in t \) it holds, that
+          \begin{itemize}[label={}]
+          \item timed\((\vec{o}\circ\vec{o'}) \sqsubseteq \text{ timed}(\vec{o}\circ\vec{o'}\circ\vec{o''})\)
+          \end{itemize}
+      \end{itemize}
+  \end{itemize}
+\end{definition}
+
+Based on the \emph{timed} and \emph{upto} Functions and the notion of boundedness and monotonicity, timed Transducers can be compared with respect to the timestamps of their output:
 
 \begin{definition}[name = Observational Equivalence]\label{def:observational_equivalence}
-  Two timed Transducers \(t_1, t_2\) are called observational equivalent, written \(t_1 \equiv_o t_2\),\\
-  if \(\forall (\vec{\imath},\vec{o}) \in t_1\) \\
-then \( \forall \vec{\imath'} \in {(\Phi\times\mathbb{T})}^*, \vec{o'} \in {(\Gamma\times\mathbb{T})}^* \text{ such that } (\vec{\imath}\circ\vec{\imath'},\vec{o}\circ\vec{o'}) \in t_1\) \\
-it holds, that \( \exists k in \mathbb{N},j \in \mathbb{N}_{\geq\text{length}(\vec{o})} \text{ with  } \vec{\imath_k} = (\vec{\imath}\circ\vec{\imath'}_{[0,k]}),
-  \vec{o_j} = (\vec{o}\circ\vec{o'}) \text{ and } (\vec{\imath_k}, \vec{o_j}) \in t_2\)
+  Let \(t_1, t_2\) be two bounded, monotonic timed Transducers with input Alphabet \(\Phi\) and output Alphabet \(\Gamma\).
+  They are called \emph{observational equivalent}, written \(t_1 \equiv_o t_2\), if they satisfy: \\
+  \(\forall \sigma \in {(\Phi\times\mathbb{T})}^*\):
+  \begin{itemize}[label={}]
+    \item \(\forall (\sigma_{[0,k]}, \vec{o}) \in t_1\): \(\exists k', k'' \geq k\) such that
+      \begin{itemize}[label={}]
+        \item \((\sigma_{[0,k']}, \vec{o} \circ \vec{o'}) \in t_1\)
+        \item and \((\sigma_{[0,k'']}, \vec{o_2}) \in t_2\)
+        \item and (work in progress)\(\text{timed(upto(maxTimeStampIn o,}\vec{o} \circ \vec{o'} )) = \text{timed(upto(maxTimeStampIn o,}\vec{o_2}))\)
+      \end{itemize}
+  \end{itemize}
 \end{definition}
+
+\begin{lemma}[name=Transitivity of observational Equivalence]\label{lemma:transitivity_observational_equivalence}
+  Let \(t_1, t_2, t_3\) be timed Transducers.
+  If they are bounded and \(t_1 \equiv_o t_2\) and \(t_2 \equiv_o t_3\) then \(t_1 \equiv_o t_3\).
+\end{lemma}
+\begin{proof}
+  YEP
+\end{proof}
+
+\begin{exmp}[name=Observational Equivalence]\label{exmp:observational_equivalence}
+  Let \(t_1 = \{((a,0.0), \epsilon),((a,0.0)(a,1.0), (1,1.0)),((a,0.0)(a,1.0)(a,2.0), (1,1.0)(1,2.0)(1,0.0))\}\), \\
+  \(t_2 = \{((a,0.0), \epsilon),((a,0.0)(a,1.0), \epsilon),((a,0.0)(a,1.0)(a,2.0), (1,2.0)(1,1.0)(1,0.0))\}\), \\
+  \(t_3 = \{((a,0.0), (1,0.0)),((a,0.0)(a,1.0), a),((a,0.0)(a,1.0)(a,2.0), (1,2.0)(1,1.0)(1,0.0))\}\)
+  All three are causal, monotonic, asynchronous timed Transducers.
+
+  Let's see which ones are observational equivalent:
+
+  \(t_1 \stackrel{?}{\equiv}_o t_2\)
+  \begin{itemize}[label={}]
+    \item \(((a,0.0), \epsilon)             \in t_1, k = 1\)
+      \begin{itemize}[label={}]
+        \item \(\rightarrow k' = 1, ((a,0.0), \epsilon)     \in t_2\)
+        \item and \(\text{timed}(\epsilon)  \sqsubseteq \text{timed}(\epsilon)\)
+      \end{itemize}
+    \item \(((a,0.0)(a,1.0), (1,1.0))       \in t_1, k = 2\)
+      \begin{itemize}[label={}]
+        \item \(\rightarrow k' = 3, ((a,0.0)(a,1.0)(a,2.0), (1,2.0)(1,1.0)(1,0.0))    \in t_2\)
+        \item and \(\text{timed}((1,1.0))=(1,1.0)   \sqsubseteq (1,0.0)(1,1.0)(1,2.0)\)
+      \end{itemize}
+  \end{itemize}
+  \(\Rightarrow t_1 \equiv_a t_2\)
+
+  \(t_1 \stackrel{?}{\equiv}_a t_3\)
+  \begin{align*}
+  \end{align*}
+  \(\Rightarrow t_1 \not\equiv_a t_3\)
+
+  Because of Lemma~\ref{lemma:transitivity_observational_equivalence} \(\Rightarrow t_2 \not\equiv_a t_3\).
+
+\end{exmp}
+
+
 
 % \begin{definition}[name = Timed Function]\label{def:timed_function}
 %   Let \(\vec{o},\vec{o'} \in {(\Gamma \times \mathbb{T})}^*, (o_1, t_1), (o_2, t_2) \in {(\Gamma \times \mathbb{T})}, t_1 \neq t_2\).
@@ -157,6 +301,9 @@ it holds, that \( \exists k in \mathbb{N},j \in \mathbb{N}_{\geq\text{length}(\v
 %     &\text{timed}(\vec{o}\circ(o_1,t_1)\circ\vec{o'}) \text{, } t_1 \text{ has the smallest time of all elements in } \vec{o}, \vec{o'} = (o_1,t_1)\circ\text{timed}(\vec{o}\circ\vec{o'})
 %   \end{align*}
 % \end{definition}
+
+\subsection{Labeled Timed Transducers}
+Maybe necessary, maybe not
 
 
 \subsection{Functions}
@@ -189,16 +336,16 @@ Therefore a Node is the concrete implementation of a Function in a runtime for T
 The set of all Nodes is called \(N\).
 The Function of a Node \(n \in N\) is written as \(f_n\).
 
-Each Node has a set of inputs, which are either input or internal Streams, and one output, which is either an internal or an output Stream.
+Each Node has a set of inputs, which are either external or internal Streams, and one output, which is either an internal or an output Stream.
+Nodes, which have at least one external Stream as an input, are called \emph{sources}.
 Nodes use a FIFO queue, provided by the Erlang plattform, to process new received Events in multiple steps:
 
 \begin{enumerate}
-  \item Add the new Event to the inputs
   \item Check if a new output Event can be produced (see Section~\ref{sec:concepts:defs:nodes:processable})
   \item If so, compute all timestamps, where new Events might be computed and
     \begin{enumerate}
-      \item Compute the Events, add them to the History as new outputs
-      \item Distribute the updated output to all successors
+      \item Compute the Events, add them to the History as new Events on the output
+      \item Distribute the new Events to the children of the Node
     \end{enumerate}
   \item Else wait for another input
 \end{enumerate}
@@ -207,15 +354,15 @@ Nodes use a FIFO queue, provided by the Erlang plattform, to process new receive
 \label{sec:concepts:defs:nodes:processable}
 
 Based on the asynchronous nature of Nodes, Events from different Streams can be received out of order.
-E.g.\ if a Node C is a child of Node A and B, it can receive Events from Node A at timestamps \(t_1, t_2, t_3, t_4\)
-before receiving an event with timestamp \(t_1\) from Node B.
+E.g.\ if a Node c is a child of Node a and b, it can receive Events from Node a at timestamps \(t_1, t_2, t_3, t_4\)
+before receiving an event with timestamp \(t_1\) from Node b.
 Therefore a Node can not compute it's output upto a timestamp unless it has informations from all predecessors that they did progress to that timestamp.
-When Node C receives the first four Events from Node A, it will only add them to it's inputs but won't compute an output.
-When it finally receives the first Event from Node B it can compute all Events upto \(t_1\).
+When Node c receives the first four Events from Node a, it will only add them to it's input queues but won't compute an output.
+When it finally receives the first Event from Node b it can compute all Events upto \(t_1\).
 To do so it will compute \emph{change timestamps}: The union of all timestamps where an Event occured on any input between the timestamp of the last generated output and the minimal progress of all inputs.
 
-To see why this is necessary lets assume that Node C will receive a new Event from Node B with timestamp \(t_4\):
-All inputs have progressed to \(t_4\), but on the Stream from Node A there are changes between \(t_1\) (where the last output was generated) and \(t_4\),
+To see why this is necessary lets assume that Node c will receive a new Event from Node b with timestamp \(t_4\):
+All inputs have progressed to \(t_4\), but on the Stream from Node a there are changes between \(t_1\) (where the last output was generated) and \(t_4\),
 therefore the \emph{change timestamps} are \(t_2, t_3, t_4\) and the Node will have to compute it's output based on the values of the streams at that timestamps.
 
 \subsection{TeSSLa Evaluation Engine}
@@ -225,15 +372,16 @@ Because Functions in TeSSLa specifications itself depend on other Functions, and
 the specification can be represented as a DAG@.
 This DAG can be directly translated into an evaluation Engine for that specification: The Nodes of the DAGs are Nodes representing the functions and the Edges are the input and output Streams between the Nodes.
 
+
 \begin{definition}[name=Equivalence of evaluation Engines]\label{def:equivalence_eval_engine}
-  Two evaluation Engines are called equivalent, if they produce the same relationship between inputs and outputs for all possible inputs.
+  Two evaluation Engines are called equivalent, if they produce the same relationship between external and output Events for all valid sequences of external Events (where valid means ordered by their timestampt).
 \end{definition}
 
 \begin{definition}[name=Equivalence of evaluation Engines for an input]\label{def:equivalence_eval_engine_specific}
   Two evaluation Engines are called equivalent for an input, if they produce the same output for that input.
 \end{definition}
 
-To evaluate a specification over Traces, the Evaluation Engine has process the Events that were traced.
+To evaluate a specification over Traces, the evaluation Engine has process the Events that were traced.
 To do so the Nodes have to run their computations until no more Events are present (or the specification found an error in the trace).
 This leads to the question in which order Nodes should be scheduled to perform their computation.
 While some schedules are simply not rational (think of unfairness and causality) there are many different schedules that are feasible.
@@ -249,14 +397,9 @@ The State of a whole evaluation Engine is made up of the States of its Nodes.
 
 Each Node has a State, which can hold arbitray information, e.g.\ a counter for a \emph{CountNode}, and its input queues.
 Input queues are Fifo queues, which hold the Events produced by predecessors of the Node, that weren't consumed yet by the Node.
-% Each Node has a State which holds the History of its input Streams and its output Stream.
-% One part of the State of every Node is the History of a Node, which holds all Events received from it's parents, called it's inputs, and all produced Events of the Node, called it's output.
 
 To distinguish between the two types of States, we will call the State of the whole Engine the \emph{global State} and the State of a Node the \emph{Node State}.
 The Set of all valid node States is called \(\widetilde{N}\).
-
-% Formally the State of a Node is a  Set of a Sequence of the inputs (which are internal or input Streams) and the output (an internal or an output Stream).
-% The Set of all valid Node States \(\widetilde{N} = {(\Sigma_i \cup \Sigma_n)}^*\times(\Sigma_n \cup \Sigma_o)\).
 
 The global State of an evaluation Engine at a certain step is a map from its Nodes to their node State.
 We will call the Set of all global States as \(S\).
@@ -285,14 +428,15 @@ The consumption of one Event from each input of a Node and the optional generati
 To look at it in another way: A Transition is the computation of a Node, therefore when we say `Node A is scheduled' we mean that a Transition is taken which models the computation of that Node.
 
 Formally Transitions are a Relation between two Sets of Events.
-E.g.\ the Transition \(\tau = (\{e_1,e_2\}, \{e_3\})\) specifies that two Events were consumed by a Node (thereby adding them to its inputs) and one Event was produced based on them (which is added to the output).
-The Set of all Transitions is
+E.g.\ the Transition \(\tau = (\{e_1,e_2\}, \{e_3\})\) specifies that two Events were consumed by a Node and one Event was produced based on them.
+A Transition is valid, if it has at least one input Event, all of its input Events are from different Streams and all of its output Events are from the same Stream: The one from the Node which computation is modeled by the Transition.
+The Set of all valid Transitions is
 \begin{align*}
-  T = \{(e, e') | &e \subseteq (E_i \cup E_n) \land e \neq \emptyset \land e' \subseteq (E_n \cup E_o)\\
-                  &\land (\forall e_i, e_j \in e': \varsigma(e_i) = \varsigma(e_j)) \land (\forall \widetilde{e}_i, \widetilde{e}_j \in e: \varsigma(\widetilde{e}_i) \neq \varsigma(\widetilde{e}_j)\}
+  T = \{(\widetilde{E}, \widetilde{E'}) | &\widetilde{E} \subseteq (E_e \cup E_n) \land \widetilde{E} \neq \emptyset \land \widetilde{E'} \subseteq (E_n \cup E_o)\\
+&\land (\forall e_i, e_j \in \widetilde{E'}: \varsigma(e_i) = \varsigma(e_j)) \land (\forall \widetilde{e}_i, \widetilde{e}_j \in \widetilde{E}: \varsigma(\widetilde{e}_i) \neq \varsigma(\widetilde{e}_j))\}
 \end{align*}
 where the Node which caused the Transition is \(\eta(\varsigma(e_i))\).
-For brevity we define \(\eta : T \rightarrow N\) with \(\eta((e, e') = \eta(\varsigma(e_i)),\ e_i \in e'\), which yields the Node that is modeled by the Transition.
+For brevity we define \(\eta : T \rightarrow N\) with \(\eta((e, e')) = \eta(\varsigma(e_i)),\ e_i \in e'\), which yields the Node that is modeled by the Transition.
 
 The empty Transition, meaning no input was consumed and no output produced, is labeled with \(\lambda\).
 Note that all Transitions, except the empty one, have to consume at least one Event (therefore no Events can be created from nowhere) and that it's possible that no Event was produced based on the consumed Events (think of a \emph{FilterNode}).
@@ -301,14 +445,14 @@ This makes only sense in the context of Timing Nodes, because else the generated
 With Timing Nodes one could for example implement an \emph{EchoNode}, which duplicates an input after a specified amount of Time.
 
 \begin{definition}[name = Application of a Transition on a State]\label{sec:concepts:def:application_transition}
-  Given a global State \(S_0\) and a Transition \(\tau_1 = (e, e') = (\{e_1,e_2,\dots,e_i\}, \{e_1',e_2',\dots,e_i'\})\), when we \emph{apply} \(\tau_1\) to \(S_0\) we get a new global State \(S_1\) with\\
-  \(\forall \widetilde{n}_i = S_0(i)\)
+  Given a global State \(s_0\) and a Transition \(\tau_1 = (\widetilde{E}, \widetilde{E'}) = (\{e_1,e_2,\dots,e_i\}, \{e_1',e_2',\dots,e_i'\})\), when we \emph{apply} \(\tau_1\) to \(s_0\) we get a new global State \(s_1\) with\\
+  \(\forall \widetilde{n}_i = s_0(i)\)
   \begin{itemize}
-    \item if \(\eta(\widetilde{n}_i) \neq \eta(\tau_1) \rightarrow S_1(i) = \widetilde{n}_i\) (No Node States changes except the one from the Node of the Transition)
-    \item else let \((\{\sigma_1,\dots,\sigma_n\}, \sigma_o) = n_i\). Than is \(S_1(i) = (\widetilde{\sigma}, \sigma_o')\) with
+    \item if \(\eta(\widetilde{n}_i) \neq \eta(\tau_1) \text{ then } s_1(i) = \widetilde{n}_i\) (No Node States changes except the one from the Node of the Transition)
+    \item else let \((\{\sigma_1,\dots,\sigma_n\}, \sigma_o) = n_i\). Then is \(s_1(i) = (\widetilde{\sigma}, \sigma_o')\) with
       \begin{itemize}
         \item \(\sigma_o' = \sigma_o ++ e'\) with \(++\) defined as appending all Events in \(e'\) to \(\sigma_o\) ordered by their timestamp
-        \item \(\widetilde{\sigma} = \{\sigma_1', \sigma_2', \dots, \sigma_n'\}\) with \(\sigma_l', l \in [1,n]: \sigma_l + \widetilde{e}\) where \(\widetilde{e} \in e \land \eta(\varsigma(\widetilde{e})) = \eta(\sigma_l)\) and \(+\) is the known append operator for sequences.
+        \item \(\widetilde{\sigma} = \{\sigma_1', \sigma_2', \dots, \sigma_n'\}\) with \(\sigma_l', l \in [1,n]: \sigma_l + \widetilde{e}\) where \(\widetilde{e} \in e \text{ and } \eta(\varsigma(\widetilde{e})) = \eta(\sigma_l)\) and \(+\) is the known append operator for sequences.
       \end{itemize}
   \end{itemize}
 
@@ -322,8 +466,8 @@ The Node State is altered by appending all Events in the second Element of the T
 A Run of an evaluation Engine is a sequence of Transitions and States.
 The first element of the sequence is the empty Transition and the initial State of the evaluation Engine.
 It is a representation of the steps the Engine takes to evaluate a specification over input Streams.
-The length of a Run can be retrieved with \(l(R_1) = d \in \mathbb{N}\).
-A Run can be queried by it's index to return the element at that index: \(R_1(i)=(\tau_i, S_i),\ i \in [0, l(R_1)]\).
+The length of a Run can be retrieved with \(l(r) = d \in \mathbb{N}\).
+A Run can be queried by it's index to return the element at that index: \(r(i)=(\tau_i, s_i),\ i \in [0, l(r)]\).
 
 The Run \(\langle (\lambda, s_0), (\tau_1, s_1) \rangle\) means, that the Engine was in it's initial State, took the transition \(\tau_1\) and thereby reached the state \(s_1\).
 
@@ -338,32 +482,32 @@ Because the State can be built from the Transitions that were taken, equivalence
 \end{lemma}
 
 \begin{proof}
-  Let \(R_1, R_2\) be the Runs of two Engines with the same Set of Transitions \(T'\).
-  Let \(S_1\) be the final State of the Run \(R_1\) and \(S_2\) of \(R_2\).
-  If the two global States weren't equal, there would have to be at least one \(i\) with \(S_1(i) \neq S_2(i)\), meaning the same Node has to have a different State in both Engines.
+  Let \(r_1, r_2\) be the Runs of two Engines with the same Set of Transitions \(\widetilde{T}\).
+  Let \(s_1\) be the final State of the Run \(r_1\) and \(s_2\) of \(r_2\).
+  If the two global States weren't equal, there would have to be at least one \(i\) with \(s_1(i) \neq s_2(i)\), meaning the same Node has to have a different State in both Engines.
   Let \(\widetilde{n}_1, \widetilde{n}_2\) be the Node States of one such Node in both Engines.
   If the two Node States are different, one of them has to contain at least one Event on an input or output that isn't on the same Stream in the other State.
   Let that Event be \(e_d\).
   To be added to the State, there has to be a Transition \(\tau = (e, e')\) with \(e_d \in e \lor e_d \in e'\).
-  This Transition has to be in \(T'\), which means it was taken by both Engines, therefore \(e_d\) is in the History of the Node in both Runs, therefore its the two Node States are equal in both Engines.
+  This Transition has to be in \(\widetilde{T}\), which means it was taken by both Engines, therefore \(e_d\) is in the History of the Node in both Runs, therefore its the two Node States are equal in both Engines.
 \end{proof}
 
-\begin{definition}[name = Distance of Runs]\label{def:runs_distance}
-  The Distance \(\delta\) of a Run \(R_1\) to a Run \(R_2\) is a pair \(\delta(R_1,R_2) = (x,y)\), where \(x\) is the index before the first position where the two Runs differ and y is the number of Steps between the index of the first difference and the position where \(R_2\) takes the Transition that \(R_1\) took after step \(x\).
-  The Distance of Runs is ordered element-wise: \((x,y) < (x',y') \leftrightarrow ((x > x') \lor (x = x' \land y < y))\).
-  Therefore two Runs with length \(d\) are equal, if their Distance is \(d,0\), which is the minimal Distance two Runs of length \(d\) can have at all.
+\begin{definition}[name = Closeness of Runs]\label{def:runs_closeness}
+  The Closeness \(\delta\) of a Run \(r_1\) to a Run \(r_2\) is a pair \(\delta(r_1,r_2) = (x,y)\), where \(x\) is the index before the first position where the two Runs differ and y is the number of Steps between the index of the first difference and the position where \(r_2\) takes the Transition that \(r_1\) took after step \(x\).
+  The Closeness of Runs is ordered element-wise: \((x,y) > (x',y') \leftrightarrow ((x > x') \lor (x = x' \land y < y))\).
+  Therefore two Runs with length \(d\) are equal, if their Closeness is \(d,0\), which is the maximal Closeness two Runs of length \(d\) can have at all.
 \end{definition}
 
 \begin{exmp}
   Let
-  \[R_1 = \langle (\lambda, S_0), (\tau_1,S_1), (\tau_2,S_2), (\tau_3,S_3), (\tau_4,S_4), (\tau_5,S_5), (\tau_6,S_6) \rangle\]
-  \[R_2 = \langle (\lambda, S_0), (\tau_1,S_1), (\tau_2,S_2), (\tau_5,S_3'), (\tau_4,S_4'), (\tau_6,S_5'), (\tau_3,S_6') \rangle\]
-  \[R_3 = \langle (\lambda, S_0), (\tau_1,S_1), (\tau_2,S_2), (\tau_3,S_3), (\tau_5,S_4''), (\tau_4,S_5''), (\tau_6,S_6'') \rangle\]
+  \[r_1 = \langle (\lambda, s_0), (\tau_1,s_1), (\tau_2,s_2), (\tau_3,s_3), (\tau_4,s_4), (\tau_5,s_5), (\tau_6,s_6) \rangle\]
+  \[r_2 = \langle (\lambda, s_0), (\tau_1,s_1), (\tau_2,s_2), (\tau_5,s_3'), (\tau_4,s_4'), (\tau_6,s_5'), (\tau_3,s_6') \rangle\]
+  \[r_3 = \langle (\lambda, s_0), (\tau_1,s_1), (\tau_2,s_2), (\tau_3,s_3), (\tau_5,s_4''), (\tau_4,s_5''), (\tau_6,s_6'') \rangle\]
 
-  Than is
-  \[\delta_{1,2} = \delta(R_1,R_2) = (3,3),\ \delta_{1,3} = \delta(R_1,R_3) = (4,1)\]
-  \[\delta_{2,1} = \delta(R_2,R_1) = (3,2),\ \delta_{2,3} = \delta(R_2,R_3) = (3,1)\]
-  \[\delta_{3,1} = \delta(R_3,R_1) = (4,1),\ \delta_{3,2} = \delta(R_3,R_2) = (3,2)\]
+  Then is
+  \[\delta_{1,2} = \delta(r_1,r_2) = (3,3),\ \delta_{1,3} = \delta(r_1,r_3) = (4,1)\]
+  \[\delta_{2,1} = \delta(r_2,r_1) = (3,2),\ \delta_{2,3} = \delta(r_2,r_3) = (3,1)\]
+  \[\delta_{3,1} = \delta(r_3,r_1) = (4,1),\ \delta_{3,2} = \delta(r_3,r_2) = (3,2)\]
 
   And \(\delta_{1,3} < \delta_{2,3} < \delta_{2,1} < \delta_{2,1}\).
 
@@ -371,32 +515,32 @@ Because the State can be built from the Transitions that were taken, equivalence
 \end{exmp}
 
 \begin{definition}[name = Enabledness of a Node]\label{def:node_enabled}
-  A Node \(n\) with the input Streams \(\widetilde{\sigma}\) in an evaluation Engine is called \emph{enabled} at a Step \(s\) of a Run \(R_1\) of that Engine, when it satisfies all of the following conditions:
+  A Node \(n\) with the input Streams \(\widetilde{\sigma}\) in an evaluation Engine is called \emph{enabled} at a Step \(i\) of a Run \(r\) of that Engine, when it satisfies all of the following conditions:
 
   \begin{itemize}
     \item All consumed Events are either internal Events that were produced at an earlier step or external Events that are present:
       \begin{itemize}
-        \item \(\forall \sigma_x \in \widetilde{\sigma} \cap \Sigma_n: \exists j \in [1, s]: R_1(j) = (\tau_j, S_j)\) with
+        \item \(\forall \sigma_x \in \widetilde{\sigma} \cap \Sigma_n: \exists j \in [1, i]: r(j) = (\tau_j, s_j)\) with
           \begin{itemize}
             \item\( (e, e') = \tau_j \land e_x \in e'\) with \(\varsigma(e_x) = \sigma_x \)
           \end{itemize}
-        \item and \(\forall \sigma_i \in \widetilde{\sigma} \cap\Sigma_i:\exists e_i\) with \(\varsigma(e_i) = \sigma_i\)
+        \item and \(\forall \sigma_e \in \widetilde{\sigma} \cap\Sigma_e:\exists e_e\) with \(\varsigma(e_e) = \sigma_e\)
       \end{itemize}
     \item and weren't consumed earlier by that Node
       \begin{itemize}
         \item \(\forall e_x\) (the same \(e_x\) as in the steps above)
           \begin{itemize}
-            \item \(\not\exists h \in [j, s]: (\widetilde{e}, \widetilde{e'}) = \tau_h \land \eta(\tau_h) = n \land (\tau_h, S_h) = R_1(h) \land e_x \in \widetilde{e}\)
+            \item \(\not\exists h \in [j, i]: (\widetilde{e}, \widetilde{e'}) = \tau_h \land \eta(\tau_h) = n \land (\tau_h, s_h) = r(h) \land e_x \in \widetilde{e}\)
           \end{itemize}
       \end{itemize}
   \end{itemize}
 \end{definition}
 
 \begin{definition}[name = Valid Run]\label{def:valid_run}
-  A Run \(R_1\) is called \emph{valid} if
+  A Run \(r\) is called \emph{valid} if
   \begin{itemize}
-    \item \(\forall i \in [0,l(R_1)]: R_1(i) = (\tau_i,S_i) \land \eta(\tau_i)\) is enabled at step \(i\)
-    \item and \(S_i\) is built by applying \(\tau_i\) to \(S_{i-1}\)
+    \item \(\forall i \in [0,l(r)]: r(i) = (\tau_i,s_i) \land \eta(\tau_i)\) is enabled at step \(i\)
+    \item and \(s_i\) is built by applying \(\tau_i\) to \(s_{i-1}\)
   \end{itemize}
 \end{definition}
 
@@ -405,26 +549,26 @@ Because the State can be built from the Transitions that were taken, equivalence
 \end{definition}
 
 \begin{definition}[name = Independence of Transitions]\label{def:independence_transitions}
-  A Transition \(\tau_1\) is called independent of another Transitions \(\tau_2\), if \(\eta(\tau_1))\) is independent of \(\eta(\tau_2))\).
+  A Transition \(\tau_1\) is called independent of another Transitions \(\tau_2\), if \(\eta(\tau_1)\) is independent of \(\eta(\tau_2)\).
 \end{definition}
 
 \begin{lemma}[name = Exchange of independent Transitions]\label{lemma:exchange_independent_transitions}
-  If a Transition \(\tau_1\) is independent of a Transition \(\tau_2\), than for all Runs of the evaluation Engine that produces the Runs the following holds:
+  If a Transition \(\tau_1\) is independent of a Transition \(\tau_2\), then for all Runs of the evaluation Engine that produces the Runs the following holds:
   \begin{align*}
-    R_1 = \langle (\lambda, S_0), \dots, (\tau_2, s_i), (\tau_1, s_j), \dots, (\tau_l, s_l) \rangle \text{is a valid Run} \\
-    \rightarrow R_2 = \langle (\lambda, S_0), \dots, (\tau_1, s_i'), (\tau_2, s_j'), \dots, (\tau_l, s_l') \rangle \text{is a valid Run}
+    r_1 = \langle (\lambda, s_0), \dots, (\tau_2, s_i), (\tau_1, s_j), \dots, (\tau_l, s_l) \rangle \text{is a valid Run} \\
+    \rightarrow r_2 = \langle (\lambda, s_0), \dots, (\tau_1, s_i'), (\tau_2, s_j'), \dots, (\tau_l, s_l') \rangle \text{is a valid Run}
   \end{align*}
 \end{lemma}
 
 \begin{proof}
-  Because \(A = \eta(\tau_1)\) is no descendant of \(B = \eta(\tau_2)\), the Stream \(\sigma\) with \(\eta(\sigma) = \eta(\tau_2)\) can be no input of \(A\).
-  Therefore the enabledness of \(A\) can't be changed by \(\tau_2\) as you can see from the Definition of enabledness.
-  So \(A\) has to be enabled before \(\tau_2\) was taken by \(R_1\), else it couldn't be enabled afterwards.
-  Therefore \(R_2\) also fullfills the requirements for a valid Run.
+Because \(a = \eta(\tau_1)\) is no descendant of \(b = \eta(\tau_2)\), the Stream \(\sigma\) with \(\eta(\sigma) = \eta(\tau_2)\) can be no input of \(a\).
+  Therefore the enabledness of \(a\) can't be changed by \(\tau_2\) as you can see from the Definition of enabledness.
+  So \(a\) has to be enabled before \(\tau_2\) was taken by \(r_1\), else it couldn't be enabled afterwards.
+  Therefore \(r_2\) also fullfills the requirements for a valid Run.
 \end{proof}
 
 \begin{lemma}[name = Influence of independent Nodes]\label{lemma:independent_nodes}
-  When a Node A is independent of a Node B, than it has no influence on the enabledness of Node A if Node B is scheduled before or after it.
+  When a Node a is independent of a Node b, then it has no influence on the enabledness of Node a if Node b is scheduled before or after it.
 \end{lemma}
 
 \begin{proof}
@@ -433,7 +577,7 @@ Because the State can be built from the Transitions that were taken, equivalence
 
 \begin{lemma}[name = Duration of Enabledness]\label{lemma:enabled_till_scheduled}
   A Node which is enabled stays enabled at least until it is scheduled.
-  Formaly: If a Node \(n\) is enabled at step \(i\) in a Run \(R_1\) it will stay enabled at least until Step \(j > j\) with \(R_1(j) = (\tau,s), \eta(\tau) = n\).
+  Formaly: If a Node \(n\) is enabled at step \(i\) in a Run \(r\) it will stay enabled at least until Step \(j > j\) with \(r(j) = (\tau,s), \eta(\tau) = n\).
   Note that it doesn't have to be enabled after step \(j\), because there could have been multiple Events buffered on it's inputs.
 \end{lemma}
 
@@ -459,7 +603,7 @@ Therefore at each Step one Node is scheduled to perform it's operation, represen
 The Transition will encode one of the following three Things that can happen:
 
 \begin{itemize}
-  \item An input Event can be consumed by a source in the DAG, which generates an internal Event that is propagated to it's children.
+  \item The next external Event (external Events have to be totally ordered by their timestamp) can be consumed by a source in the DAG, which generates internal Events, that are propagated to it's children.
   \item An internal Node, which has at least one new input buffered on all of its input queues, can perform
     its computation and generate a new internal Event, which is propagated to the children of that node, which therefore can compute in the next step.
   \item An output node, which has at least one new input buffered on all of its input queues, can produce a new output.
@@ -476,7 +620,7 @@ They are characterized by a specific, fixed schedule.
 The scheduling algorithm is as follows:
 
 \begin{itemize}
-  \item Select all Nodes that are no input Nodes, let their number be \(\i\)
+  \item Select all Nodes that are no sources, let their count be \(\i\)
   \item Label them with unique natural numbers from \([1,i]\) in reversed topological order
   \item Label the remaining Nodes with unique natural numbers bigger than \(i\)
   \item Whenever a Node has to be scheduled, schedule the enabled one with the lowest label
@@ -494,62 +638,62 @@ As shown in Section~\ref{sec:concepts:topological_schedule_is_fair} any schedule
 \begin{figure}
   \begin{tikzpicture}
     [pre/.style={<-,shorten <=1pt,>=stealth,semithick}]
-    \node (S) at (2,5) {\(e_1\)};
-    \node [shape=circle,draw=black] (A) [label=right:5] at (2, 4) {A}
-      edge [pre] (S);
-    \node [shape=circle,draw=black] (B) [label=left:4] at (0,2.5) {B}
-      edge [pre] (A);
-    \node [shape=circle,draw=black] (C) [label=left:1] at (0,0) {C}
-      edge [pre] (B);
-    \node [shape=circle,draw=black] (D) [label=right:3] at (4,1) {D}
-      edge [pre] (A)
-      edge [pre] (B);
-    \node [shape=circle,draw=black] (E) [label=right:2] at (4,-1) {E}
-      edge [pre] (D);
-    \node (o1) at (0,-2) {\(o\)} edge [pre] (C);
-    \node (o2) at (4,-2) {\(u\)} edge [pre] (E);
+    \node (s) at (2,5) {\(e_1\)};
+    \node [shape=circle,draw=black] (a) [label=right:5] at (2, 4) {a}
+      edge [pre] (s);
+    \node [shape=circle,draw=black] (b) [label=left:4] at (0,2.5) {b}
+      edge [pre] (a);
+    \node [shape=circle,draw=black] (c) [label=left:1] at (0,0) {c}
+      edge [pre] (b);
+    \node [shape=circle,draw=black] (d) [label=right:3] at (4,1) {d}
+      edge [pre] (a)
+      edge [pre] (b);
+    \node [shape=circle,draw=black] (e) [label=right:2] at (4,-1) {e}
+      edge [pre] (d);
+    \node (o1) at (0,-2) {\(o\)} edge [pre] (c);
+    \node (o2) at (4,-2) {\(u\)} edge [pre] (e);
   \end{tikzpicture}
   \begin{tikzpicture}
     [pre/.style={<-,shorten <=1pt,>=stealth,semithick}]
-    \node [shape=circle,draw=black] (A) [label=right:5] at (2, 4) {A};
-    \node [shape=circle,draw=black] (B) [label=left:4] at (0,2.5) {B}
-      edge [pre] node[align=left,left,pos=0.6] {\(n_{A1}\)} (A);
-    \node [shape=circle,draw=black] (C) [label=left:1] at (0,0) {C}
-      edge [pre] (B);
-    \node [shape=circle,draw=black] (D) [label=right:3] at (4,1) {D}
-      edge [pre] node[align=right,right,pos=0.6] {\(n_{A1}\)} (A)
-      edge [pre] (B);
-    \node [shape=circle,draw=black] (E) [label=right:2] at (4,-1) {E}
-      edge [pre] (D);
-    \node (o1) at (0,-2) {\(o\)} edge [pre] (C);
-    \node (o2) at (4,-2) {\(u\)} edge [pre] (E);
+    \node [shape=circle,draw=black] (a) [label=right:5] at (2, 4) {a};
+    \node [shape=circle,draw=black] (b) [label=left:4] at (0,2.5) {b}
+      edge [pre] node[align=left,left,pos=0.6] {\(n_{a1}\)} (a);
+    \node [shape=circle,draw=black] (c) [label=left:1] at (0,0) {c}
+      edge [pre] (b);
+    \node [shape=circle,draw=black] (d) [label=right:3] at (4,1) {d}
+      edge [pre] node[align=right,right,pos=0.6] {\(n_{a1}\)} (a)
+      edge [pre] (b);
+    \node [shape=circle,draw=black] (e) [label=right:2] at (4,-1) {e}
+      edge [pre] (d);
+    \node (o1) at (0,-2) {\(o\)} edge [pre] (c);
+    \node (o2) at (4,-2) {\(u\)} edge [pre] (e);
   \end{tikzpicture}
   \caption{Visualization of a simple asynchronous system with a reversed topological order.}
 \label{fig:chap3:sec_sync:visual_dag}
 \end{figure}
 
 Figure~\ref{fig:chap3:sec_sync:visual_dag} visualizes a synchronous evaluation Engine.
-It shows two DAG representations of an evaluation Engine  where the Nodes A to E are labeled in a reversed topological order and \(o\) and \(u\) represents the output Streams with that name.
-The left System is in its initial State and an input Event \(e_1\) is present and can be consumed by the input Node A.
-When a Node is chosen to compute by the scheduler, only Node A is enabled, therefore it is scheduled.
-The right System is the representation of the next step: Node A has consumed the external Event and produced an internal Event \(n_{A1}\) which is propagated to all it's children: Node B and D.
-In the next step Node B would be scheduled, because it has the lowest number of any node that can compute (actually it's the only node that can compute at all, because D has to wait for the event from B).
-After B was scheduled, it would have produced the internal Event \(n_{B1}\) which would then be distributed to Nodes C and D.
+It shows two DAG representations of an evaluation Engine  where the Nodes a to e are labeled in a reversed topological order and \(o\) and \(u\) represents the output Streams with that name.
+The left System is in its initial State and an input Event \(e_1\) is present and can be consumed by the input Node a.
+When a Node is chosen to compute by the scheduler, only Node a is enabled, therefore it is scheduled.
+The right System is the representation of the next step: Node a has consumed the external Event and produced an internal Event \(n_{a1}\) which is propagated to all it's children: Node b and d.
+In the next step Node b would be scheduled, because it has the lowest number of any node that can compute (actually it's the only node that can compute at all, because d has to wait for the event from b).
+After B was scheduled, it would have produced the internal Event \(n_{b1}\) which would then be distributed to Nodes c and d.
 
 The complete Run of the synchronous Engine for one Input is the following, where the States are not further defined:
 
 \begin{align*}
   \langle
-    (\lambda,                             S_0),
-    ((\{ n_{A1}         \}, \{n_{B1}\}),  S_1),
-    ((\{ n_{B1}         \}, \{o_1\}),     S_2),\\
-    ((\{ n_{A1}, n_{B1} \}, \{n_{D1}\}),  S_3),
-    ((\{ n_{D1}         \}, \{u_1\}),     S_4)
+    (\lambda,                             s_0),
+    ((\{ n_{a1}         \}, \{n_{b1}\}),  s_1),
+    ((\{ n_{b1}         \}, \{o_1\}),     s_2),\\
+    ((\{ n_{a1}, n_{b1} \}, \{n_{d1}\}),  s_3),
+    ((\{ n_{d1}         \}, \{u_1\}),     s_4)
   \rangle
 \end{align*}
 
-If there were more than one input Event, at this point Node A would be scheduled again.
-It would consume the next input and the following Nodes would be scheduled in the same order as before, extending the Run in an obvious way.
+If there were more then one input Event, at this point Node a would be scheduled again.
+It would consume the next external Event and the following Nodes would be scheduled in the same order as before, extending the Run in an obvious way.
 
 \subsection{Asynchronous evaluation}
 \label{sec:concepts:behaviour_without_timing:async}
@@ -587,47 +731,46 @@ But both will produce all outputs that can be produced after consuming one speci
 Also both Runs will obviously have the same length (both Engines are the same DAG, so they have the same number of Nodes), let that length be \(l\).
 
 To proof the equivalence of both Engines we can prove the equivalence of their Runs.
-To show the equivalence we will show that there is always another Run, which is equivalent to the second one, that has a smaller Distance from the first one.
-If such a closer Run always exist, we will show that the Run with Distance \(l, 0\) to the first Run, which has to be the first Run itself, is also an equivalent Run to the second Run.
+To show the equivalence we will show that there is always another Run, which is equivalent to the second one, that has a bigger Closeness to the first one.
+If such a closer Run always exist, we will show that the Run with Closeness \(l, 0\) to the first Run, which has to be the first Run itself, is also an equivalent Run to the second Run.
 
 \begin{theorem}[name = Equivalence of different synchronous evaluation Engines]\label{theorem:equivalence_sync_eval_engines}
   Two synchronous evaluation Engines for a specification with different schedules are equivalent.
 \end{theorem}
 \begin{proof}
 
-% Let \(\vec{e} = (e_1, e_2, \dots, e_x)\) be the input Events both Engines receive.
-Let \(R_1, R_2\) be the Runs of the two Engines for a given TeSSLa specification.
+Let \(r_1, r_2\) be the Runs of the two Engines for a given TeSSLa specification.
 Because each TeSSLa specification contains only a finite amount of Functions and works on finite traces, the Runs also have to be finite.
 
-If the two Runs aren't equal, they must have a Distance which is bigger than \((l, 0)\).
-Let \([R_2]\) be the Set of all Runs that are equivalent to \(R_2\).
-All of those Runs will also have a Distance from \(R_1\) which is bigger than \((l, 0)\).
-Select one Run \(R_2' \in [R_2]\) which has a minimal Distance from \(R_1\).
-Let \((d,k) = \delta(R_1, R_2')\).
+If the two Runs aren't equal, they must have a Closeness which is smaller than \((l, 0)\).
+Let \([r_2]\) be the Set of all Runs that are equivalent to \(r_2\).
+All of those Runs will also have a Closeness from \(r_1\) which is smaller than \((l, 0)\).
+Select one Run \(r_2' \in [r_2]\) which has a minimal Closeness from \(r_1\).
+Let \((d,k) = \delta(r_1, r_2')\).
 
-This means that at Step \(d\) the Run \(R_2'\) has taken a different Transition than Run \(R_1\).
-Let the Transitions the Runs have taken be \(\tau_1\) for \(R_1\) and \(\tau_2\) for \(R_2'\).
-Run \(R_2'\) will take Transition \(\tau_1\) at step \(d+k\) (as per the definition of the Distance).
+This means that at Step \(d\) the Run \(r_2'\) has taken a different Transition than Run \(r_1\).
+Let the Transitions the Runs have taken be \(\tau_1\) for \(r_1\) and \(\tau_2\) for \(r_2'\).
+Run \(R_2'\) will take Transition \(\tau_1\) at step \(d+k\) (as per the definition of the Closeness).
 Obviously the two Transitions have to be independent of each other, else they couldn't have been taken in different order by the two Runs.
 
-If \(k > 1\) there will be a Transition \(\tau_2' \neq \tau_1\) which is taken by the Run \(R_2'\) at Step \(d+(k-1)\).
-While this Transition \(\tau_2'\) must also be taken in the first Run as per Lemma~\ref{lemma:enabled_till_scheduled}, it's not possible, that it was taken before \(\tau_1\), beause than the two runs wouldn't have been the same upto the point where \(\tau_1\) was taken.
+If \(k > 1\) there will be a Transition \(\tau_2' \neq \tau_1\) which is taken by the Run \(r_2'\) at Step \(d+(k-1)\).
+While this Transition \(\tau_2'\) must also be taken in the first Run as per Lemma~\ref{lemma:enabled_till_scheduled}, it's not possible, that it was taken before \(\tau_1\), beause then the two runs wouldn't have been the same upto the point where \(\tau_1\) was taken.
 Therefore \(\tau_1\) has to be independent of \(\tau_2'\), and because \(\tau_2'\) was scheduled by the second Run before \(\tau_1\) both Transitions are independent of each other.
 
 As of Lemma~\ref{lemma:independent_nodes} which one of them is taken first can't change the enabledness of the Node of the second Transition.
-Therefore there is a Run \(R_2''\), which is equal to \(R_2'\), except that the Transitions \(\tau_1, \tau_2'\) are scheduled the other way around.
+Therefore there is a Run \(r_2''\), which is equal to \(r_2'\), except that the Transitions \(\tau_1, \tau_2'\) are scheduled the other way around.
 Figure~\ref{fig:chap3:sec_sync:commutativity_scheduling} visualizes how changing the order of the two Transitions can't change the global State of the Engine after both were taken.
-Therefore the Runs \(R_2'\) and \(R_2''\) are equivalent and the Distance to \(R_1\) is \(d, k-1\), which contradicts the initial statement that \(R_1'\) was a Run with a minimal Distance.
-This means that there is an equivalent Run to \(R_2\) which has at most the Distance \((d, 1)\).
+Therefore the Runs \(r_2'\) and \(r_2''\) are equivalent and their Closeness to \(r_1\) is \(d, k-1\), which contradicts the initial statement that \(r_1'\) was a Run with a maximal Closeness.
+This means that there is an equivalent Run to \(r_2\) which has at least the Closeness \((d, 1)\).
 
 If \(k = 1\) the Transition \(\tau_2'\) from the previous case is equal to \(\tau_2\).
-Based on the same reasoning there also exist a Run \(R_2''\) which is equal to \(R_2'\), except that the order of \(\tau_2\) and \(\tau_1\) is changed, and which is also equivalent to \(R_2'\) and to \(R_2\).
-This Run has the Distance \((d, 0)\) from \(R_1\).
-This obviously doesn't make sense: The first element of the Distance is the last step where both Runs are equal, the second element describes how many Steps afterwards the differing Transition was taken.
-But if it was taken right in the step after the last equal step, there is no difference at that position, so the Difference of \(R_1\) and \(R_2''\) can be at most \((d+1, x), x \in \mathbb{N}_{>0}\).
-This also contradicts our initial statement that \(R_2'\) was the Run with the smallest Distance from \(R_1\) which is equivalent to \(R_2\).
+Based on the same reasoning there also exist a Run \(r_2''\) which is equal to \(r_2'\), except that the order of \(\tau_2\) and \(\tau_1\) is changed, and which is also equivalent to \(r_2'\) and to \(r_2\).
+This Run has the Closeness \((d, 0)\) to \(r_1\).
+This obviously doesn't make sense: The first element of the Closeness is the last step where both Runs are equal, the second element describes how many Steps afterwards the differing Transition was taken.
+But if it was taken right in the step after the last equal step, there is no difference at that position, so the Closeness of \(r_1\) and \(r_2''\) can be at least \((d+1, x), x \in \mathbb{N}_{>0}\).
+This also contradicts our initial statement that \(r_2'\) was the Run with the biggest Closeness to \(r_1\) which is equivalent to \(r_2\).
 
-Combined we can now say, that there is no lower bound on the Distance of equivalent Runs of \(R_2\) to \(R_1\), therefore the Run with the Distance \((l, 0)\) also has to be equivalent to \(R_2\).
+Combined we can now say, that there is no upper bound on the Closeness of equivalent Runs of \(r_2\) to \(r_1\), therefore the Run with the Closeness \((l, 0)\) also has to be equivalent to \(r_2\).
 
 \end{proof}
 
@@ -655,7 +798,7 @@ Combined we can now say, that there is no lower bound on the Distance of equival
 \subsection{Equivalence of synchronous and asynchronous schedules}
 \label{sec:concepts:equivalence_without_timing:sync_async}
 
-When the Nodes of \(A\) aren't scheduled in reversed topological order, the System can consume inputs before producing all outputs based on the last consumed input.
+When the Nodes of \(a\) aren't scheduled in reversed topological order, the System can consume inputs before producing all outputs based on the last consumed input.
 Therefore the reordering of Runs has to be performed over wider parts of the Run.
 % Idea: each step is a commutation of two internal events in regard to the rev top order.
 % => show commutativity of traces (note: only valid commutations, no two events, where one depends one the other, can be commuted, this is ensured by the scheduling of nodes that have input buffered)

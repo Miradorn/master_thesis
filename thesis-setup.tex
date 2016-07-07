@@ -90,10 +90,18 @@
 \cthesissetcolor{RGB}{0,75,90}{160,187,47}
 \addbibresource{bib-refs}
 
-\newtheorem{lemma}{Lemma}
-\newtheorem{definition}{Definition}
-\newtheorem{theorem}{Theorem}
-\newtheorem{exmp}{Example}
+\declaretheoremstyle[
+notefont=\bfseries, notebraces={}{},
+bodyfont=\normalfont\itshape,
+headformat=\NAME~\NUMBER:\NOTE,
+postheadspace = \newline
+]{default}
+\theoremstyle{break}
+
+\declaretheorem[style=default]{lemma}
+\declaretheorem[style=default]{definition}
+\declaretheorem[style=default]{theorem}
+\declaretheorem[style=default, name = Example]{exmp}
 
 \newcommand{\defeq}{\mathrel{\texttt{:=}}}
 
