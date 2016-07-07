@@ -46,7 +46,7 @@ Signals can be described by a sequence of changes, where a change denotes that t
 The only difference between a Signal and an EventStreams is that Signals always have a value while an EventStream may return \(\bot\) when queried for its value at a specific time, which denotes, that no event happened at that time.
 Based on the similarity of Signals and Eventstreams in the following we will mainly reason about Eventstreams, but most things can also be applied to Signals.
 
-Formally a Stream \(\sigma\) can be represented as a Sequence of Events \(\langle e_1, \dots e_n\rangle\) where \(\pi(e_i) < \pi(e_{i+1}),\ \forall i < n \in \mathbb{N}\).
+Formally a Stream \(\sigma\) can be represented as a sequence of Events \(\langle e_1, \dots e_n\rangle\) where \(\pi(e_i) < \pi(e_{i+1}),\ \forall i < n \in \mathbb{N}\).
 The Set of all Streams \(\Sigma\) is defined as all possible finite sequences of Events \(\Sigma = \{\sigma | \sigma \in E^* \}\).
 An external Stream \(\sigma_e\) is a stream consisting only of external Events, the set of all external Streams is \(\Sigma_e = \{\sigma_e | \sigma_e \in E_e^*\}\).
 Output and internal Streams are defined analogous.
@@ -61,228 +61,310 @@ Internal and output Streams can be queried for the Node that produced them with 
 \subsection{Transducers}
 \label{sec:concepts:defs:transducers}
 
-Fundamentally TeSSLa is a special kind of a Transducer.
-Therefore in this Section we will define a model of Transducers which can be used to reason about the evaluation of a TeSSLa specification.
+Fundamentally TeSSLa is a special kind of a transducer.
+Therefore in this section we will define a model of transducers which can be used to reason about the evaluation of a TeSSLa specification.
 
-A Transducer is a System, which consumes an input and produces an output.
-Let \(\Phi, \Gamma\) be two Alphabets and \(\epsilon\) the empty word.
+A transducer is a system, which consumes an input and produces an output.
+Let \(\Phi, \Gamma\) be two alphabets and \(\epsilon\) the empty word.
 
 \begin{definition}[name = Transducer]\label{def:transducer}
-  A Transducer \(t\) is a Relation \(t \subseteq \Phi^* \times \Gamma^*\), \(\Phi\) is called the input Alphabet, \(\Gamma\) the output Alphabet.
+  A transducer \(t\) is a relation \(t \subseteq \Phi^* \times \Gamma^*\), \(\Phi\) is called the input alphabet, \(\Gamma\) the output alphabet.
 \end{definition}
 
 
 TeSSLa specifications are deterministic for any input, meaning they should produce the same output for the same input.
 
 \begin{definition}[name = Deterministic Transducer]\label{def:deterministic_transducer}
-  A deterministic Transducer relates each input to at most one output.
+  A deterministic transducer relates each input to at most one output.
 \end{definition}
 
 \begin{exmp}[name = Deterministic and Nondeterministic Transducers]
-  \(t_d = \{(a,1),(b,2),(ab,12),(ba,21)\}\) is a deterministic Transducer, \(t_{nd} = \{(a,1),(a,2)\}\) is nondeterministic, because it relates \(a\) to \(1\) and \(2\).
+  \(t_d = \{(a,1),(b,2),(ab,12),(ba,21)\}\) is a deterministic transducer, \(t_{nd} = \{(a,1),(a,2)\}\) is nondeterministic, because it relates \(a\) to \(1\) and \(2\).
 \end{exmp}
 
-Transducers can furthermore be categorized as synchronous, asynchronous, causal and clairvoyant Transducers:
-Synchronosity is a property over the behaviour of a Transducer when it's consuming input per element.
+Transducers can furthermore be categorized as synchronous, asynchronous, causal and clairvoyant transducers:
+synchronosity is a property over the behaviour of a transducer when it's consuming input per element.
 If it is synchronous, it will produce an output element for each input element.
 
 \begin{definition}[name = Synchronous Transducer]\label{def:synchronous_transducer}
 Let \(\vec{\imath} \in \Phi^*, i \in \Phi, \vec{o} \in \Gamma^*, o \in \Gamma\).
-  A Transducer \(t\) is called synchronous, when it satisfies the formula:
+  A transducer \(t\) is called synchronous, when it satisfies, that:
   if \( (\vec{\imath}\circ i,\vec{o}\circ o) \in t\)
   then \( (\vec{\imath}, \vec{o}) \in t \)
 \end{definition}
 
-An asynchronous Transducer can produce zero, one or many outputs for each input it consumes.
+An asynchronous transducer can produce zero, one or many outputs for each input it consumes.
 
 \begin{definition}[name = Asynchronous Transducer]\label{def:asynchronous_transducer}
   Let \(\vec{\imath}\in \Phi^*, i \in \Phi,\vec{o} \in \Gamma^*\).
-  A Transducer \(t\) is called asynchronous when it satisfies the formula:
+  A transducer \(t\) is called asynchronous when it satisfies the formula:
   if \((\vec{\imath}\circ i, \vec{o}) \in t \)
   then \(\exists \vec{o'},\vec{o''} \in \Gamma^*\text{ so that } \vec{o} = \vec{o'}\circ\vec{o''} \text{ and } (\vec{\imath},\vec{o'}) \in t \)
 \end{definition}
 
 \begin{exmp}[name = Synchronous and Asynchronous Transducers]
-  \(t_s = \{(a,1),(b,2),(ab,12),(ba,21)\}\) is a synchronous Transducer, \(t_{as} = \{(a,\epsilon),(ab,12)\}\) is asynchronous.
+  \(t_s = \{(a,1),(b,2),(ab,12),(ba,21)\}\) is a synchronous transducer, \(t_{as} = \{(a,\epsilon),(ab,12)\}\) is asynchronous.
 \end{exmp}
 
-A causal Transducer is one, where the output depends only on consumed inputs and not on future inputs:
+A causal transducer is one, where the output depends only on consumed inputs and not on future inputs:
 
 \begin{definition}[name = Causal and Clairvoyant Transducers]\label{def:causal_transducer}
-  A Transducer \(t\) is called causal, when it satiesfies the condition:
+  A transducer \(t\) is called causal, when it satiesfies, that:
   if \((\vec{\imath},\vec{o}) \in t \)
   then \( \forall \vec{\imath'} \in \Phi^* \text{ with } (\vec{\imath} \circ \vec{\imath'}, \vec{o'}) \in t \)
   it holds, that \( \vec{o} \sqsubseteq \vec{o'} \)
 
-  A Transducer that isn't casual is called \emph{clairvoyant}.
+  A transducer that isn't casual is called \emph{clairvoyant}.
 \end{definition}
 
 
 \begin{exmp}[name = Causal and Clairvoyant Transducers]
-  \(t_{cl} = \{(a,1),(b,2),(ab,12),(ba,21)\}\) is a causal Transducer, because each output only depends on the inputs seen upto that point, \(t_{cl} = \{(a,1),(ab,22),(aa,11)\}\) is clairvoyant, because the output when the letter \(a\) is seen depends on the next input.
+  \(t_{cl} = \{(a,1),(b,2),(ab,12),(ba,21)\}\) is a causal transducer, because each output only depends on the inputs seen upto that point, \(t_{cl} = \{(a,1),(ab,22),(aa,11)\}\) is clairvoyant, because the output when the letter \(a\) is seen depends on the next input.
 \end{exmp}
 
-When talking about Transducers, it is interesting to know if two Transducers are \emph{equivalent}.
-There are multiple possible definitions for equivalence of Transducers, we will look at two, which are interesting for this thesis.
-In the following \(\sigma_{[i,j]}\) means the infix of \(\sigma\) which starts at position \(i\) and end at \(j\).
+When talking about transducers, it is interesting to know if two transducers are \emph{equivalent}.
+There are multiple possible definitions for equivalence of transducers, we will look at two, which are interesting for this thesis.
+In the following \(\sigma_i\) is used to get the Element at Position \(i\) and \(\sigma_{[i,j]}\) to get the infix of \(\sigma\) which starts at position \(i\) and ends at position \(j\) (With \(0\) as the index of the first Element).
 
 \begin{definition}[name = Asynchronous equivalence of Transducers]\label{def:async_equivalence_transducer}
-  Let \(t_1, t_2\) be two asynchronous Transducers from \(\Phi^*\) to \(\Gamma^*\).
+  Let \(t_1, t_2\) be two asynchronous transducers from \(\Phi^*\) to \(\Gamma^*\).
   They are called \emph{asynchronous equivalent}, written \(t_1 \equiv_a t_2\), if they satisfy: \\
   \(\forall \sigma \in \Phi^*\):
   \begin{itemize}
-    \item \(\forall (\sigma_{[0,k]}, o) \in t_1\): \(\exists k' \geq k \text{ with } (\sigma_{[0,k']}, o') \in t_2\) and \(o \sqsubseteq o'\)
-    \item and \(\forall (\sigma_{[0,k]}, o) \in t_2\): \(\exists k' \geq k \text{ with } (\sigma_{[0,k']}, o') \in t_1\) and \(o \sqsubseteq o'\)
+    \item \(\forall (\sigma_{[0,k]}, \vec{o}) \in t_1\): \(\exists k' \geq k \text{ with } (\sigma_{[0,k']}, \vec{o'}) \in t_2\) and \(\vec{o} \sqsubseteq \vec{o'}\)
+    \item and \(\forall (\sigma_{[0,k]}, \vec{o}) \in t_2\): \(\exists k' \geq k \text{ with } (\sigma_{[0,k']}, \vec{o'}) \in t_1\) and \(\vec{o} \sqsubseteq \vec{o'}\)
   \end{itemize}
 \end{definition}
 
-\begin{lemma}[name=Transitivity of asynchronous equivalence]\label{lemma:transitivity_async_equivalence}
-  Let \(t_1, t_2, t_3\) be asynchronous Transducers.
-  If \(t_1 \equiv_a t_2\) and \(t_2 \equiv_a t_3\) then \(t_1 \equiv_a t_3\).
+\begin{lemma}[name=Asynchronous equivalence is an equivalence Relationship]\label{lemma:async_equivalence_is_equivalence_relationship}
+  Asynchronous equivalence is symmetric, reflexive and transitive.
 \end{lemma}
-\begin{proof}
-  Yep
+\begin{proof}$ $\newline
+  \begin{itemize}
+    \item Symmetry: trivial, since the second part of the definition is requiring it.
+    \item Reflexivity: Also trivial, for \((\sigma_{[0,k]}, \vec{o})\) select \(k' = k\).
+    \item Transitivity:
+      \begin{itemize}
+        \item Let \(t_1 \equiv_a t_2\), \(t_2 \equiv_a t_3\).
+        \item First case:
+          \begin{align*}
+            &\text{Since } t_1 \equiv_a t_2:\ \forall (\sigma_{[0,k_1]}, \vec{o_1}) \in t_1: \\
+            &\hspace{2em} \exists k_2\ \text{such, that } (\sigma_{[0,k_2]}, \vec{o_2}) \in t_2\ \text{with } \vec{o_1} \sqsubseteq \vec{o_2} \\
+            &\hspace{2em} \text{and since } t_2 \equiv_a t_3 \\
+            &\hspace{4em} \exists k_3\ \text{such, that } (\sigma_{[0,k_3]}, \vec{o_3}) \in t_3\ \text{with } \vec{o_2} \sqsubseteq \vec{o_3}\\
+            &\hspace{4em} \text{With } \vec{o_1} \sqsubseteq \vec{o_2} \sqsubseteq \vec{o_3}\ \text{it follows, that } t_1 \equiv_a t_3
+          \end{align*}
+        \item The second case works the same, just change \(t_1\) and \(t_3\).
+      \end{itemize}
+  \end{itemize}
 \end{proof}
 
 \begin{exmp}[name = Asynchronous equivalence of Transducers]
   Let \(\Phi = \{a\}, \Gamma = \{1\}\) and \\
-  \(t_1 = \{(a,\epsilon),(aa,\epsilon),(aaa,111)\}\), \\
-  \(t_2 = \{(a,1),(aa,1),(aaa,111)\}\), \\
-  \(t_3 = \{(a,\epsilon),(aa,1),(aaa,11)\}\).\\
+  \begin{align*}
+    &t_1 = \{&&(a,\epsilon),  &&(aa,\epsilon),  &&(aaa,111)   &\} \\
+    &t_2 = \{&&(a,1),         &&(aa,1),         &&(aaa,111)   &\} \\
+    &t_3 = \{&&(a,\epsilon),  &&(aa,1),         &&(aaa,11)    &\}\\
+  \end{align*}
   All three transducers are asynchronous and causal.
   Let's see which ones are asynchronous equivalent:
 
   \(t_1 \stackrel{?}{\equiv}_a t_2\)
   \begin{align*}
-    (a,\epsilon)  &\in t_1, k = 1 \rightarrow k' = 1, &&(a,1)     \in t_2, &&\epsilon  \sqsubseteq 1 \\
-    (aa,\epsilon) &\in t_1, k = 2 \rightarrow k' = 2, &&(aa,1)    \in t_2, &&\epsilon  \sqsubseteq 1 \\
-    (aaa,111)     &\in t_1, k = 3 \rightarrow k' = 3, &&(aaa,111) \in t_2, &&111       \sqsubseteq 111 \\
-    (a,1)         &\in t_2, k = 1 \rightarrow k' = 3, &&(aaa,111) \in t_1, &&1         \sqsubseteq 111 \\
-    (aa,1)        &\in t_2, k = 2 \rightarrow k' = 3, &&(aaa,111) \in t_1, &&1         \sqsubseteq 111 \\
-    (aaa,111)     &\in t_2, k = 3 \rightarrow k' = 3, &&(aaa,111) \in t_1, &&111       \sqsubseteq 111 \\
+    &(a,\epsilon)  &&\in t_1, k = 1 &\rightarrow k' = 1, &(a,1)     \in t_2, &\epsilon  &\sqsubseteq 1 \\
+    &(aa,\epsilon) &&\in t_1, k = 2 &\rightarrow k' = 2, &(aa,1)    \in t_2, &\epsilon  &\sqsubseteq 1 \\
+    &(aaa,111)     &&\in t_1, k = 3 &\rightarrow k' = 3, &(aaa,111) \in t_2, &111       &\sqsubseteq 111 \\
+    &(a,1)         &&\in t_2, k = 1 &\rightarrow k' = 3, &(aaa,111) \in t_1, &1         &\sqsubseteq 111 \\
+    &(aa,1)        &&\in t_2, k = 2 &\rightarrow k' = 3, &(aaa,111) \in t_1, &1         &\sqsubseteq 111 \\
+    &(aaa,111)     &&\in t_2, k = 3 &\rightarrow k' = 3, &(aaa,111) \in t_1, &111       &\sqsubseteq 111 \\
   \end{align*}
   \(\Rightarrow t_1 \equiv_a t_2\)
 
   \(t_1 \stackrel{?}{\equiv}_a t_3\)
   \begin{align*}
-    (aaa,111)     &\in t_1, k = 3 \rightarrow \not\exists k'
+    &(aaa,111)     \in t_1, k = 3 \rightarrow \not\exists k'
   \end{align*}
   \(\Rightarrow t_1 \not\equiv_a t_3\)
 
-  Because of Lemma~\ref{lemma:transitivity_async_equivalence} \(\Rightarrow t_2 \not\equiv_a t_3\).
+  Because of Lemma~\ref{lemma:async_equivalence_is_equivalence_relationship} \(\Rightarrow t_2 \not\equiv_a t_3\).
 
 \end{exmp}
 
 \subsection{Timed Transducers}\label{sec:concepts:def:timed_transducer}
 
-For the second kind of equivalence we need to introduce \emph{timed Transducers}.
+For the second kind of equivalence we need to introduce \emph{timed sequences} and \emph{timed transducers}.
 Let \(\mathbb{T}\) be a timing model that is isomorphic to \(\mathbb{R}\).
-For the examples we will use \(\mathbb{R}\) for \(\mathbb{T}\).\\
+For the examples we will use \(\mathbb{R}\) for \(\mathbb{T}\).
+
+\begin{definition}[name = Timed Sequence]\label{def:timed_sequence}
+  A sequence is called Timed, if every element of it is associated with a timestamp: \(\sigma \in {(\Gamma\times\mathbb{T})}^*\).
+  For bravety a timed sequence can be written with the timestamps as the index of the Elements: \(\sigma = e_0e_{0.5}e_1 \).\\
+  The Function
+  \[\mathit{timed: } {(\Gamma \times \mathbb{T})}^* \rightarrow {(\Gamma \times \mathbb{T})}^* \]
+  reorders a timed sequence \(\sigma\) by its timestamps, such that:
+  \[ \forall i,j \in \mathbb{N}:\text{ if } i < j \text{ then } t_i < t_j \text{ with } (o_i, t_i) = \sigma_i \text{ and } (o_j, t_j) = \sigma_j \]
+  The Function
+  \[\mathit{upto: } \mathbb{T} \times {(\Gamma\times\mathbb{T})}^* \rightarrow {(\Gamma\times\mathbb{T})}^*\]
+  removes all elements from a timed sequence, that have a timestamp bigger than the first argument.\\
+  The Function
+  \[\mathit{maxTime: } {(\Gamma\times\mathbb{T})}^* \rightarrow \mathbb{T} \]
+  returns the biggest Timestamp in a timed sequence.
+\end{definition}
+
+\begin{exmp}[name=Functions on timed Sequences]
+Let \(\sigma = a_1a_{0.5}a_{1.5}a_0\).\\
+  Then is
+    \begin{align*}
+      &\mathit{timed} (\sigma) = a_0a_{0.5}a_1a_{1.5}\ \\
+      &\mathit{upto} (1.3,\sigma) = a_1a_{0.5}a_0 \\
+      &\mathit{maxTime} (\sigma) = 1.5
+    \end{align*}
+\end{exmp}
+
+\begin{definition}[name = Monotonicity of Timed Streams]\label{def:monotonicity_timed_streams}
+  A timed Stream \(\sigma\) with alphabet \(\Phi\) is called monotonic,
+  if \( \mathit{timed}(\sigma) = \sigma\)
+\end{definition}
 
 \begin{definition}[name = Timed Transducer]\label{def:timed_transducer}
-  A timed Transducer \(t\) with input Alphabet \(\Phi\) and output Alphabet \(\Gamma\) works on timed inputs and produces timed outputs:
-  \[t \subseteq {\left(\Phi \times \mathbb{T}\right)}^* \times {\left(\Gamma \times \mathbb{T}\right)}^*\]
-  % Furthermore a timed Transducer has to be causal and asynchronous.
+  A timed transducer \(t\) with input alphabet \(\Phi\) and output alphabet \(\Gamma\) works on monotonic, timed sequences as inputs and has timed sequences as outputs:
+  \[t \subset {\left(\Phi \times \mathbb{T}\right)}^* \times {\left(\Gamma \times \mathbb{T}\right)}^*\]
+  % Furthermore a timed transducer has to be causal and asynchronous.
 \end{definition}
 
 \begin{exmp}[name=Timed Transducers]
-  \(t_{tsc} = \{((a,0.0), (1,0.0)),((a,0.0)(a,1.0), (1,0.0)(1,1.0))\}\) is a timed, causal and synchronous Transducer.
-  \(t_{tac} = \{((a,0.0), \epsilon),((a,0.0)(a,1.0), (1,0.0)(1,1.0))\}\) is a timed, causal and asynchronous Transducer.
+  Let \(\Phi = \{a\}, \Gamma = \{b\}\).\\
+  \(t_{tsc} = \{(a_0, b_0),(a_0a_1, b_0b_1)\}\) is a timed, causal and synchronous transducer.\\
+  \(t_{tac} = \{(a_0, \epsilon),(a_0a_1, b_0b_1)\}\) is a timed, causal and asynchronous transducer.
 \end{exmp}
 
-The Function \(\text{timed:} {(\Gamma \times \mathbb{T})}^* \rightarrow {(\Gamma \times \mathbb{T})}^* \)
-reorders a timed sequence \(\vec{o}\) by its timestamps, such that:
-\[
-  \forall i,j \in \mathbb{N}:\text{ if } i < j \text{ then } t_i < t_j \text{ with } (o_i, t_i) = \vec{o}_i \text{ and } (o_j, t_j) = \vec{o}_j
-\]
 
-
-\begin{exmp}[name=Timed Function]
-  Let \(\sigma = (a,1.0)(a,0.5)(a,1.5)(a,0.0)\). Then is \(\text{timed}(\sigma) =(a,0.0)(a,0.5)(a,1.0)(a,1.5)\)
-\end{exmp}
-
-Furthermore the Function \(\text{upto: } \mathbb{T} \times {(\Gamma\times\mathbb{T})}^* \rightarrow {(\Gamma\times\mathbb{T})}^*\) removes all elements from a timed stream, that have a timestamp bigger than the first argument.
-\begin{exmp}[name=Upto Function]
-  Let \(\sigma = (a,1.0)(a,0.5)(a,1.5)(a,0.0)\). Then is \(\text{upto}(1.3,\sigma) = (a,1.0)(a,0.5)(a,0.0)\)
-\end{exmp}
-
-For the next definitions we have to restrict timed Transducers in two ways:
-
-\begin{definition}[name = Monotonicity of Timed Transducers]\label{def:monotonicity_timed_transducer}
-  QUESTION:\ Should this be part of Timed Transducer or an extra definition?
-  A timed Transducer \(t\) with input Alphabet \(\Phi\) and output Alphabet \(\Gamma\) is called monotonic,
-  if \(\forall (\vec{\imath}, \vec{o}) \in t \text{ it holds, that timed}(\vec{\imath}) = \vec{\imath} \)
-\end{definition}
+For later theoretic work we have to restrict timed transducers:
 
 \begin{definition}[name = Boundedness of Timed Transducers]\label{def:boundedness_timed_transducer}
-  A timed Transducer \(t\) with input Alphabet \(\Phi\) and output Alphabet \(\Gamma\) is called bounded, if it satisfies:
-  \begin{itemize}[label={}]
-    \item \(\forall \sigma \in {(\Phi \times \mathbb{T})}^*\):
-    \item if \((\sigma_{[0,k]}, \vec{o}) \in t\)
-    \item then \(\exists k' > k\) with
-      \begin{itemize}[label={}]
-        \item \((\sigma_{[0,k']}, \vec{o} \circ \vec{o'}) \in t\)
-        \item and \(\forall k'' > k' \text{ with } (\sigma_{[0,k'']}, \vec{o}\circ\vec{o'}\circ\vec{o''}) \in t \) it holds, that
-          \begin{itemize}[label={}]
-          \item timed\((\vec{o}\circ\vec{o'}) \sqsubseteq \text{ timed}(\vec{o}\circ\vec{o'}\circ\vec{o''})\)
-          \end{itemize}
-      \end{itemize}
-  \end{itemize}
+  A timed transducer \(t\) with input alphabet \(\Phi\) and output alphabet \(\Gamma\) is called bounded, if it satisfies:
+  \begin{align*}
+    &\forall \sigma \in {(\Phi \times \mathbb{T})}^*:\\
+    &\hspace{2em}\text{if } (\sigma_{[0,k]}, \vec{o}) \in t\\
+    &\hspace{2em}\text{then }\exists k' > k\ \text{with}\\
+    &\hspace{4em}(\sigma_{[0,k']}, \vec{o} \circ \vec{o'}) \in t\\
+    &\hspace{4em}\text{and} \forall k'' > k'\ \text{with } (\sigma_{[0,k'']}, \vec{o}\circ\vec{o'}\circ\vec{o''}) \in t\ \text{it holds, that}\\
+    &\hspace{6em}\mathit{upto}(\mathit{maxTime}(\vec{o}), \mathit{timed}(\vec{o}\circ\vec{o'})) = \mathit{upto}(\mathit{maxTime}(\vec{o}), \mathit{timed}(\vec{o}\circ\vec{o'}\circ\vec{o''}))
+  \end{align*}
 \end{definition}
 
-Based on the \emph{timed} and \emph{upto} Functions and the notion of boundedness and monotonicity, timed Transducers can be compared with respect to the timestamps of their output:
+Based on the definitions we can define an equivalence Relationship on bounded timed transducers:
 
 \begin{definition}[name = Observational Equivalence]\label{def:observational_equivalence}
-  Let \(t_1, t_2\) be two bounded, monotonic timed Transducers with input Alphabet \(\Phi\) and output Alphabet \(\Gamma\).
-  They are called \emph{observational equivalent}, written \(t_1 \equiv_o t_2\), if they satisfy: \\
-  \(\forall \sigma \in {(\Phi\times\mathbb{T})}^*\):
-  \begin{itemize}[label={}]
-    \item \(\forall (\sigma_{[0,k]}, \vec{o}) \in t_1\): \(\exists k', k'' \geq k\) such that
-      \begin{itemize}[label={}]
-        \item \((\sigma_{[0,k']}, \vec{o} \circ \vec{o'}) \in t_1\)
-        \item and \((\sigma_{[0,k'']}, \vec{o_2}) \in t_2\)
-        \item and (work in progress)\(\text{timed(upto(maxTimeStampIn o,}\vec{o} \circ \vec{o'} )) = \text{timed(upto(maxTimeStampIn o,}\vec{o_2}))\)
-      \end{itemize}
-  \end{itemize}
+  Let \(t_1, t_2\) be two bounded timed transducers with input alphabet \(\Phi\) and output alphabet \(\Gamma\).
+  They are called \emph{observational equivalent}, written \(t_1 \equiv_o t_2\), if they satisfy:
+  \begin{align*}
+    &\forall \sigma \in {(\Phi\times\mathbb{T})}^*:\\
+    &\hspace{2em}\forall (\sigma_{[0,k]}, \vec{o}) \in t_1: \exists k', k'' \geq k\ \text{such that}\\
+    &\hspace{4em}(\sigma_{[0,k']}, \vec{o} \circ \vec{o'}) \in t_1\\
+    &\hspace{4em}\text{and } (\sigma_{[0,k'']}, \vec{o_2}) \in t_2\\
+    &\hspace{4em}\text{and } \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o}),\vec{o} \circ \vec{o'} )) = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o}),\vec{o_2}))
+  \end{align*}
+  and the same for switched \(t_1, t_2\).
 \end{definition}
 
-\begin{lemma}[name=Transitivity of observational Equivalence]\label{lemma:transitivity_observational_equivalence}
-  Let \(t_1, t_2, t_3\) be timed Transducers.
-  If they are bounded and \(t_1 \equiv_o t_2\) and \(t_2 \equiv_o t_3\) then \(t_1 \equiv_o t_3\).
+\begin{lemma}[name=Observational Equivalence is an equivalence Relationship for bounded Transducers]\label{lemma:observational_equivalence_equivalence_relationship}
+  \(\equiv_o\) is symmetric, reflexive and transitive for bounded timed Transducers.
 \end{lemma}
-\begin{proof}
-  YEP
+\begin{proof}$ $\newline
+  Let \(t_1, t_2, t_3\) be bounded timed transducers.
+  \begin{itemize}
+    \item Symmetry: By definition.
+    \item Reflexivity: For \((\sigma_{[0,k]}, \vec{o})\) select \(k' = k''\) as the k, for which the transducer is bounded for that input.
+    \item Transitivity:
+      \begin{itemize}
+        \item Let \(t_1 \equiv_o t_2\), \(t_2 \equiv_o t_3\).
+        \item First case:
+          \begin{align*}
+            &\text{Since } t_1 \equiv_o t_2:\ \forall (\sigma_{[0,k_1]}, \vec{o_1}) \in t_1: \\
+            &\hspace{2em} \exists k_1', k_2 > k_1\ \text{with } (\sigma_{[0,k_1']}, \vec{o_1}\circ\vec{o_1'}) \in t_1\ \text{and } (\sigma_{[0,k_2]}, \vec{o_2}) \in t_2 \\
+            &\hspace{4em} \text{with } \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_1} \circ \vec{o_1'} )) \\
+            &\hspace{8em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_2})) & (\star)\\
+            &\hspace{2em} \text{and since } t_2 \equiv_o t_3: \exists k_2', k_3 > k_2\ \text{with } (\sigma_{[0,k_2']}, \vec{o_2}\circ\vec{o_2'}) \in t_2 \\
+            &\hspace{4em} \text{and } (\sigma_{[0,k_3]}, \vec{o_3}) \in t_3 \\
+            &\hspace{6em} \text{with } \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_2}),\vec{o_2} \circ \vec{o_2'} )) \\
+            &\hspace{10em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_2}),\vec{o_3})) & (\star\star)\\
+            &\hspace{2em} \mathit{maxTime}(\vec{o_1})\ \text{has to be smaller then}\mathit{maxTime}(\vec{o_2}) \\
+            &\hspace{4em} \text{else } (\star)\ \text{couldn't hold, therefore, combined with boundedness and }(\star\star): \\
+            &\hspace{4em} \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_2} )) \\
+            &\hspace{8em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_3})) \\
+            &\text{which concludes }\mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_1} \circ \vec{o_1'} ))\\
+            &\hspace{4em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_3}))
+          \end{align*}
+        \item The second case works the same, just switch \(t_1\) and \(t_3\).
+      \end{itemize}
+  \end{itemize}
 \end{proof}
 
+
 \begin{exmp}[name=Observational Equivalence]\label{exmp:observational_equivalence}
-  Let \(t_1 = \{((a,0.0), \epsilon),((a,0.0)(a,1.0), (1,1.0)),((a,0.0)(a,1.0)(a,2.0), (1,1.0)(1,2.0)(1,0.0))\}\), \\
-  \(t_2 = \{((a,0.0), \epsilon),((a,0.0)(a,1.0), \epsilon),((a,0.0)(a,1.0)(a,2.0), (1,2.0)(1,1.0)(1,0.0))\}\), \\
-  \(t_3 = \{((a,0.0), (1,0.0)),((a,0.0)(a,1.0), a),((a,0.0)(a,1.0)(a,2.0), (1,2.0)(1,1.0)(1,0.0))\}\)
-  All three are causal, monotonic, asynchronous timed Transducers.
+  Let
+  \begin{align*}
+    &t_1 = \{&&(a_0, \epsilon),   &&(a_0a_1, b_1),      &&(a_0a_1a_2, b_1b_2b_0)  &\} \\
+    &t_2 = \{&&(a_0, \epsilon),   &&(a_0a_1, \epsilon), &&(a_0a_1a_2, b_2b_1b_0)  &\} \\
+    &t_3 = \{&&(a_0, b_0),        &&(a_0a_1, b_0),      &&(a_0a_1a_2, b_2b_1)     &\}
+  \end{align*}
+  All three are causal, asynchronous timed transducers.
 
   Let's see which ones are observational equivalent:
 
   \(t_1 \stackrel{?}{\equiv}_o t_2\)
   \begin{itemize}[label={}]
-    \item \(((a,0.0), \epsilon)             \in t_1, k = 1\)
+    \item \((a_0, \epsilon)             \in t_1, k = 1, \mathit{maxTime}(\epsilon) = 0\)
       \begin{itemize}[label={}]
-        \item \(\rightarrow k' = 1, ((a,0.0), \epsilon)     \in t_2\)
-        \item and \(\text{timed}(\epsilon)  \sqsubseteq \text{timed}(\epsilon)\)
+        \item \(\rightarrow k' = 1, (a_0, \epsilon)     \in t_1\)
+        \item \(\rightarrow k'' = 1, (a_0, \epsilon)     \in t_2\)
       \end{itemize}
-    \item \(((a,0.0)(a,1.0), (1,1.0))       \in t_1, k = 2\)
+    \item \((a_0a_1, b_1)               \in t_1, k = 2, \mathit{maxTime}(b_1) = 1\)
       \begin{itemize}[label={}]
-        \item \(\rightarrow k' = 3, ((a,0.0)(a,1.0)(a,2.0), (1,2.0)(1,1.0)(1,0.0))    \in t_2\)
-        \item and \(\text{timed}((1,1.0))=(1,1.0)   \sqsubseteq (1,0.0)(1,1.0)(1,2.0)\)
+        \item \(\rightarrow k' = 3, (a_0a_1a_2, b_1b_2b_0)    \in t_1\)
+        \item \(\rightarrow k'' = 3, (a_0a_1a_2, b_2b_1b_0)    \in t_2\)
+        \item \(\mathit{timed}(\mathit{upto}(1, b_1b_2b_0)) = b_0b_1 = \mathit{timed}(\mathit{upto}(1, b_2b_1b_0))\)
+      \end{itemize}
+    \item \((a_0a_1a_2, b_1b_2b_0)               \in t_1, k = 3, \mathit{maxTime}(b_1b_2b_0) = 2\)
+      \begin{itemize}[label={}]
+        \item \(\rightarrow k' = 3, (a_0a_1a_2, b_1b_2b_0)    \in t_1\)
+        \item \(\rightarrow k'' = 3, (a_0a_1a_2, b_2b_1b_0)    \in t_2\)
+        \item \(\mathit{timed}(\mathit{upto}(2, b_1b_2b_0)) = b_0b_1b_2 = \mathit{timed}(\mathit{upto}(2, b_2b_1b_0))\)
+      \end{itemize}
+    \item \((a_0, \epsilon)               \in t_2, k = 1, \mathit{maxTime}(\epsilon) = 0\)
+      \begin{itemize}[label={}]
+        \item \(\rightarrow k' = 1, (a_0, \epsilon)     \in t_2\)
+        \item \(\rightarrow k'' = 1, (a_0, \epsilon)     \in t_1\)
+      \end{itemize}
+    \item \((a_0a_1, \epsilon)            \in t_2, k = 2, \mathit{maxTime}(epsilon) = 0\)
+      \begin{itemize}[label={}]
+        \item \(\rightarrow k' = 2, (a_0a_1, \epsilon)    \in t_2\)
+        \item \(\rightarrow k'' = 2, (a_0a_1, b_1)    \in t_1\)
+        \item \(\mathit{timed}(\mathit{upto}(0, \epsilon)) = \epsilon = \mathit{timed}(\mathit{upto}(0, b_1))\)
+      \end{itemize}
+    \item \((a_0a_1a_2, b_2b_1b_0)        \in t_2, k = 3, \mathit{maxTime}(b_2b_1b_0) = 2\)
+      \begin{itemize}[label={}]
+        \item \(\rightarrow k' = 3, (a_0a_1a_2, b_2b_1b_0)    \in t_2\)
+        \item \(\rightarrow k'' = 3, (a_0a_1a_2, b_1b_2b_0)    \in t_1\)
+        \item \(\mathit{timed}(\mathit{upto}(2, b_2b_1b_0)) = b_0b_1b_2 = \mathit{timed}(\mathit{upto}(2, b_1b_2b_0))\)
       \end{itemize}
   \end{itemize}
   \(\Rightarrow t_1 \equiv_a t_2\)
 
   \(t_1 \stackrel{?}{\equiv}_a t_3\)
-  \begin{align*}
-  \end{align*}
-  \(\Rightarrow t_1 \not\equiv_a t_3\)
+  \begin{itemize}[label={}]
+    \item \((a_0a_1a_2,b_1b_2b_0)      \in t_1, k=3, \mathit{maxTime}(b_1b_2b_0) = 2\)
+      \begin{itemize}[label={}]
+        \item \(\rightarrow k' = 3, (a_0a_1a_2, b_1b_2b_0)    \in t_1\)
+        \item \(\rightarrow \not\exists (\vec{\imath}, \vec{o}) \in t_3\ \text{with } \exists n \in \mathbb{N}: \vec{o}_n = b_0\)
+        \item \(\rightarrow \not\exists (\vec{\imath}, \vec{o}) \in t_3\ \text{with } \mathit{timed}(\mathit{upto}(2, b_1b_2b_0)) = b_0b_1b_2 = \mathit{timed}(\mathit{upto}(2,\vec{o}))\)
+      \end{itemize}
+  \end{itemize}
+  \(\Rightarrow t_1 \not\equiv_a t_3\)\\
+  If \(t_3\) weren't bounded (and therefore not finite) there would be no way to know, if it was equivalent to \(t_1\), because it could always produce a missing Event at a later time.
 
-  Because of Lemma~\ref{lemma:transitivity_observational_equivalence} \(\Rightarrow t_2 \not\equiv_a t_3\).
+  Because of Lemma~\ref{lemma:observational_equivalence_equivalence_relationship} \(\Rightarrow t_2 \not\equiv_a t_3\).
 
 \end{exmp}
 

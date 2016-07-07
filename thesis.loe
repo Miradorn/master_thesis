@@ -19,58 +19,58 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {definition}{\numberline {6}\MakeUppercase {d}efinition\thmtformatoptarg {Asynchronous equivalence of Transducers}}{12}{definition.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {1}\MakeUppercase {l}emma\thmtformatoptarg {Transitivity of asynchronous equivalence}}{12}{lemma.1}
+\contentsline {lemma}{\numberline {1}\MakeUppercase {l}emma\thmtformatoptarg {Asynchronous equivalence is an equivalence Relationship}}{12}{lemma.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {exmp}{\numberline {4}Example\thmtformatoptarg {Asynchronous equivalence of Transducers}}{12}{exmp.4}
+\contentsline {exmp}{\numberline {4}Example\thmtformatoptarg {Asynchronous equivalence of Transducers}}{13}{exmp.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {7}\MakeUppercase {d}efinition\thmtformatoptarg {Timed Transducer}}{13}{definition.7}
+\contentsline {definition}{\numberline {7}\MakeUppercase {d}efinition\thmtformatoptarg {Timed Sequence}}{13}{definition.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {exmp}{\numberline {5}Example\thmtformatoptarg {Timed Transducers}}{13}{exmp.5}
+\contentsline {exmp}{\numberline {5}Example\thmtformatoptarg {Functions on timed Sequences}}{14}{exmp.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {exmp}{\numberline {6}Example\thmtformatoptarg {Timed Function}}{13}{exmp.6}
+\contentsline {definition}{\numberline {8}\MakeUppercase {d}efinition\thmtformatoptarg {Monotonicity of Timed Streams}}{14}{definition.8}
 \defcounter {refsection}{0}\relax 
-\contentsline {exmp}{\numberline {7}Example\thmtformatoptarg {Upto Function}}{13}{exmp.7}
+\contentsline {definition}{\numberline {9}\MakeUppercase {d}efinition\thmtformatoptarg {Timed Transducer}}{14}{definition.9}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {8}\MakeUppercase {d}efinition\thmtformatoptarg {Monotonicity of Timed Transducers}}{13}{definition.8}
+\contentsline {exmp}{\numberline {6}Example\thmtformatoptarg {Timed Transducers}}{14}{exmp.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {9}\MakeUppercase {d}efinition\thmtformatoptarg {Boundedness of Timed Transducers}}{14}{definition.9}
+\contentsline {definition}{\numberline {10}\MakeUppercase {d}efinition\thmtformatoptarg {Boundedness of Timed Transducers}}{14}{definition.10}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {10}\MakeUppercase {d}efinition\thmtformatoptarg {Observational Equivalence}}{14}{definition.10}
+\contentsline {definition}{\numberline {11}\MakeUppercase {d}efinition\thmtformatoptarg {Observational Equivalence}}{15}{definition.11}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {2}\MakeUppercase {l}emma\thmtformatoptarg {Transitivity of observational Equivalence}}{14}{lemma.2}
+\contentsline {lemma}{\numberline {2}\MakeUppercase {l}emma\thmtformatoptarg {Observational Equivalence is an equivalence Relationship for bounded Transducers}}{15}{lemma.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {exmp}{\numberline {8}Example\thmtformatoptarg {Observational Equivalence}}{14}{exmp.8}
+\contentsline {exmp}{\numberline {7}Example\thmtformatoptarg {Observational Equivalence}}{16}{exmp.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {11}\MakeUppercase {d}efinition\thmtformatoptarg {Equivalence of evaluation Engines}}{17}{definition.11}
+\contentsline {definition}{\numberline {12}\MakeUppercase {d}efinition\thmtformatoptarg {Equivalence of evaluation Engines}}{20}{definition.12}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {12}\MakeUppercase {d}efinition\thmtformatoptarg {Equivalence of evaluation Engines for an input}}{17}{definition.12}
+\contentsline {definition}{\numberline {13}\MakeUppercase {d}efinition\thmtformatoptarg {Equivalence of evaluation Engines for an input}}{20}{definition.13}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {13}\MakeUppercase {d}efinition\thmtformatoptarg {Application of a Transition on a State}}{19}{definition.13}
+\contentsline {definition}{\numberline {14}\MakeUppercase {d}efinition\thmtformatoptarg {Application of a Transition on a State}}{22}{definition.14}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {14}\MakeUppercase {d}efinition\thmtformatoptarg {Equivalence of Runs}}{20}{definition.14}
+\contentsline {definition}{\numberline {15}\MakeUppercase {d}efinition\thmtformatoptarg {Equivalence of Runs}}{22}{definition.15}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {3}\MakeUppercase {l}emma\thmtformatoptarg {Equivalence of Runs over Transitions}}{20}{lemma.3}
+\contentsline {lemma}{\numberline {3}\MakeUppercase {l}emma\thmtformatoptarg {Equivalence of Runs over Transitions}}{23}{lemma.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {15}\MakeUppercase {d}efinition\thmtformatoptarg {Closeness of Runs}}{20}{definition.15}
+\contentsline {definition}{\numberline {16}\MakeUppercase {d}efinition\thmtformatoptarg {Closeness of Runs}}{23}{definition.16}
 \defcounter {refsection}{0}\relax 
-\contentsline {exmp}{\numberline {9}Example}{21}{exmp.9}
+\contentsline {exmp}{\numberline {8}Example}{23}{exmp.8}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {16}\MakeUppercase {d}efinition\thmtformatoptarg {Enabledness of a Node}}{21}{definition.16}
+\contentsline {definition}{\numberline {17}\MakeUppercase {d}efinition\thmtformatoptarg {Enabledness of a Node}}{23}{definition.17}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {17}\MakeUppercase {d}efinition\thmtformatoptarg {Valid Run}}{21}{definition.17}
+\contentsline {definition}{\numberline {18}\MakeUppercase {d}efinition\thmtformatoptarg {Valid Run}}{24}{definition.18}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {18}\MakeUppercase {d}efinition\thmtformatoptarg {Independence of Nodes}}{21}{definition.18}
+\contentsline {definition}{\numberline {19}\MakeUppercase {d}efinition\thmtformatoptarg {Independence of Nodes}}{24}{definition.19}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {19}\MakeUppercase {d}efinition\thmtformatoptarg {Independence of Transitions}}{21}{definition.19}
+\contentsline {definition}{\numberline {20}\MakeUppercase {d}efinition\thmtformatoptarg {Independence of Transitions}}{24}{definition.20}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {4}\MakeUppercase {l}emma\thmtformatoptarg {Exchange of independent Transitions}}{22}{lemma.4}
+\contentsline {lemma}{\numberline {4}\MakeUppercase {l}emma\thmtformatoptarg {Exchange of independent Transitions}}{24}{lemma.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {5}\MakeUppercase {l}emma\thmtformatoptarg {Influence of independent Nodes}}{22}{lemma.5}
+\contentsline {lemma}{\numberline {5}\MakeUppercase {l}emma\thmtformatoptarg {Influence of independent Nodes}}{24}{lemma.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {6}\MakeUppercase {l}emma\thmtformatoptarg {Duration of Enabledness}}{22}{lemma.6}
+\contentsline {lemma}{\numberline {6}\MakeUppercase {l}emma\thmtformatoptarg {Duration of Enabledness}}{24}{lemma.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {20}\MakeUppercase {d}efinition\thmtformatoptarg {Valid evaluation Engines}}{24}{definition.20}
+\contentsline {definition}{\numberline {21}\MakeUppercase {d}efinition\thmtformatoptarg {Valid evaluation Engines}}{26}{definition.21}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {7}\MakeUppercase {l}emma\thmtformatoptarg {Equivalence of Engines for one Input}}{25}{lemma.7}
+\contentsline {lemma}{\numberline {7}\MakeUppercase {l}emma\thmtformatoptarg {Equivalence of Engines for one Input}}{27}{lemma.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {theorem}{\numberline {1}\MakeUppercase {t}heorem\thmtformatoptarg {Equivalence of different synchronous evaluation Engines}}{26}{theorem.1}
+\contentsline {theorem}{\numberline {1}\MakeUppercase {t}heorem\thmtformatoptarg {Equivalence of different synchronous evaluation Engines}}{28}{theorem.1}
