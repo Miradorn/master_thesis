@@ -12,15 +12,14 @@ Software Verification is an important tool to harden critical systems against fa
 Due to the raising importance of computer based systems, verification has become a big field of research in computer science.
 
 While pure verification approaches try to proof the correct behaviour of a system under all possible executions,
-Runtime Verifications limits itself to single, finite runs of a system, trying to proof it conforms to a given specification
+\gls{rv} limits itself to single, finite runs of a system, trying to proof it conforms to a given specification
 under specific conditions, like input sequences or scheduling.
-These specifications can be given in various ways, like LTL formulas or in specification languages that are specifically developed for
-runtime verification.
-Examples for this are RMoR \citep{Havelund2008}, Lola \citep{DAngelo2005} and others \citep{Zheng2015, Pike2010, Mostafa2015}, which we will look at more closely in Section~\ref{sec:related}.
+These specifications can be given in various ways, e.g.\ as a \gls{tl} formula or in specification languages that are specifically developed for \gls{rv}.
+Examples for this are \gls{rmor} \citep{Havelund2008}, \gls{lola} \citep{DAngelo2005} and others \citep{Zheng2015, Pike2010, Mostafa2015}, which we will look at more closely in Section~\ref{sec:related}.
 
-The language TeSSLa aims to make it easy to specify behaviour of streams.
+The language \gls{tessla} aims to make it easy to specify behaviour of streams.
 To gain this it introduces a number of language features and syntax sugar to expressively describe the conditions a stream should fulfill.
-The evaluation of TeSSLa specifications is done in two steps: first the specification is compiled by a compiler written at the ISP of the University of Luebeck.
+The evaluation of TeSSLa specifications is done in two steps: first the specification is compiled by a compiler written at the \gls{isp} of the University of Lübeck.
 The output is a canonical representation of the operations on the streams in the specification.
 In the second step the compiled specification is connected with a system that produces some kind of traces, which are treated as the input streams of the specification.
 
@@ -34,19 +33,19 @@ while external executions of monitors can't directly modify the program but can 
 While online monitoring can be used to actively react to error conditions, either automatically or by notification of a third party,
 offline monitoring can be thought of as an extension to software testing (\cite{DAngelo2005}).
 
-At the beginning of this thesis there was one implementation of a runtime for TeSSLa specifications that is based on FPGAs that have to be manually reconfigured for each new specification.
-While this is a very performant approach for the actual monitoring it isn't usable for testing and prototyping.
+At the beginning of this thesis there was one implementation of a runtime for \gls{tessla} specifications that is based on FPGAs that have to be manually reconfigured for each new specification.
+While this is a very performant approach for actual monitoring it isn't feasible for testing and prototyping.
 Therefore it is wanted to implement a runtime for TeSSLa specifications that can be run independent of specific hardware.
 
-Furthermore most Runtime Verification approaches are specific to one programming language or environment and combine ways of generating the data that is monitored and the monitoring itself.
-TeSSLa specifications themself are independent of any implementation details, working only on streams of data, which can be gathered in any way.
+Furthermore most \gls{rv} approaches are specific to one programming language or environment and combine ways of generating the data, which is used for monitoring, and the monitoring itself.
+\gls{tessla} specifications themself are independent of any implementation details of the monitored system, working only on streams of data, which can be gathered in any way.
 This can be used to implement a runtime that is also independent of the monitored system an how traces of it are collected.
 
-During the Thesis it is prooven that the actual approach of this runtime, a functional, actor based, asynchronous system,
+During the thesis it is prooven, that the actual approach of this runtime, a functional, actor based, asynchronous system,
 will generate the same observations on input traces as a synchronous evaluation of the specification.
-While TeSSLa specifications can work on all kinds of streams, especially on traces on all levels of a program, e.g.\
+While \gls{tessla} specifications can work on all kinds of streams, especially on traces on all levels of a program, e.g.\
 on instruction counters or on spawning processes, in this thesis we will mainly focus on the level of function calls and variable reads/writes.
-Other applications of the system can easily extend it to use traces of drastically different fields, e.g. Health Data, Temperatures, Battery Levels, Web Services and more.
+Other applications of the system can easily extend it to use traces of drastically different fields, e.g.\ health data, temperatures, battery levels, web services and more.
 
 To test the software based runtime, different specifications will be tested on multiple traces, some of which are generated by actually running a program,
 which was instrumented by hand to generate traces, others which are generated or modified by hand to deliberately introduce bugs which should be detected by the system.
@@ -61,18 +60,17 @@ which was instrumented by hand to generate traces, others which are generated or
 As the whole evaluation engine is built on top of different technical and theroetical ideas, it is structured to show
 the reasoning behind the decisions that were made during the development.
 Furthermore it will proof equalitys of different kinds of systems in multiple steps that build on one another.
-In the following a quick overview of the different parts of the Thesis is given.
+In the following a quick overview of the different parts of the thesis is given.
 
 \textbf{Chapter~\ref{sec:related}} \\[0.2em]
 
-In this Chapter the theoretical foundation for the system is explained.
+In this chapter the theoretical foundation for the system is explained.
 Furthermore multiple approaches solving similar problems are shown and it is highlighted which concepts of them were
 used in the new system and which were disregarded and why.
 
 \textbf{Chapter~\ref{sec:system}} \\[0.2em]
 
-Moving towards the implementation of the new system, in this chapter practical concepts and systems that are used for implementing
-and evaluating the runtime are shown.
+Moving towards the implementation of the new evaluation engine, in this chapter practical concepts and systems that are used to implement the runtime are shown.
 It is explained how they are used and which alternatives exist.
 
 \textbf{Chapter~\ref{sec:concepts}} \\[0.2em]
