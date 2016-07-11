@@ -337,12 +337,12 @@ There are three types of events: external, output and internal events.
 The set of all events is denoted as \(E\).
 Each event carries a value, which can be \emph{nothing} or a value of a type (types are formally defined in the \gls{tessla} specification, but aren't important for this thesis), a timestamp and the stream it's perceived on (e.g.\ a function call of a specific function or the name of an output stream).
 
-The value of an event can be queried with the function \(\upsilon\), its timestamp with \(\pi\) and its stream with \(\varsigma\).
+The value of an event can be queried with the function \(\upsilon\), its timestamp with \(\pi\) and its stream with \(\mathit{stream}\).
 
 \(E_e \subset E\) is the set of all external events, their stream corresponds to a specific trace.
 \(E_o \subset E\) is the set of all output events, their stream is specified by an output name of the \gls{tessla} specification.
 \(E_n \subset E\) is the set of all internal events.
-Internal events are mostly an implementation detail, which denote steps of computation inside the runtime.
+Internal events are mostly an implementation dmathit{node}il, which denote steps of computation inside the runtime.
 The stream of internal events is implicitly given by the node that produces the stream of the event.
 Note that \(E_e, E_o, E_n\) are pairwise disjoint and \(E_e \cup E_o \cup E_n = E\).
 
@@ -358,17 +358,15 @@ Signals can be described by a sequence of changes, where a change denotes that t
 The only difference between a signal and an eventstreams is that signals always have a value while an eventstream may return \(\bot\) when queried for its value at a specific time, which denotes that no event happened at that time.
 Based on the similarity of signals and eventstreams in the following we will mainly reason about eventstreams, but most things can also be applied to signals.
 
-Formally a stream \(\sigma\) can be represented as a sequence of events \(\langle e_1, \dots e_n\rangle\) where \(\pi(e_i) < \pi(e_{i+1}),\ \forall i < n \in \mathbb{N}\).
-The set of all streams \(\Sigma\) is defined as all possible finite sequences of events \(\Sigma = \{\sigma | \sigma \in E^* \}\).
-An external stream \(\sigma_e\) is a stream consisting only of external events, the set of all external streams is \(\Sigma_e = \{\sigma_e | \sigma_e \in E_e^*\}\).
+Formally a stream \(\sigma\) can be represented as the product of a sequence of events \(\langle e_1, \dots e_n\rangle\) where \(\pi(e_i) < \pi(e_{i+1}),\ \forall i < n \in \mathbb{N}\) and a value from \(\mathbb{T}\) which marks the progress of the stream and has to be equal or bigger to the timestamp of the last event.
+The set of all streams \(\Sigma\) is defined as all possible finite sequences of events \(\Sigma = \{\sigma | \sigma \in E^* \} \times \mathbb{T}\).
+An external stream \(\sigma_e\) is a stream consisting only of external events, the set of all external streams is \(\Sigma_e = \{\sigma_e | \sigma_e \in E_e^*\} \times \mathbb{T}\).
 Output and internal streams are defined analogous.
+
 To get the event of a stream \(\sigma\) at a timestamp \(t\) it can be queried like a function: \(\sigma(t) = e\) with \(\pi(e) = t \).
 When working with signals, the function will return the latest event that happened at or before t while an eventstream may return \(\bot\).
-
-Furthermore streams hold the timestamp to which they have progressed, which can be equal or greater than the timestamp of the last event happened on them.
-The progress of a stream can be obtained with \(p(\sigma) = t \in T\).
-
-Internal and output streams can be queried for the node that produced them with \(\eta(\sigma) = n \in N\).
+The progress of a stream can be obtained with \(\mathit{progress}(\sigma) = t \in T\).
+Internal and output streams can be queried for the node that produced them with \(\mathit{node}(\sigma) = n \in N\).
 
 \subsection{Functions}
 \label{sec:concepts:defs:functions}
@@ -386,6 +384,7 @@ Unpure, or stateful, functions are evaluated over the whole input stream, meanin
 E.g.\ a function \emph{eventCount} has to \emph{remember} how many events already happened on it's input stream and increment that counter on every new event.
 Timing functions are evaluated not only on the value of events but also on their timestamp and can also manipulate it:
 While non timing functions will consume events at a specific timestamp and emit events with that timestamp, timing functions can emit events with a changed timestamp.
+In this thesis we will only look at past time functions, meaning functions can only delay timestamps, therefore can't depend on future values.
 
 Timing functions complicate the reasoning about schedules and causality and therefore aren't included in Section~\ref{sec:concepts:behaviour_without_timing}.
 In Section~\ref{sec:concepts:behaviour_with_timing} the conclusions of earlier sections will be extended to include timing functions.
@@ -402,46 +401,52 @@ The function of a node \(n \in N\) is written as \(f_n\).
 
 Each node has a set of inputs, which are either external or internal streams, and one output, which is either an internal or an output stream.
 Nodes which have at least one external stream as an input are called \emph{sources}.
-Nodes use a \gls{fifo} queue, provided by the Erlang plattform, to process new received events in multiple steps:
+Nodes have \gls{fifo} queues, provided by the Erlang plattform, which buffer events from the inputs for later computation.
+Furthermore they have a timestamp for each input that encodes the progress of that input.
+Based on the queues, the timestamps of the inputs and it's function, a node performs its computation in multiple steps:
 
 \begin{enumerate}
-  \item Check if a new output event can be produced (see Section~\ref{sec:concepts:defs:nodes:processable})
-  \item If so, compute all timestamps, where new events might be computed and
-    \begin{enumerate}
-      \item Compute the events, add them to the history as new Events on the output
-      \item Distribute the new events to the children of the node
-    \end{enumerate}
-  \item Else wait for another input
+  \item Check if one or more new output events can be produced (see Section~\ref{sec:concepts:defs:nodes:processable})
+    \begin{itemize}
+      \item If so, compute all timestamps, where new events might be computed
+      \item Compute the events at the possible timestamps
+      \item Remove the used Events for the computation from the input queue
+    \end{itemize}
+  \item Afterwards check if the progress of the output can be updated
+    \begin{itemize}
+      \item The progress always is the minimum of the timestamps of all inputs
+    \end{itemize}
+  \item Add the produced events to the input of all children and update the associated progress to the new one
 \end{enumerate}
 
 \subsubsection{Determination of processable Events}
 \label{sec:concepts:defs:nodes:processable}
 
 Based on the asynchronous nature of nodes, events from different streams can be received out of order.
-E.g.\ if a node c is a child of node a and b, it can receive events from node a at timestamps \(t_1, t_2, t_3, t_4\)
-before receiving an event with timestamp \(t_1\) from node b.
-Therefore a node can not compute its output upto a timestamp unless it has the information from all predecessors that they did progress to at least that timestamp.
-When node c receives the first four events from node a, it will only add them to it's input queues but won't compute an output.
-When it finally receives the first event from node b it can compute all events upto \(t_1\).
-To do so it will compute \emph{change timestamps}: The union of all timestamps where an event occured on any input between the timestamp of the last generated output and the minimal progress of all inputs.
+Therefore a node cannot compute its output upto a timestamp unless it has the information from all inputs that they did progress to at least that timestamp.
 
-To see why this is necessary lets assume that node c will receive a new event from node b with timestamp \(t_4\):
-All inputs have progressed to \(t_4\), but on the stream from node a there are changes between \(t_1\) (where the last output was generated) and \(t_4\), therefore the \emph{change timestamps} are \(t_2, t_3, t_4\) and the node will have to compute it's output based on the values of the streams at that timestamps.
+E.g.\ if a node \(c\) is a child of node \(a\) and \(b\), it can receive events from node \(a\) at timestamps \(t_1, t_2, t_3, t_4\) before receiving an event with timestamp \(t_1\) from node \(b\).
+When node \(c\) receives the first four events from node \(a\), they will stay buffered on the input queue that represents the stream from node a and the progress for that input will be \(t_4\), while the input queue representing the stream from node b will have no events buffered and a progress of \(0\).
+When it receives the first event from node \(b\) it can compute all events upto \(t_1\).
+To do so it will compute \emph{change timestamps}: The union of all timestamps where an event occured on any input between the timestamp of the last generated output and the minimal progress of all inputs.
+In this case that is only \(t_1\).
+Therefore the node will remove the events with timestamp \(t_1\) from both queues and will compute a new event based on them, with a timestamp that is equal to or smaller than \(t_1\), where smaller can only happen if it is a timing node.
+Then it will distribute the computed event together with the new progress \(t_1\) to its children.
+
+To see why the computation of change timestamps is necessary lets assume that node \(c\) will receive a new event from node \(b\) with timestamp \(t_4\):
+All inputs have progressed to \(t_4\), but on the stream from node \(a\) there are changes between \(t_1\) (where the last output was generated) and \(t_4\), therefore the \emph{change timestamps} are \(t_2, t_3, t_4\) and the node will have to compute its output based on the values of the streams at that timestamps.
 
 \subsection{\glsentryname{tessla} Evaluation Engine}
 \label{sec:concepts:def:eval_engine}
 
-Because functions in \gls{tessla} specifications depend on other functions, and these dependencies have to be circle free,
-the specification can be represented as a \gls{dag}.
-This \gls{dag} can be directly translated into an evaluation engine for that specification: the vertices of the \gls{dag} are nodes representing the functions and the edges are the input and output streams between the nodes.
+Because functions in \gls{tessla} specifications depend on other functions, and these dependencies have to be circle free, the specification can be represented as a \gls{dag}, where the functions are vertices and the relationship between functions are edges.
+This is exactly how the \gls{tessla} compiler outputs a specification.
+One can now use the \gls{dag} of a \gls{tessla} specification to synthesize a system to evaluate it over inputs:
+The vertices of the \gls{dag} become nodes representing the functions and the edges are the input and output streams between the nodes.
+We will call this synthesized system an \emph{evaluation engine}.
 
-\begin{definition}[name=Equivalence of Evaluation Engines]\label{def:equivalence_eval_engine}
-  Two evaluation engines are called equivalent, if they produce the same relationship between external and output events for all valid sequences of external events (where valid means ordered by their timestamp).
-\end{definition}
-
-\begin{definition}[name=Equivalence of Evaluation Engines for an Input]\label{def:equivalence_eval_engine_specific}
-  Two evaluation engines are called equivalent for an input, if they produce the same output for that input.
-\end{definition}
+When fed with inputs (or \emph{traces}) the engine will produce outputs.
+The relationship between inputs and outputs that is produced can be seen as a timed transducer.
 
 To evaluate a specification over traces, the evaluation engine has process the events that were traced.
 To do so the nodes have to run their computations until no more events are present (or the specification found an error in the trace).
@@ -449,7 +454,19 @@ This leads to the question in which order nodes should be scheduled to perform t
 While some schedules are simply not rational (think of unfairness and causality), there are many different schedules that are feasible.
 It has to be prooven that a chosen schedule produces the correct conclusions for a specification, else the evaluation engine is not valid.
 
-In this thesis it is shown that multiple schedules will lead to the same conclusions and therefore an implementation of an evaluation engine is free to choose between them.
+This proof will be carried out for different kinds of schedules in Section~\ref{sec:concepts:equivalence_without_timing}, showing that all of them can be used by an evaluation engine.
+For now we can define when to evaluation engines are called equivalent based on the work in Section~\ref{sec:concepts:def:timed_transducer}:
+
+\begin{definition}[name=Equivalence of Evaluation Engines]\label{def:equivalence_eval_engine}
+  Two evaluation engines are called equivalent, if their produced relationships between inputs and outputs are observational equivalent.
+\end{definition}
+
+Because the possible inputs are infinite we will restrict the definition of equivalence to a specified set of inputs:
+
+\begin{definition}[name=Equivalence of Evaluation Engines for Specified Inputs]\label{def:equivalence_eval_engine_specific_inputs}
+  Two evaluation engines are called equivalent for a set of inputs, if the relationship for theese inputs and the produced outputs is observational equivalent.
+\end{definition}
+
 
 \subsection{State and History}
 \label{sec:concepts:def:state}
@@ -495,10 +512,10 @@ A transition is valid, if it has at least one input event, all of its input even
 The set of all valid transitions is
 \begin{align*}
   T = \{(\widetilde{E}, \widetilde{E'}) | &\widetilde{E} \subseteq (E_e \cup E_n) \land \widetilde{E} \neq \emptyset \land \widetilde{E'} \subseteq (E_n \cup E_o)\\
-&\land (\forall e_i, e_j \in \widetilde{E'}: \varsigma(e_i) = \varsigma(e_j)) \land (\forall \widetilde{e}_i, \widetilde{e}_j \in \widetilde{E}: \varsigma(\widetilde{e}_i) \neq \varsigma(\widetilde{e}_j))\}
+&\land (\forall e_i, e_j \in \widetilde{E'}: \mathit{stream}(e_i) = \mathit{stream}(e_j)) \land (\forall \widetilde{e}_i, \widetilde{e}_j \in \widetilde{E}: \mathit{stream}(\widetilde{e}_i) \neq \mathit{stream}(\widetilde{e}_j))\}
 \end{align*}
-where the node which caused the transition is \(\eta(\varsigma(e_i))\).
-For brevity we define \(\eta : T \rightarrow N\) with \(\eta((e, e')) = \eta(\varsigma(e_i)),\ e_i \in e'\), which yields the node that is modeled by the transition.
+where the node which caused the transition is \(\mathit{node}(\mathit{stream}(e_i))\).
+For brevity we define \(\mathit{node} : T \rightarrow N\) with \(\mathit{node}((e, e')) = \mathit{node}(\mathit{stream}(e_i)),\ e_i \in e'\), which yields the node that is modeled by the transition.
 
 The empty transition, meaning no input was consumed and no output produced, is labeled with \(\lambda\).
 Note that all transitions, except the empty one, have to consume at least one event (therefore no events can be created from nowhere) and that it's possible that no event was produced based on the consumed events (think of a \emph{FilterNode}).
@@ -510,11 +527,11 @@ With timing nodes one could for example implement an \emph{EchoNode}, which dupl
   Given a global state \(s_0\) and a transition \(\tau_1 = (\widetilde{E}, \widetilde{E'}) = (\{e_1,e_2,\dots,e_i\}, \{e_1',e_2',\dots,e_i'\})\), when we \emph{apply} \(\tau_1\) to \(s_0\) we get a new global state \(s_1\) with\\
   \(\forall \widetilde{n}_i = s_0(i)\)
   \begin{itemize}
-    \item if \(\eta(\widetilde{n}_i) \neq \eta(\tau_1) \text{ then } s_1(i) = \widetilde{n}_i\) (no node states changes except the one from the node of the transition)
+    \item if \(\mathit{node}(\widetilde{n}_i) \neq \mathit{node}(\tau_1) \text{ then } s_1(i) = \widetilde{n}_i\) (no node states changes except the one from the node of the transition)
     \item else let \((\{\sigma_1,\dots,\sigma_n\}, \sigma_o) = n_i\). Then is \(s_1(i) = (\widetilde{\sigma}, \sigma_o')\) with
       \begin{itemize}
         \item \(\sigma_o' = \sigma_o ++ e'\) with \(++\) defined as appending all events in \(e'\) to \(\sigma_o\) ordered by their timestamp
-        \item \(\widetilde{\sigma} = \{\sigma_1', \sigma_2', \dots, \sigma_n'\}\) with \(\sigma_l', l \in [1,n]: \sigma_l + \widetilde{e}\) where \(\widetilde{e} \in e \text{ and } \eta(\varsigma(\widetilde{e})) = \eta(\sigma_l)\) and \(+\) is the known append operator for sequences.
+        \item \(\widetilde{\sigma} = \{\sigma_1', \sigma_2', \dots, \sigma_n'\}\) with \(\sigma_l', l \in [1,n]: \sigma_l + \widetilde{e}\) where \(\widetilde{e} \in e \text{ and } \mathit{node}(\mathit{stream}(\widetilde{e})) = \mathit{node}(\sigma_l)\) and \(+\) is the known append operator for sequences.
       \end{itemize}
   \end{itemize}
 
@@ -585,15 +602,15 @@ Because the state can be built from the transitions that were taken, equivalence
       \begin{itemize}
         \item \(\forall \sigma_x \in \widetilde{\sigma} \cap \Sigma_n: \exists j \in [1, i]: r(j) = (\tau_j, s_j)\) with
           \begin{itemize}
-            \item\( (e, e') = \tau_j \land e_x \in e'\) with \(\varsigma(e_x) = \sigma_x \)
+            \item\( (e, e') = \tau_j \land e_x \in e'\) with \(\mathit{stream}(e_x) = \sigma_x \)
           \end{itemize}
-        \item and \(\forall \sigma_e \in \widetilde{\sigma} \cap\Sigma_e:\exists e_e\) with \(\varsigma(e_e) = \sigma_e\)
+        \item and \(\forall \sigma_e \in \widetilde{\sigma} \cap\Sigma_e:\exists e_e\) with \(\mathit{stream}(e_e) = \sigma_e\)
       \end{itemize}
     \item and weren't consumed earlier by that node
       \begin{itemize}
         \item \(\forall e_x\) (the same \(e_x\) as in the steps above)
           \begin{itemize}
-            \item \(\not\exists h \in [j, i]: (\widetilde{e}, \widetilde{e'}) = \tau_h \land \eta(\tau_h) = n \land (\tau_h, s_h) = r(h) \land e_x \in \widetilde{e}\)
+            \item \(\not\exists h \in [j, i]: (\widetilde{e}, \widetilde{e'}) = \tau_h \land \mathit{node}(\tau_h) = n \land (\tau_h, s_h) = r(h) \land e_x \in \widetilde{e}\)
           \end{itemize}
       \end{itemize}
   \end{itemize}
@@ -602,7 +619,7 @@ Because the state can be built from the transitions that were taken, equivalence
 \begin{definition}[name = Valid Run]\label{def:valid_run}
   A run \(r\) is called \emph{valid} if
   \begin{itemize}
-    \item \(\forall i \in [0,l(r)]: r(i) = (\tau_i,s_i) \land \eta(\tau_i)\) is enabled at step \(i\)
+    \item \(\forall i \in [0,l(r)]: r(i) = (\tau_i,s_i) \land \mathit{node}(\tau_i)\) is enabled at step \(i\)
     \item and \(s_i\) is built by applying \(\tau_i\) to \(s_{i-1}\)
   \end{itemize}
 \end{definition}
@@ -612,7 +629,7 @@ Because the state can be built from the transitions that were taken, equivalence
 \end{definition}
 
 \begin{definition}[name = Independence of Transitions]\label{def:independence_transitions}
-  A transition \(\tau_1\) is called independent of another transitions \(\tau_2\), if \(\eta(\tau_1)\) is independent of \(\eta(\tau_2)\).
+  A transition \(\tau_1\) is called independent of another transitions \(\tau_2\), if \(\mathit{node}(\tau_1)\) is independent of \(\mathit{node}(\tau_2)\).
 \end{definition}
 
 \begin{lemma}[name = Exchange of Independent Transitions]\label{lemma:exchange_independent_transitions}
@@ -624,7 +641,7 @@ Because the state can be built from the transitions that were taken, equivalence
 \end{lemma}
 
 \begin{proof}
-Because \(a = \eta(\tau_1)\) is no descendant of \(b = \eta(\tau_2)\), the stream \(\sigma\) with \(\eta(\sigma) = \eta(\tau_2)\) can be no input of \(a\).
+Because \(a = \mathit{node}(\tau_1)\) is no descendant of \(b = \mathit{node}(\tau_2)\), the stream \(\sigma\) with \(\mathit{node}(\sigma) = \mathit{node}(\tau_2)\) can be no input of \(a\).
   Therefore the enabledness of \(a\) can't be changed by \(\tau_2\) as you can see from the definition of enabledness.
   So \(a\) has to be enabled before \(\tau_2\) was taken by \(r_1\), else it couldn't be enabled afterwards.
   Therefore \(r_2\) also fullfills the requirements for a valid run.
@@ -640,7 +657,7 @@ Because \(a = \eta(\tau_1)\) is no descendant of \(b = \eta(\tau_2)\), the strea
 
 \begin{lemma}[name = Duration of Enabledness]\label{lemma:enabled_till_scheduled}
   A node which is enabled stays enabled at least until it is scheduled.
-  Formally: If a node \(n\) is enabled at step \(i\) in a run \(r\) it will stay enabled at least until step \(j > j\) with \(r(j) = (\tau,s), \eta(\tau) = n\).
+  Formally: If a node \(n\) is enabled at step \(i\) in a run \(r\) it will stay enabled at least until step \(j > j\) with \(r(j) = (\tau,s), \mathit{node}(\tau) = n\).
   Note that it doesn't have to be enabled after step \(j\), because there could have been multiple events buffered on it's inputs.
 \end{lemma}
 
