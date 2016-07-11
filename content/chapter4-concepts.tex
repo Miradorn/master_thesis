@@ -147,7 +147,8 @@ In the following \(\sigma_i\) is used to get the element at position \(i\) and \
 
 \end{exmp}
 
-\subsection{Timed Transducers}\label{sec:concepts:def:timed_transducer}
+\subsection{Timed Transducers}
+\label{sec:concepts:def:timed_transducer}
 
 For the second kind of equivalence we need to introduce \emph{timed sequences} and \emph{timed transducers}.
 Let \(\mathbb{T}\) be a timing model that is isomorphic to \(\mathbb{R}\).
@@ -454,7 +455,7 @@ This leads to the question in which order nodes should be scheduled to perform t
 While some schedules are simply not rational (think of unfairness and causality), there are many different schedules that are feasible.
 It has to be prooven that a chosen schedule produces the correct conclusions for a specification, else the evaluation engine is not valid.
 
-This proof will be carried out for different kinds of schedules in Section~\ref{sec:concepts:equivalence_without_timing}, showing that all of them can be used by an evaluation engine.
+This proof will be carried out for different kinds of schedules in Section~\ref{sec:concepts:equivalence_without_timing} and Section~\ref{sec:concepts:equivalence_with_timing}, showing that all of them can be used by an evaluation engine.
 For now we can define when to evaluation engines are called equivalent based on the work in Section~\ref{sec:concepts:def:timed_transducer}:
 
 \begin{definition}[name=Equivalence of Evaluation Engines]\label{def:equivalence_eval_engine}
@@ -474,8 +475,7 @@ Because the possible inputs are infinite we will restrict the definition of equi
 All \gls{tessla} evaluation engines have to hold a state, which encodes information necessary to continue the evaluation, and a history, which encodes what happened on all streams in the evaluation engine.
 The state of a whole evaluation engine is made up of the states of its nodes.
 
-Each node has a state, which can hold arbitray information, e.g.\ a counter for a \emph{CountNode}, and its input queues.
-Input queues are \gls{fifo} queues, which hold the events produced by predecessors of the node, that weren't consumed yet by the node.
+Each node has a state, which contains arbitray information, e.g.\ a counter for a \emph{CountNode}, and its input queues holding the non processed events and the progress of the stream.
 
 To distinguish between the two types of states, the state of the whole engine is called the \emph{global state} and the state of a single node the \emph{Node State}.
 The set of all valid node states is called \(\widetilde{N}\).
@@ -484,20 +484,29 @@ The global state of an evaluation engine at a certain step is a map from its nod
 We will denote the set of all global States as \(S\).
 A global state can be queried like \(s(n) = \widetilde{n}\) to yield the state of the node \(n\).
 
-Everytime a node \(n\) is scheduled, it changes its own node state and the node state of its direct children \(N_c\) by:
+Nodes are scheduled to perform computation when they can produce new events or update the progress of their output, meaning they have events buffered on all inputs that are needed to compute a new event or all inputs have progressed to a timestamp bigger than the progress of its output.
+As already sketched in Section~\ref{sec:concepts:defs:nodes} everytime a node \(n\) is scheduled, it changes its own node state and the node state of its direct children \(N_c\) by
 
 \begin{itemize}
-  \item Take one event \(e_i\) from each input queue \(q_i\): \(e_i = hd(q_i)\)
-  \item Produce new events based on the internal information and the taken events
-  \item Change its children node state by appending the produced events to the queues of all nodes in \(N_c\)
-  \item Update its own node state by
-  \begin{itemize}
-    \item Updating the internal information if necessary
-    \item Replace all input queues \(q_i\) with \(q_i' = tl(q_i)\)
-  \end{itemize}
+  \item If new output events can be computed
+    \begin{itemize}
+      \item Take one event \(e_i\) from each input queue \(q_i\): \(e_i = hd(q_i)\)
+      \item Produce new events based on the internal information in its state and the taken events
+      \item Change its childrens node state by appending the produced events to the queues representing the stream of node \(n\) of all nodes in \(N_c\) and update the progress of that queue
+      \item Update its own node state by
+        \begin{itemize}
+          \item Updating the internal information if necessary
+          \item Replace all input queues \(q_i\) with \(q_i' = tl(q_i)\)
+        \end{itemize}
+    \end{itemize}
+    \item Else, if no new events can be produced but the progress can be updated
+    \begin{itemize}
+      \item Optionally drop events from inputs that are no longer needed (think of a \emph{MergeNode} which only emits events if on both inputs have an event at a specific timestamp)
+      \item Update the progress of the queue representing the stream from \(n\) of all nodes in \(N_c\)
+    \end{itemize}
 \end{itemize}
 
-TODO History
+The history of an evaluation engine is defined at every step (read: after every computation of a node) as all events that were produced by any node upto that step.
 
 \subsection{Transitions}
 \label{sec:concepts:def:transitions}
@@ -884,5 +893,7 @@ Therefore the reordering of runs has to be performed over wider parts of the run
 % => show commutativity of traces (note: only valid commutations, no two events, where one depends one the other, can be commuted, this is ensured by the scheduling of nodes that have input buffered)
 
 \section{Behaviour with Timing functions}
+\label{sec:concepts:behaviour_with_timing}
 \section{Equalitys with Timing functions}
+\label{sec:concepts:equivalence_with_timing}
 \section{Parallel computation}
