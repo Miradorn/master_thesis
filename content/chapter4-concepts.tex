@@ -401,7 +401,10 @@ The function of a node \(n \in N\) is written as \(f_n\).
 
 Each node has a set of inputs, which are either external or internal streams, and one output, which is either an internal or an output stream.
 Nodes which have at least one external stream as an input are called \emph{sources}.
-Nodes have \gls{fifo} queues, provided by the Erlang plattform, which buffer events from the inputs for later computation and a state, as described in Section~/ref{sec:concepts:def:state}.
+Nodes have \gls{fifo} queues, provided by the Erlang plattform, which buffer events from the inputs for later computation and a state, as described in Section~\ref{sec:concepts:def:state}.
+Every new event added to a queue has to have a bigger timestamp than the last event added to it.
+This means a queue has a kind of progress timestamp, which denotes the timestamp of the latest event added to it and which is strictly increasing over time.
+
 % Based on the input queues and its function, when a node perform its compputation on a set of input events, it:
 
 % \begin{enumerate}
@@ -442,6 +445,11 @@ We will call this synthesized system an \emph{evaluation engine}.
 
 When fed with inputs (or \emph{traces}) the engine will produce outputs.
 The relationship between inputs and outputs that is produced can be seen as a timed transducer.
+The input to an evaluation engine has to have strictly increasing timestamps.
+This is needed to have a known progress which can be distributed through the system.
+If inputs weren't ordered by their timestamp for example the absense of input events on a specific stream couldn't be detected because they always could be present at a later position of the input trace.
+Especially for offline monitoring this obviously is no problem because the traces can simply be reordered into a strictly increasing sequence, except when multiple input events are at the same timestamp.
+This can be solved in two ways: either increase the timing precision when generating the traces or manipulate the timestamps in the traces by adding a minimal offset to them if they are equal to another timestamp.
 
 To evaluate a specification over traces, the evaluation engine has process the events that were traced.
 To do so the nodes have to run their computations until no more events are present (or the specification found an error in the trace).
@@ -470,27 +478,29 @@ Because the possible inputs are infinite we will restrict the definition of equi
 We are taking advantage of that to categorize functions based on how or if at all they can be encoded in our evaluation approach.
 The categorization is based upon the relationship between consumption and production of input and output events that a node representing the function in an evaluation engine produces.
 For this we will use the terms node and functions somewhat interchangeable in the following subsections.
+
 Nodes are only scheduled, if they are enabled, meaning they have events on their inputs buffered.
-Therefore the function the node implements is evaluated at the minimal timestamp of the buffered events, this timestamp is called the \emph{evaluation timestamp}.
+The function implemented by a node is evaluated at the minimal timestamp of the buffered events of the node, this timestamp is called the \emph{evaluation timestamp}.
 This is important to understand the completeness criteria: It means that when the function is evaluated there is at least one event with that timestamp on one input.
-The inverse of that statement shows shows why this is important: a function is never evaluated at a timestamp where no event is present.
+The inverse of that statement shows shows why this is important: a function is never evaluated at a timestamp where no event is present, therefore the system can't arbitrarily produce new timestamps.
 
 Nodes having signals as inputs always have to remember the last occured change of them in their state.
-When such a node is scheduled, the function will work either on the remembered value if no new change is present at the evaluation timestamp for the signal.
-If a new change is present at the evaluation timestamp that will be used and the state of the node has to be updated to remember the new change.
+When such a node is scheduled, the function will work on the remembered value if no new change is present at the evaluation timestamp for the signal.
+If a new change is present at the evaluation timestamp, it will be used and the state of the node has to be updated to remember the new change.
 
 It is important to note that all functions always have to consume at least one input event, else an evaluation engine can enter a livelock, where new events are produced forever out of nowhere.
+Also all functions will only produce a finite amount of events at every evaluation.
 
 \subsubsection{Complete Functions}
 \label{sec:concepts:def:tessla_functions:complete}
 
-Complete functions will consume one event from every input and produce at least one event at every timestamp they are evaluated.
+Complete functions will consume one event from every input and produce one event at every timestamp they are evaluated.
 Most complete functions are pretty simple and often have eventstreams as inputs or only have one input.
 The complete functions that are present in the implemented runtime are explained in Table~\ref{table:complete_functions}.
 
 \begin{table}[htb]
   \begin{tabularx}{\textwidth}{lllX}
-    Name                         & Domain  & Range   & Explanation \\
+    Name                                  & Domain  & Range   & Explanation \\
     \toprule \\
     \(\mathit{instruction\_executions}\)  & Events  & Events  & Converts a string to an event that denotes the execution of a specific instruction in the monitored program. \\
     \(\mathit{function\_returns}\)        & Events  & Events  & Converts a string to an event that denotes the return from a function in the monitored program. \\
@@ -588,7 +598,7 @@ For example the \(\mathit{add}\) function could consume two input events with th
 \subsubsection{Timing Functions}
 
 Timing functions are a bit special, therefore they are mentioned here in their own section.
-Basically they are also incomplete functions, but they have to buffer more events.
+Basically they are also incomplete functions, but they have to buffer multiple events until they are emitted.
 TODO
 
 \subsection{State and History}
@@ -597,74 +607,71 @@ TODO
 All \gls{tessla} evaluation engines have to hold a state, which encodes information necessary to continue the evaluation, and a history, which encodes what happened on all streams in the evaluation engine.
 The state of a whole evaluation engine is made up of the states of its nodes.
 
-Each node has a state, which contains arbitray information, e.g.\ a counter for a \emph{CountNode}, its input queues holding the non-processed events and, if they have signals as inputs, the last changes of them.
+Each node has a state, which contains arbitray information, e.g.\ a counter for a \(\mathit{CountNode}\), its input queues holding the non-processed events and, if they have signals as inputs, the last changes of them.
 
-To distinguish between the two types of states, the state of the whole engine is called the \emph{global state} and the state of a single node the \emph{Node State}.
+To distinguish between the two types of states, the state of the whole engine is called the \emph{global state} and the state of a single node the \emph{node state}.
 The set of all valid node states is called \(\widetilde{N}\).
 
 The global state of an evaluation engine at a certain step is a map from its nodes to their node state.
-We will denote the set of all global States as \(S\).
+We will denote the set of all global states as \(S\).
 A global state can be queried like \(s(n) = \widetilde{n}\) to yield the state of the node \(n\).
 
-Nodes are scheduled to perform computation when they can produce new events or update the progress of their output, meaning they have events buffered on all inputs that are needed to compute a new event or all inputs have progressed to a timestamp bigger than the progress of its output.
-Everytime a node \(n\) is scheduled it changes its own node state and the node state of its direct children \(N_c\):
+Nodes, and therefore the whole evaluation engine, change their state when they are scheduled.
+The transition between states is described in Section~\ref{sec:concepts:defs:transitions}
 
-\begin{itemize}
-  \item Check for the next timestamp \(t\) where a new output can be created
-  \item If such a timestamp exists, perform the computation:
-    \begin{itemize}
-      \item Take one event \(e_i\) from each input queue \(q_i\) that is needed to perform the computation at timestamp \(t\): \(e_i = hd(q_i)\). Note that depending on the categorization of the function of the node, it's not necessary that each input is used
-      \item Produce new events based on the function it's modeling, the internal information in its state and the taken events
-      \item Change its childrens node state by appending the produced events to the queues representing the stream of node \(n\) of all nodes in \(N_c\) and update the progress of that queue
-      \item Update its own node state by:
-        \begin{itemize}
-          \item Updating the internal information based on the function it's modeling, the events that were taken and the previous internal information, if necessary
-          \item Replace all input queues \(q_i\) with \(q_i' = tl(q_i)\)
-        \end{itemize}
-    \end{itemize}
+
+% \begin{itemize}
+%   \item Selecting the minimal timestamp \(t\) of the heads of all inputs
+%   \item If such a timestamp exists, perform the computation:
+%     \begin{itemize}
+%       \item Take one event \(e_i\) from each input queue \(q_i\) that is needed to perform the computation at timestamp \(t\): \(e_i = hd(q_i)\). Note that depending on the categorization of the function of the node, it's not necessary that each input is used
+%       \item Produce new events based on the function it's modeling, the internal information in its state and the taken events
+%       \item Change its childrens node state by appending the produced events to the queues representing the stream of node \(n\) of all nodes in \(N_c\) and update the progress of that queue
+%       \item Update its own node state by:
+%         \begin{itemize}
+%           \item Updating the internal information based on the function it's modeling, the events that were taken and the previous internal information, if necessary
+%           \item Replace all input queues \(q_i\) with \(q_i' = tl(q_i)\)
+%         \end{itemize}
+%     \end{itemize}
   % \item Else, if no new events can be produced but the progress can be updated
   %   \begin{itemize}
   %     \item Optionally drop events from inputs that are no longer needed (think of a \emph{MergeNode} which only emits events if on both inputs have an event at a specific timestamp)
   %     \item Update the progress of the queue representing the stream from \(n\) of all nodes in \(N_c\)
   %   \end{itemize}
-\end{itemize}
+% \end{itemize}
 
 The history of an evaluation engine is defined at every step (read: after every computation of a node) as all events that were produced by any node upto that step.
 
 \subsection{Transitions}
-\label{sec:concepts:def:transitions}
+\label{sec:concepts:defs:transitions}
 
-A transition describes what happens when the evaluation engine switches state by performing a step, meaning that a node was scheduled to perform its computation:
-Events from the the inputs of a node are removed, one ore more output events can be generated and distributed and the progress of the output of the node is changed.
+A transition describes what happens when the evaluation engine schedules a node:
+Events from the the inputs of a node are removed (at least one), output events can be generated and distributed and the internal state of nodes are updated.
 To look at it in another way: a transition models the computation of a node, therefore when we say `Node \(a\) is scheduled' we mean that a transition is taken which models the computation of that node.
+The set of all transitions is written as \(T\).
+The function \(\mathit{node} : T \rightarrow N\) returns the node of which the transitions models the computation.
 
 One part of a transition is a relation between two sets of events, why sometimes we write \(\tau = (\{e_1, e_2\}, \{e_3\})\) to visualize a transition, but remember that there is more to a transition than that.
 E.g.\ the relation \(\tau = (\{e_1,e_2\}, \{e_3\})\) means that two events were consumed by a node and one event was produced based on them.
-The set of all transitions is written as \(T\).
-
-The function \(\mathit{node} : T \rightarrow N\) returns the node of which the transitions models the computation.
 
 The empty transition, meaning no input was consumed and no output produced, is labeled with \(\lambda\).
-Note that all transitions, which produces events have to consume at least one event (therefore no events can be created from nowhere) and that it's possible that no event was produced based on the consumed events (think of a \emph{FilterNode}).
-Furthermore it's possible to create multiple events in one transition.
-With timing nodes one could for example implement an \emph{EchoNode}, which duplicates an input after a specified amount of time.
+Note that all transitions, which produces events have to consume at least one event (therefore no events can be created from nowhere) and that it's possible that no event was produced based on the consumed events (see Section~\ref{sec:concepts:def:tessla_functions}).
+Furthermore with timing functions it's possible to create multiple events in one transition.
+For example think of an \(\mathit{EchoNode}\), which duplicates an input after a specified amount of time.
 
 \begin{definition}[name = Application of a Transition on a State]\label{sec:concepts:def:application_transition}
-  Given a global state \(s_0\) and a transition \(\tau_1 = (\widetilde{E}, \widetilde{E'}) = (\{e_1,e_2,\dots,e_i\}, \{e_1',e_2',\dots,e_i'\})\), when we \emph{apply} \(\tau_1\) to \(s_0\) we get a new global state \(s_1\) with\\
+  Given a global state \(s_0\) and a transition \(\tau = (\widetilde{E}, \widetilde{E'}) = (\{e_1,e_2,\dots,e_i\}, \{e_1',e_2',\dots,e_i'\})\) with \(n = \mathit{node}(\tau_1)\) and \(N_c\) the set of all nodes that are children of \(n\).
+  When we \emph{apply} \(\tau\) to \(s_0\) we get a new global state \(s_1\) with\\
   \(\forall \widetilde{n}_i = s_0(i)\)
   \begin{itemize}
-    \item if \(\mathit{node}(\widetilde{n}_i) \neq \mathit{node}(\tau_1) \text{ then } s_1(i) = \widetilde{n}_i\) (no node states changes except the one from the node of the transition)
-    \item else let \((\{\sigma_1,\dots,\sigma_n\}, \sigma_o) = n_i\). Then is \(s_1(i) = (\widetilde{\sigma}, \sigma_o')\) with
-      \begin{itemize}
-        \item \(\sigma_o' = \sigma_o ++ e'\) with \(++\) defined as appending all events in \(e'\) to \(\sigma_o\) ordered by their timestamp
-        \item \(\widetilde{\sigma} = \{\sigma_1', \sigma_2', \dots, \sigma_n'\}\) with \(\sigma_l', l \in [1,n]: \sigma_l + \widetilde{e}\) where \(\widetilde{e} \in e \text{ and } \mathit{node}(\mathit{stream}(\widetilde{e})) = \mathit{node}(\sigma_l)\) and \(+\) is the known append operator for sequences.
-      \end{itemize}
+    \item if \(\mathit{node}(\widetilde{n}_i) \not\in N_c \cup \{n\} \text{ then } s_1(i) = \widetilde{n}_i\) (no node states changes except the one from the node of the transition and its children)
+    \item else if \(\mathit{node}(\widetilde{n}_i) \in N_c\) then append all events in \(\widetilde{E'}\) to the input representing the stream from \(n\)
+    \item else remove all events in \(\widetilde{E}\) from the inputs representing their streams and update the internal information based on the function \(n\) is modelling.
   \end{itemize}
-
 \end{definition}
 
-This means, that the new global state is built with the old global state by altering only the node state of the node identified by the events in the second element of the transition.
-The node state is altered by appending all events in the second element of the transition to the output ordered by their timestamp and by adding each event in the first element of the transition to the input corresponding to the stream of that event.
+This means that the new global state is built with the old global state by altering only the node states of the node identified by the transition and its children.
+The node states are altered by removing all events that were consumed by the function from the inputs of the scheduled node, updating its internal state and adding the produced events to the queues representing it in the node states of its children.
 
 \subsection{Run}
 \label{sec:concepts:def:run}
@@ -672,31 +679,31 @@ The node state is altered by appending all events in the second element of the t
 A run of an evaluation engine is a sequence of transitions and states.
 The first element of the sequence is the empty transition and the initial state of the evaluation engine.
 It is a representation of the steps the engine takes to evaluate a specification over input streams.
-The length of a run can be retrieved with \(l(r) = d \in \mathbb{N}\).
-A run can be queried by it's index to return the element at that index: \(r(i)=(\tau_i, s_i),\ i \in [0, l(r)]\).
+The length of a run can be retrieved with \(\mathit{length}(r) = d \in \mathbb{N}\).
+A run can be queried by it's index to return the element at that index: \(r(i)=(\tau_i, s_i),\ i \in [0, \mathit{length}(r)]\).
 
 The run \(\langle (\lambda, s_0), (\tau_1, s_1) \rangle\) means, that the engine was in it's initial state, took the transition \(\tau_1\) and thereby reached the state \(s_1\).
 
-\begin{definition}[name = Equivalence of Runs]\label{def:equivalence_runs}
-  Two runs are called equivalent if they have an equal state at their last position.
-\end{definition}
+% \begin{definition}[name = Equivalence of Runs]\label{def:equivalence_runs}
+%   Two runs are called equivalent if they have an equal state at their last position.
+% \end{definition}
 
-Because the state can be built from the transitions that were taken, equivalence can also be defined over transitions.
+% Because the state can be built from the transitions that were taken, equivalence can also be defined over transitions.
 
-\begin{lemma}[name = Equivalence of Runs over Transitions]\label{lemma:equivalent_runs_with_transitions}
-  If the set of transitions of two runs are equal, the runs are equivalent.
-\end{lemma}
+% \begin{lemma}[name = Equivalence of Runs over Transitions]\label{lemma:equivalent_runs_with_transitions}
+%   If the set of transitions of two runs are equal, the runs are equivalent.
+% \end{lemma}
 
-\begin{proof}
-  Let \(r_1, r_2\) be the runs of two engines with the same set of transitions \(\widetilde{T}\).
-  Let \(s_1\) be the final state of the run \(r_1\) and \(s_2\) of \(r_2\).
-  If the two global states weren't equal, there would have to be at least one \(i\) with \(s_1(i) \neq s_2(i)\), meaning the same Node has to have a different state in both engines.
-  Let \(\widetilde{n}_1, \widetilde{n}_2\) be the node states of one such node in both engines.
-  If the two node states are different, one of them has to contain at least one event on an input or output that isn't on the same stream in the other state.
-  Let that event be \(e_d\).
-  To be added to the state, there has to be a transition \(\tau = (e, e')\) with \(e_d \in e \lor e_d \in e'\).
-  This transition has to be in \(\widetilde{T}\), which means it was taken by both engines, therefore \(e_d\) is in the history of the node in both runs, therefore its the two node States are equal in both engines.
-\end{proof}
+% \begin{proof}
+%   Let \(r_1, r_2\) be the runs of two engines with the same set of transitions \(\widetilde{T}\).
+%   Let \(s_1\) be the final state of the run \(r_1\) and \(s_2\) of \(r_2\).
+%   If the two global states weren't equal, there would have to be at least one \(i\) with \(s_1(i) \neq s_2(i)\), meaning the same Node has to have a different state in both engines.
+%   Let \(\widetilde{n}_1, \widetilde{n}_2\) be the node states of one such node in both engines.
+%   If the two node states are different, one of them has to contain at least one event on an input or output that isn't on the same stream in the other state.
+%   Let that event be \(e_d\).
+%   To be added to the state, there has to be a transition \(\tau = (e, e')\) with \(e_d \in e \lor e_d \in e'\).
+%   This transition has to be in \(\widetilde{T}\), which means it was taken by both engines, therefore \(e_d\) is in the history of the node in both runs, therefore its the two node States are equal in both engines.
+% \end{proof}
 
 \begin{definition}[name = Closeness of Runs]\label{def:runs_closeness}
   The closeness \(\delta\) of a run \(r_1\) to a run \(r_2\) is a pair \(\delta(r_1,r_2) = (x,y)\), where \(x\) is the index before the first position where the two runs differ and y is the number of steps between the index of the first difference and the position where \(r_2\) takes the transition that \(r_1\) took after step \(x\).
