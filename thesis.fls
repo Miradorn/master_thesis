@@ -277,6 +277,10 @@ INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/glossaries/styles/glossary-tr
 INPUT glossary.tex
 INPUT glossary.tex
 OUTPUT thesis.glo
+INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/tools/multicol.sty
+INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/tools/multicol.sty
+INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/booktabs/booktabs.sty
+INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/booktabs/booktabs.sty
 INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty
 INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty
 INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty

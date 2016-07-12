@@ -41,36 +41,36 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {exmp}{\numberline {7}Example\thmtformatoptarg {Observational Equivalence}}{19}{exmp.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {12}\MakeUppercase {d}efinition\thmtformatoptarg {Equivalence of Evaluation Engines}}{25}{definition.12}
+\contentsline {definition}{\numberline {12}\MakeUppercase {d}efinition\thmtformatoptarg {Equivalence of Evaluation Engines}}{24}{definition.12}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {13}\MakeUppercase {d}efinition\thmtformatoptarg {Equivalence of Evaluation Engines for Specified Inputs}}{25}{definition.13}
+\contentsline {definition}{\numberline {13}\MakeUppercase {d}efinition\thmtformatoptarg {Equivalence of Evaluation Engines for Specified Inputs}}{24}{definition.13}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {14}\MakeUppercase {d}efinition\thmtformatoptarg {Application of a Transition on a State}}{27}{definition.14}
+\contentsline {definition}{\numberline {14}\MakeUppercase {d}efinition\thmtformatoptarg {Application of a Transition on a State}}{30}{definition.14}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {15}\MakeUppercase {d}efinition\thmtformatoptarg {Equivalence of Runs}}{28}{definition.15}
+\contentsline {definition}{\numberline {15}\MakeUppercase {d}efinition\thmtformatoptarg {Equivalence of Runs}}{31}{definition.15}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {3}\MakeUppercase {l}emma\thmtformatoptarg {Equivalence of Runs over Transitions}}{28}{lemma.3}
+\contentsline {lemma}{\numberline {3}\MakeUppercase {l}emma\thmtformatoptarg {Equivalence of Runs over Transitions}}{31}{lemma.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {16}\MakeUppercase {d}efinition\thmtformatoptarg {Closeness of Runs}}{28}{definition.16}
+\contentsline {definition}{\numberline {16}\MakeUppercase {d}efinition\thmtformatoptarg {Closeness of Runs}}{32}{definition.16}
 \defcounter {refsection}{0}\relax 
-\contentsline {exmp}{\numberline {8}Example}{28}{exmp.8}
+\contentsline {exmp}{\numberline {8}Example}{32}{exmp.8}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {17}\MakeUppercase {d}efinition\thmtformatoptarg {Enabledness of a Node}}{29}{definition.17}
+\contentsline {definition}{\numberline {17}\MakeUppercase {d}efinition\thmtformatoptarg {Enabledness of a Node}}{32}{definition.17}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {18}\MakeUppercase {d}efinition\thmtformatoptarg {Valid Run}}{29}{definition.18}
+\contentsline {definition}{\numberline {18}\MakeUppercase {d}efinition\thmtformatoptarg {Valid Run}}{32}{definition.18}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {19}\MakeUppercase {d}efinition\thmtformatoptarg {Independence of Nodes}}{29}{definition.19}
+\contentsline {definition}{\numberline {19}\MakeUppercase {d}efinition\thmtformatoptarg {Independence of Nodes}}{33}{definition.19}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {20}\MakeUppercase {d}efinition\thmtformatoptarg {Independence of Transitions}}{29}{definition.20}
+\contentsline {definition}{\numberline {20}\MakeUppercase {d}efinition\thmtformatoptarg {Independence of Transitions}}{33}{definition.20}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {4}\MakeUppercase {l}emma\thmtformatoptarg {Exchange of Independent Transitions}}{29}{lemma.4}
+\contentsline {lemma}{\numberline {4}\MakeUppercase {l}emma\thmtformatoptarg {Exchange of Independent Transitions}}{33}{lemma.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {5}\MakeUppercase {l}emma\thmtformatoptarg {Influence of Independent Nodes}}{29}{lemma.5}
+\contentsline {lemma}{\numberline {5}\MakeUppercase {l}emma\thmtformatoptarg {Influence of Independent Nodes}}{33}{lemma.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {6}\MakeUppercase {l}emma\thmtformatoptarg {Duration of Enabledness}}{30}{lemma.6}
+\contentsline {lemma}{\numberline {6}\MakeUppercase {l}emma\thmtformatoptarg {Duration of Enabledness}}{33}{lemma.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {21}\MakeUppercase {d}efinition\thmtformatoptarg {Valid Evaluation Engines}}{31}{definition.21}
+\contentsline {definition}{\numberline {21}\MakeUppercase {d}efinition\thmtformatoptarg {Valid Evaluation Engines}}{35}{definition.21}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {7}\MakeUppercase {l}emma\thmtformatoptarg {Equivalence of Engines for one Input}}{33}{lemma.7}
+\contentsline {lemma}{\numberline {7}\MakeUppercase {l}emma\thmtformatoptarg {Equivalence of Engines for one Input}}{36}{lemma.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {theorem}{\numberline {1}\MakeUppercase {t}heorem\thmtformatoptarg {Equivalence of Different Synchronous Evaluation Engines}}{33}{theorem.1}
+\contentsline {theorem}{\numberline {1}\MakeUppercase {t}heorem\thmtformatoptarg {Equivalence of Different Synchronous Evaluation Engines}}{37}{theorem.1}
