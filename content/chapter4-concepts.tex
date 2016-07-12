@@ -401,9 +401,11 @@ The function of a node \(n \in N\) is written as \(f_n\).
 
 Each node has a set of inputs, which are either external or internal streams, and one output, which is either an internal or an output stream.
 Nodes which have at least one external stream as an input are called \emph{sources}.
-Nodes have \gls{fifo} queues, provided by the Erlang plattform, which buffer events from the inputs for later computation and a state, as described in Section~\ref{sec:concepts:def:state}.
+Nodes have a state, described in Section~\ref{sec:concepts:def:state}, which contains \gls{fifo} queues, provided by the Erlang plattform, which buffer events from its inputs for later computation.
+
 Every new event added to a queue has to have a bigger timestamp than the last event added to it.
 This means a queue has a kind of progress timestamp, which denotes the timestamp of the latest event added to it and which is strictly increasing over time.
+Queues support the standard operators for lists like \(\mathit{hd}, \mathit{tl}, ++\) to respectively get the head, the tail or to append to the end.
 
 % Based on the input queues and its function, when a node perform its compputation on a set of input events, it:
 
@@ -646,8 +648,11 @@ The history of an evaluation engine is defined at every step (read: after every 
 \label{sec:concepts:defs:transitions}
 
 A transition describes what happens when the evaluation engine schedules a node:
-Events from the the inputs of a node are removed (at least one), output events can be generated and distributed and the internal state of nodes are updated.
-To look at it in another way: a transition models the computation of a node, therefore when we say `Node \(a\) is scheduled' we mean that a transition is taken which models the computation of that node.
+Events from the the inputs of a node are removed (at least one), output events can be generated (but don't have to) and distributed and the internal state of nodes are updated.
+Because the function of a node is evaluated at the evaluation timestamp, which is the minimal timestamp of all events on the heads of inputs, the events which are removed are exactly the ones that have the evaluation timestamp.
+To look at it in another way: a transition models the computation of a node and the progressing of the stream it produces towards the evaluation timestamp, which has to be bigger than the previous progress, since input queues are strictly ordered by their timestamp and the events with the minimal timestamps are removed after the computation.
+Therefore when we say `Node \(a\) is scheduled' we mean that a transition is taken which models the computation of that node.
+
 The set of all transitions is written as \(T\).
 The function \(\mathit{node} : T \rightarrow N\) returns the node of which the transitions models the computation.
 
@@ -709,6 +714,7 @@ The run \(\langle (\lambda, s_0), (\tau_1, s_1) \rangle\) means, that the engine
   The closeness \(\delta\) of a run \(r_1\) to a run \(r_2\) is a pair \(\delta(r_1,r_2) = (x,y)\), where \(x\) is the index before the first position where the two runs differ and y is the number of steps between the index of the first difference and the position where \(r_2\) takes the transition that \(r_1\) took after step \(x\).
   The closeness of runs is ordered element-wise: \((x,y) > (x',y') \leftrightarrow ((x > x') \lor (x = x' \land y < y))\).
   Therefore two runs with length \(d\) are equal, if their closeness is \(d,0\), which is the maximal closeness two runs of length \(d\) can have at all.
+  Note that two runs have no closeness if they don't contain the same transitions.
 \end{definition}
 
 \begin{exmp}
@@ -718,36 +724,52 @@ The run \(\langle (\lambda, s_0), (\tau_1, s_1) \rangle\) means, that the engine
   \[r_3 = \langle (\lambda, s_0), (\tau_1,s_1), (\tau_2,s_2), (\tau_3,s_3), (\tau_5,s_4''), (\tau_4,s_5''), (\tau_6,s_6'') \rangle\]
 
   Then is
-  \[\delta_{1,2} = \delta(r_1,r_2) = (3,3),\ \delta_{1,3} = \delta(r_1,r_3) = (4,1)\]
-  \[\delta_{2,1} = \delta(r_2,r_1) = (3,2),\ \delta_{2,3} = \delta(r_2,r_3) = (3,1)\]
-  \[\delta_{3,1} = \delta(r_3,r_1) = (4,1),\ \delta_{3,2} = \delta(r_3,r_2) = (3,2)\]
-
-  And \(\delta_{1,3} < \delta_{2,3} < \delta_{2,1} < \delta_{2,1}\).
-
-
+  \begin{itemize}
+    \item \(\delta_{1,2} = \delta(r_1,r_2) = (3,3)\) because \(r_1\) takes \(tau_3\) at step \(3\) while \(r_2\) takes \(tau_5\) and \(r_2\) takes \(tau_3\) at step \(3 + 3 = 6\).
+    \item \(\delta_{1,3} = \delta(r_1,r_3) = (4,1)\) because \(r_1\) takes \(tau_4\) at step \(4\) while \(r_3\) takes \(tau_5\) and \(r_2\) takes \(tau_4\) at step \(4 + 1 = 5\).
+    \item The explanations for the remaining cases is analogous and therefore not stated here.
+    \item \(\delta_{2,1} = \delta(r_2,r_1) = (3,2),\ \delta_{2,3} = \delta(r_2,r_3) = (3,1)\)
+    \item \(\delta_{3,1} = \delta(r_3,r_1) = (4,1),\ \delta_{3,2} = \delta(r_3,r_2) = (3,2)\)
+  \end{itemize}
+  The ordering of the distances is straightforward: \(\delta_{1,3} < \delta_{2,3} < \delta_{2,1} < \delta_{2,1}\).
 \end{exmp}
 
-\begin{definition}[name = Enabledness of a Node]\label{def:node_enabled}
-  A node \(n\) with the input streams \(\widetilde{\sigma}\) in an evaluation engine is called \emph{enabled} at a step \(i\) of a run \(r\) of that engine, when it satisfies all of the following conditions:
+To reason about runs we have to restrict runs to the ones that are reasonable in the context of an evaluation engine.
+This means that only transitions are taken that are possible based on the global state.
+To do so we have to define when a node can compute based on its state.
+At first we will give a definition that only works for output complete \gls{tessla} functions.
+Based on that definition we will see the problems that output incomplete functions have and modify the transition model to fix the problem.
 
-  \begin{itemize}
-    \item All consumed events are either internal events that were produced at an earlier step or external events that are present:
-      \begin{itemize}
-        \item \(\forall \sigma_x \in \widetilde{\sigma} \cap \Sigma_n: \exists j \in [1, i]: r(j) = (\tau_j, s_j)\) with
-          \begin{itemize}
-            \item\( (e, e') = \tau_j \land e_x \in e'\) with \(\mathit{stream}(e_x) = \sigma_x \)
-          \end{itemize}
-        \item and \(\forall \sigma_e \in \widetilde{\sigma} \cap\Sigma_e:\exists e_e\) with \(\mathit{stream}(e_e) = \sigma_e\)
-      \end{itemize}
-    \item and weren't consumed earlier by that node
-      \begin{itemize}
-        \item \(\forall e_x\) (the same \(e_x\) as in the steps above)
-          \begin{itemize}
-            \item \(\not\exists h \in [j, i]: (\widetilde{e}, \widetilde{e'}) = \tau_h \land \mathit{node}(\tau_h) = n \land (\tau_h, s_h) = r(h) \land e_x \in \widetilde{e}\)
-          \end{itemize}
-      \end{itemize}
-  \end{itemize}
+\begin{definition}[name = Preliminary Enabledness of a Node]\label{def:node_enabled}
+  A node \(n\) with the node state \(\widetilde{n}\) containing the input queues \(\widetilde{\sigma}\) in an evaluation engine is called \emph{enabled} at a step \(i\) of a run \(r\) of that engine, if at least one input is buffered on each input queue:
+  \[\forall \sigma_x \in \widetilde{\sigma}: \mathit{hd}(\sigma_x) = e_x \]
 \end{definition}
+
+As stated this definition works for all output complete functions, while output incomplete functions have a problem.
+It is possible that an output incomplete functions will never produce a new output:
+E.g.\ think of a \(\mathit{FilterNode}\) where the second input is always \(\mathit{false}\).
+Even if new input events are added to the first input and the second input is known to be \(\mathit{false}\) upto any timestamp, the children of the node will never receive new events for that input queue.
+Therefore all children can never again compute, because they don't have an event buffered on all inputs.
+
+There are two ways to fix this:\\
+All input queues could be extended with a progress timestamp, which denotes how far the parent node has progressed.
+Now everytime a node \(n\) with children \(N_c\) evaluates its function at a new evaluation timestamp the inputs of all nodes in \(N_c\) representing the stream of \(n\) would be updated to have that evaluation timestamp as their new progress, even if no new event was produced at that timestamp.
+
+The other way, which is used in this thesis, doesn't alter the input queues:
+First we need a new type of events: \emph{progress events}.
+A progress event holds no value and exists only to notify a node, that a specific input has progressed upto the timestamp of the progress event.
+We will write a progress event as \(e^p_t\) where t is the timestamp of it.
+Now, whenever a node performs its computation at an evaluation timestamp and no new event was produced, a progress event with the evaluation timestamp is added to the corresponding input queue of all children.
+When a Node computes at an evaluation timestamp and one of the consumed events is a progress event there are two possibilities:
+\begin{itemize}
+  \item If the progress event is on a signal, the last change of the signal, which is saved in the state of the node, is used as the argument of the function and the last change of that stream is not updated in the state.
+  \item If the progress event is on an eventstream it means that no events were produced upto and including that timestamp. This information can be used to produce timeouts if needed.
+\end{itemize}
+
+No matter the kind of the stream the progress event happened on, if the node that consumed it produced no new output for the computation at that evaluation timestamp, it will propagate the progress event to its children.
+With the addition of progress events the preliminary definition of enabledness for a node works for all kinds of \gls{tessla} functions.
+
+Now it is possible to restrict runs to a subset where each run models a rational evaluation of a specification.
 
 \begin{definition}[name = Valid Run]\label{def:valid_run}
   A run \(r\) is called \emph{valid} if
