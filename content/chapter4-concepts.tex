@@ -500,7 +500,7 @@ Complete functions will consume one event from every input and produce one event
 Most complete functions are pretty simple and often have eventstreams as inputs or only have one input.
 The complete functions that are present in the implemented runtime are explained in Table~\ref{table:complete_functions}.
 
-\begin{table}[htb]
+\begin{table}
   \begin{tabularx}{\textwidth}{lllX}
     Name                                  & Domain  & Range   & Explanation \\
     \toprule \\
@@ -529,7 +529,7 @@ The first four functions are sources which take an external event and format the
 Output complete functions will produce a new output everytime they are evaluated but only have to consume one event from any input and not one from every input.
 Table~\ref{table:output_complete_functions} summarizes all input complete functions.
 
-\begin{table}[htb]
+\begin{table}
   \begin{tabularx}{\textwidth}{lllX}
     Name                 & Domain        & Range   & Explanation \\
     \toprule \\
@@ -547,7 +547,7 @@ Input complete function consume one events from every input but can produce zero
 Table~\ref{table:input_complete_functions} summarizes all input complete functions.
 
 
-\begin{table}[htb]
+\begin{table}
   \begin{tabularx}{\textwidth}{lllX}
     Name                 & Domain  & Range   & Explanation \\
     \toprule \\
@@ -772,9 +772,9 @@ With the addition of progress events the preliminary definition of enabledness f
 Now it is possible to restrict runs to a subset where each run models a rational evaluation of a specification.
 
 \begin{definition}[name = Valid Run]\label{def:valid_run}
-  A run \(r\) is called \emph{valid} if
+  A run \(r\) is called \emph{valid}, if
   \begin{itemize}
-    \item \(\forall i \in [0,l(r)]: r(i) = (\tau_i,s_i) \land \mathit{node}(\tau_i)\) is enabled at step \(i\)
+    \item \(\forall i \in [0,\mathit{length}(r)]: r(i) = (\tau_i,s_i) \land \mathit{node}(\tau_i)\) is enabled at step \(i\)
     \item and \(s_i\) is built by applying \(\tau_i\) to \(s_{i-1}\)
   \end{itemize}
 \end{definition}
@@ -855,7 +855,7 @@ They are characterized by a specific, fixed schedule.
 The scheduling algorithm is as follows:
 
 \begin{itemize}
-  \item Select all nodes that are no sources, let their count be \(\i\)
+  \item Select all nodes that are no sources, let their count be \(i\)
   \item Label them with unique natural numbers from \([1,i]\) in reversed topological order
   \item Label the remaining nodes with unique natural numbers bigger than \(i\)
   \item Whenever a node has to be scheduled, schedule the enabled one with the lowest label
