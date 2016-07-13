@@ -535,10 +535,10 @@ INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchri8t.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/psnfss/ts1bch.fd
 INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/psnfss/ts1bch.fd
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchri8c.tfm
-INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchr8c.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/public/lm/rm-lmri10.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/public/lm/rm-lmri8.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/public/lm/rm-lmri7.tfm
+INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchr8c.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/public/tex-gyre/ec-qhvr-sc.tfm
 INPUT thesis.lof
 INPUT thesis.lof

@@ -97,23 +97,21 @@ In the following \(\sigma_i\) is used to get the element at position \(i\) and \
   Asynchronous equivalence is symmetric, reflexive and transitive.
 \end{lemma}
 \begin{proof}$ $\newline
-  \begin{itemize}
-    \item Symmetry: trivial, since the second part of the definition is requiring it.
-    \item Reflexivity: Also trivial, for \((\sigma_{[0,k]}, \vec{o})\) select \(k' = k\).
-    \item Transitivity:
-      \begin{itemize}
-        \item Let \(t_1 \equiv_a t_2\), \(t_2 \equiv_a t_3\).
-        \item First case:
-          \begin{align*}
-            &\text{Since } t_1 \equiv_a t_2:\ \forall (\sigma_{[0,k_1]}, \vec{o_1}) \in t_1: \\
-            &\hspace{2em} \exists k_2\ \text{such, that } (\sigma_{[0,k_2]}, \vec{o_2}) \in t_2\ \text{with } \vec{o_1} \sqsubseteq \vec{o_2} \\
-            &\hspace{2em} \text{and since } t_2 \equiv_a t_3 \\
-            &\hspace{4em} \exists k_3\ \text{such, that } (\sigma_{[0,k_3]}, \vec{o_3}) \in t_3\ \text{with } \vec{o_2} \sqsubseteq \vec{o_3}\\
-            &\hspace{4em} \text{With } \vec{o_1} \sqsubseteq \vec{o_2} \sqsubseteq \vec{o_3}\ \text{it follows, that } t_1 \equiv_a t_3
-          \end{align*}
-        \item The second case works the same, just change \(t_1\) and \(t_3\).
-      \end{itemize}
-  \end{itemize}
+    Symmetry is trivial, since the second part of the definition is requiring it.\\
+    Reflexivity is also trivial, for \((\sigma_{[0,k]}, \vec{o})\) select \(k' = k\).\\
+    For transitivity:
+    \begin{itemize}[label = {}]
+      \item Let \(t_1 \equiv_a t_2\), \(t_2 \equiv_a t_3\).
+      \item First case:
+        \begin{align*}
+          &\text{Since } t_1 \equiv_a t_2:\ \forall (\sigma_{[0,k_1]}, \vec{o_1}) \in t_1: \\
+          &\hspace{2em} \exists k_2\ \text{such, that } (\sigma_{[0,k_2]}, \vec{o_2}) \in t_2\ \text{with } \vec{o_1} \sqsubseteq \vec{o_2} \\
+          &\hspace{2em} \text{and since } t_2 \equiv_a t_3 \\
+          &\hspace{4em} \exists k_3\ \text{such, that } (\sigma_{[0,k_3]}, \vec{o_3}) \in t_3\ \text{with } \vec{o_2} \sqsubseteq \vec{o_3}\\
+          &\hspace{4em} \text{With } \vec{o_1} \sqsubseteq \vec{o_2} \sqsubseteq \vec{o_3}\ \text{it follows, that } t_1 \equiv_a t_3
+        \end{align*}
+      \item The second case works the same, just change \(t_1\) and \(t_3\).
+    \end{itemize}
 \end{proof}
 
 \begin{exmp}[name = Asynchronous equivalence of Transducers]
@@ -148,7 +146,7 @@ In the following \(\sigma_i\) is used to get the element at position \(i\) and \
 \end{exmp}
 
 \subsection{Timed Transducers}
-\label{sec:concepts:def:timed_transducer}
+\label{sec:concepts:defs:timed_transducer}
 
 For the second kind of equivalence we need to introduce \emph{timed sequences} and \emph{timed transducers}.
 Let \(\mathbb{T}\) be a timing model that is isomorphic to \(\mathbb{R}\).
@@ -187,17 +185,17 @@ Let \(\sigma = a_1a_{0.5}a_{1.5}a_0\).\\
 \begin{definition}[name = Timed Transducer]\label{def:timed_transducer}
   A timed transducer \(t\) with input alphabet \(\Phi\) and output alphabet \(\Gamma\) works on monotonic, timed sequences as inputs and has timed sequences as outputs:
   \[t \subset {\left(\Phi \times \mathbb{T}\right)}^* \times {\left(\Gamma \times \mathbb{T}\right)}^*\]
-  % Furthermore a timed transducer has to be causal and asynchronous.
 \end{definition}
 
 \begin{exmp}[name=Timed Transducers]
-  Let \(\Phi = \{a\}, \Gamma = \{b\}\).\\
-  \(t_{tsc} = \{(a_0, b_0),(a_0a_1, b_0b_1)\}\) is a timed, causal and synchronous transducer.\\
-  \(t_{tac} = \{(a_0, \epsilon),(a_0a_1, b_0b_1)\}\) is a timed, causal and asynchronous transducer.
+  \begin{align*}
+    &\text{Let } \Phi = \{a\}, \Gamma = \{b\}.\\
+    &t_{tsc} = \{(a_0, b_0),(a_0a_1, b_0b_1)\}\ \text{is a timed, causal and synchronous transducer.}\\
+    &t_{tac} = \{(a_0, \epsilon),(a_0a_1, b_0b_1)\}\ \text{is a timed, causal and asynchronous transducer.}
+  \end{align*}
 \end{exmp}
 
-
-For later theoretic work we have to restrict timed transducers:
+For later theoretic work we have to restrict timed transducers.
 
 \begin{definition}[name = Boundedness of Timed Transducers]\label{def:boundedness_timed_transducer}
   A timed transducer \(t\) with input alphabet \(\Phi\) and output alphabet \(\Gamma\) is called bounded, if it satisfies:
@@ -210,8 +208,7 @@ For later theoretic work we have to restrict timed transducers:
     &\hspace{6em}\mathit{upto}(\mathit{maxTime}(\vec{o}), \mathit{timed}(\vec{o}\circ\vec{o'})) = \mathit{upto}(\mathit{maxTime}(\vec{o}), \mathit{timed}(\vec{o}\circ\vec{o'}\circ\vec{o''}))
   \end{align*}
 \end{definition}
-
-Based on the definitions we can define an equivalence relationship on bounded timed transducers:
+Based on the definitions we can define an equivalence relationship on bounded timed transducers.
 
 \begin{definition}[name = Observational Equivalence]\label{def:observational_equivalence}
   Let \(t_1, t_2\) be two bounded timed transducers with input alphabet \(\Phi\) and output alphabet \(\Gamma\).
@@ -231,31 +228,29 @@ Based on the definitions we can define an equivalence relationship on bounded ti
 \end{lemma}
 \begin{proof}$ $\newline
   Let \(t_1, t_2, t_3\) be bounded timed transducers.
+  Symmetry follows directly from the definition.\\
+  Reflexivity: For \((\sigma_{[0,k]}, \vec{o})\) select \(k' = k''\) as the k, for which the transducer is bounded for that input.\\
+  Transitivity:
   \begin{itemize}
-    \item Symmetry: By definition.
-    \item Reflexivity: For \((\sigma_{[0,k]}, \vec{o})\) select \(k' = k''\) as the k, for which the transducer is bounded for that input.
-    \item Transitivity:
-      \begin{itemize}
-        \item Let \(t_1 \equiv_o t_2\), \(t_2 \equiv_o t_3\).
-        \item First case:
-          \begin{align*}
-            &\text{Since } t_1 \equiv_o t_2:\ \forall (\sigma_{[0,k_1]}, \vec{o_1}) \in t_1: \\
-            &\hspace{2em} \exists k_1', k_2 > k_1\ \text{with } (\sigma_{[0,k_1']}, \vec{o_1}\circ\vec{o_1'}) \in t_1\ \text{and } (\sigma_{[0,k_2]}, \vec{o_2}) \in t_2 \\
-            &\hspace{4em} \text{with } \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_1} \circ \vec{o_1'} )) \\
-            &\hspace{8em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_2})) & (\star)\\
-            &\hspace{2em} \text{and since } t_2 \equiv_o t_3: \exists k_2', k_3 > k_2\ \text{with } (\sigma_{[0,k_2']}, \vec{o_2}\circ\vec{o_2'}) \in t_2 \\
-            &\hspace{4em} \text{and } (\sigma_{[0,k_3]}, \vec{o_3}) \in t_3 \\
-            &\hspace{6em} \text{with } \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_2}),\vec{o_2} \circ \vec{o_2'} )) \\
-            &\hspace{10em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_2}),\vec{o_3})) & (\star\star)\\
-            &\hspace{2em} \mathit{maxTime}(\vec{o_1})\ \text{has to be smaller then}\mathit{maxTime}(\vec{o_2}) \\
-            &\hspace{4em} \text{else } (\star)\ \text{couldn't hold, therefore, combined with boundedness and }(\star\star): \\
-            &\hspace{4em} \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_2} )) \\
-            &\hspace{8em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_3})) \\
-            &\text{which concludes }\mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_1} \circ \vec{o_1'} ))\\
-            &\hspace{4em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_3}))
-          \end{align*}
-        \item The second case works the same, just switch \(t_1\) and \(t_3\).
-      \end{itemize}
+    \item Let \(t_1 \equiv_o t_2\), \(t_2 \equiv_o t_3\).
+    \item First case:
+      \begin{align*}
+        &\text{Since } t_1 \equiv_o t_2:\ \forall (\sigma_{[0,k_1]}, \vec{o_1}) \in t_1: \\
+        &\hspace{2em} \exists k_1', k_2 > k_1\ \text{with } (\sigma_{[0,k_1']}, \vec{o_1}\circ\vec{o_1'}) \in t_1\ \text{and } (\sigma_{[0,k_2]}, \vec{o_2}) \in t_2 \\
+        &\hspace{4em} \text{with } \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_1} \circ \vec{o_1'} )) \\
+        &\hspace{8em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_2})) & (\star)\\
+        &\hspace{2em} \text{and since } t_2 \equiv_o t_3: \exists k_2', k_3 > k_2\ \text{with } (\sigma_{[0,k_2']}, \vec{o_2}\circ\vec{o_2'}) \in t_2 \\
+        &\hspace{4em} \text{and } (\sigma_{[0,k_3]}, \vec{o_3}) \in t_3 \\
+        &\hspace{6em} \text{with } \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_2}),\vec{o_2} \circ \vec{o_2'} )) \\
+        &\hspace{10em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_2}),\vec{o_3})) & (\star\star)\\
+        &\hspace{2em} \mathit{maxTime}(\vec{o_1})\ \text{has to be smaller then}\mathit{maxTime}(\vec{o_2}) \\
+        &\hspace{4em} \text{else } (\star)\ \text{couldn't hold, therefore, combined with boundedness and }(\star\star): \\
+        &\hspace{4em} \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_2} )) \\
+        &\hspace{8em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_3})) \\
+        &\text{which concludes }\mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_1} \circ \vec{o_1'} ))\\
+        &\hspace{4em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_3}))
+      \end{align*}
+    \item The second case works the same, just switch \(t_1\) and \(t_3\).
   \end{itemize}
 \end{proof}
 
@@ -437,7 +432,7 @@ Queues support the standard operators for lists like \(\mathit{hd}, \mathit{tl},
 % All inputs have progressed to \(t_4\), but on the stream from node \(a\) there are changes between \(t_1\) (where the last output was generated) and \(t_4\), therefore the \emph{change timestamps} are \(t_2, t_3, t_4\) and the node will have to compute its output based on the values of the streams at that timestamps.
 
 \subsection{\glsentryname{tessla} Evaluation Engine}
-\label{sec:concepts:def:eval_engine}
+\label{def:eval_engine}
 
 Because functions in \gls{tessla} specifications depend on other functions, and these dependencies have to be circle free, the specification can be represented as a \gls{dag}, where the functions are vertices and the relationship between functions are edges.
 This is exactly how the \gls{tessla} compiler outputs a specification.
@@ -461,7 +456,7 @@ While some schedules are simply not rational (think of unfairness and causality)
 It has to be prooven that a chosen schedule produces the correct conclusions for a specification, else the evaluation engine is not valid.
 
 This proof will be carried out for different kinds of schedules in Section~\ref{sec:concepts:equivalence_without_timing} and Section~\ref{sec:concepts:equivalence_with_timing}, showing that all of them can be used by an evaluation engine.
-For now we can define when to evaluation engines are called equivalent based on the work in Section~\ref{sec:concepts:def:timed_transducer}:
+For now we can define when to evaluation engines are called equivalent based on the work in Section~\ref{def:timed_transducer}:
 
 \begin{definition}[name=Equivalence of Evaluation Engines]\label{def:equivalence_eval_engine}
   Two evaluation engines are called equivalent, if their produced relationships between inputs and outputs are observational equivalent.
@@ -474,7 +469,7 @@ Because the possible inputs are infinite we will restrict the definition of equi
 \end{definition}
 
 \subsection{\glsentryname{tessla} Functions}
-\label{sec:concepts:def:tessla_functions}
+\label{sec:concepts:defs:tessla_functions}
 
 \gls{tessla} puts no restrictions on the semantics of functions other than that they have to work on streams or constants and produce streams, but allows to restrict them for evaluation approaches.
 We are taking advantage of that to categorize functions based on how or if at all they can be encoded in our evaluation approach.
@@ -482,7 +477,8 @@ The categorization is based upon the relationship between consumption and produc
 For this we will use the terms node and functions somewhat interchangeable in the following subsections.
 
 Nodes are only scheduled, if they are enabled, meaning they have events on their inputs buffered.
-The function implemented by a node is evaluated at the minimal timestamp of the buffered events of the node, this timestamp is called the \emph{evaluation timestamp}.
+When a node is scheduled, it will compute the minimal timestamp of all buffered events.
+The function implemented by the node is then evaluated at that timestamp, which is called the \emph{evaluation timestamp}.
 This is important to understand the completeness criteria: It means that when the function is evaluated there is at least one event with that timestamp on one input.
 The inverse of that statement shows shows why this is important: a function is never evaluated at a timestamp where no event is present, therefore the system can't arbitrarily produce new timestamps.
 
@@ -491,16 +487,16 @@ When such a node is scheduled, the function will work on the remembered value if
 If a new change is present at the evaluation timestamp, it will be used and the state of the node has to be updated to remember the new change.
 
 It is important to note that all functions always have to consume at least one input event, else an evaluation engine can enter a livelock, where new events are produced forever out of nowhere.
-Also all functions will only produce a finite amount of events at every evaluation.
+Also all functions will only produce a finite amount of events at every evaluation, especially only timed functions can produce more than one event at an evaluation timestamp.
 
 \subsubsection{Complete Functions}
-\label{sec:concepts:def:tessla_functions:complete}
+\label{sec:concepts:defs:tessla_functions:complete}
 
 Complete functions will consume one event from every input and produce one event at every timestamp they are evaluated.
 Most complete functions are pretty simple and often have eventstreams as inputs or only have one input.
 The complete functions that are present in the implemented runtime are explained in Table~\ref{table:complete_functions}.
 
-\begin{table}
+\begin{table}[!htb]
   \begin{tabularx}{\textwidth}{lllX}
     Name                                  & Domain  & Range   & Explanation \\
     \toprule \\
@@ -525,11 +521,12 @@ The complete functions that are present in the implemented runtime are explained
 The first four functions are sources which take an external event and format them for internal use, e.g.\ \(\mathit{variable\_values}\) takes a string containing the name and the value of a variable, casts the value to an appropriate type and produces a signal holding that produced value.
 
 \subsubsection{Output Complete Functions}
+\label{sec:concepts:defs:tessla_functions:output_complete}
 
-Output complete functions will produce a new output everytime they are evaluated but only have to consume one event from any input and not one from every input.
+Output complete functions will produce a new event everytime they are evaluated but only have to consume one event from any input and not one from every input.
 Table~\ref{table:output_complete_functions} summarizes all input complete functions.
 
-\begin{table}
+\begin{table}[!htb]
   \begin{tabularx}{\textwidth}{lllX}
     Name                 & Domain        & Range   & Explanation \\
     \toprule \\
@@ -542,12 +539,13 @@ Table~\ref{table:output_complete_functions} summarizes all input complete functi
 
 
 \subsubsection{Input Complete Functions}
+\label{sec:concepts:defs:tessla_functions:input_complete}
 
-Input complete function consume one events from every input but can produce zero or more output events everytime they are evaluated.
+Input complete function consume one events from every input but can produce zero or one output events everytime they are evaluated.
 Table~\ref{table:input_complete_functions} summarizes all input complete functions.
 
 
-\begin{table}
+\begin{table}[!htb]
   \begin{tabularx}{\textwidth}{lllX}
     Name                 & Domain  & Range   & Explanation \\
     \toprule \\
@@ -564,7 +562,8 @@ Table~\ref{table:input_complete_functions} summarizes all input complete functio
 
 
 \subsubsection{Incomplete Functions}
-Incomplete functions always consume at least one input from any input but don't have to produce an output.
+\label{sec:concepts:defs:tessla_functions:incomplete}
+Incomplete functions always consume at least one input from any input and will produce zero or one events.
 Table~\ref{table:incomplete_functions} lists all supported incomplete functions.
 If no explanation is given, why the function is incomplete it is the following:
 The function is not input complete, because it only consumes events or changes that have the timestamp at which it is evaluated, if one input only has events with bigger timestamps no event or change is removed from them and the remembered last change of them is used as a base for computation if it is a signal.
@@ -598,9 +597,10 @@ For example the \(\mathit{add}\) function could consume two input events with th
 \end{longtable}
 
 \subsubsection{Timing Functions}
+\label{sec:concepts:defs:tessla_functions:timing}
 
 Timing functions are a bit special, therefore they are mentioned here in their own section.
-Basically they are also incomplete functions, but they have to buffer multiple events until they are emitted.
+Basically they are also incomplete functions, but they have to buffer multiple events until they are emitted and they can produce more than one event when evaluated.
 TODO
 
 \subsection{State and History}
@@ -660,11 +660,11 @@ One part of a transition is a relation between two sets of events, why sometimes
 E.g.\ the relation \(\tau = (\{e_1,e_2\}, \{e_3\})\) means that two events were consumed by a node and one event was produced based on them.
 
 The empty transition, meaning no input was consumed and no output produced, is labeled with \(\lambda\).
-Note that all transitions, which produces events have to consume at least one event (therefore no events can be created from nowhere) and that it's possible that no event was produced based on the consumed events (see Section~\ref{sec:concepts:def:tessla_functions}).
+Note that all transitions, which produces events have to consume at least one event (therefore no events can be created from nowhere) and that it's possible that no event was produced based on the consumed events (see Section~\ref{sec:concepts:defs:tessla_functions}).
 Furthermore with timing functions it's possible to create multiple events in one transition.
 For example think of an \(\mathit{EchoNode}\), which duplicates an input after a specified amount of time.
 
-\begin{definition}[name = Application of a Transition on a State]\label{sec:concepts:def:application_transition}
+\begin{definition}[name = Application of a Transition on a State]\label{def:application_transition}
   Given a global state \(s_0\) and a transition \(\tau = (\widetilde{E}, \widetilde{E'}) = (\{e_1,e_2,\dots,e_i\}, \{e_1',e_2',\dots,e_i'\})\) with \(n = \mathit{node}(\tau_1)\) and \(N_c\) the set of all nodes that are children of \(n\).
   When we \emph{apply} \(\tau\) to \(s_0\) we get a new global state \(s_1\) with\\
   \(\forall \widetilde{n}_i = s_0(i)\)
@@ -679,7 +679,7 @@ This means that the new global state is built with the old global state by alter
 The node states are altered by removing all events that were consumed by the function from the inputs of the scheduled node, updating its internal state and adding the produced events to the queues representing it in the node states of its children.
 
 \subsection{Run}
-\label{sec:concepts:def:run}
+\label{sec:concepts:defs:run}
 
 A run of an evaluation engine is a sequence of transitions and states.
 The first element of the sequence is the empty transition and the initial state of the evaluation engine.
@@ -740,34 +740,10 @@ To do so we have to define when a node can compute based on its state.
 At first we will give a definition that only works for output complete \gls{tessla} functions.
 Based on that definition we will see the problems that output incomplete functions have and modify the transition model to fix the problem.
 
-\begin{definition}[name = Preliminary Enabledness of a Node]\label{def:node_enabled}
+\begin{definition}[name = Enabledness of a Node]\label{def:node_enabled}
   A node \(n\) with the node state \(\widetilde{n}\) containing the input queues \(\widetilde{\sigma}\) in an evaluation engine is called \emph{enabled} at a step \(i\) of a run \(r\) of that engine, if at least one input is buffered on each input queue:
   \[\forall \sigma_x \in \widetilde{\sigma}: \mathit{hd}(\sigma_x) = e_x \]
 \end{definition}
-
-As stated this definition works for all output complete functions, while output incomplete functions have a problem.
-It is possible that an output incomplete functions will never produce a new output:
-E.g.\ think of a \(\mathit{FilterNode}\) where the second input is always \(\mathit{false}\).
-Even if new input events are added to the first input and the second input is known to be \(\mathit{false}\) upto any timestamp, the children of the node will never receive new events for that input queue.
-Therefore all children can never again compute, because they don't have an event buffered on all inputs.
-
-There are two ways to fix this:\\
-All input queues could be extended with a progress timestamp, which denotes how far the parent node has progressed.
-Now everytime a node \(n\) with children \(N_c\) evaluates its function at a new evaluation timestamp the inputs of all nodes in \(N_c\) representing the stream of \(n\) would be updated to have that evaluation timestamp as their new progress, even if no new event was produced at that timestamp.
-
-The other way, which is used in this thesis, doesn't alter the input queues:
-First we need a new type of events: \emph{progress events}.
-A progress event holds no value and exists only to notify a node, that a specific input has progressed upto the timestamp of the progress event.
-We will write a progress event as \(e^p_t\) where t is the timestamp of it.
-Now, whenever a node performs its computation at an evaluation timestamp and no new event was produced, a progress event with the evaluation timestamp is added to the corresponding input queue of all children.
-When a Node computes at an evaluation timestamp and one of the consumed events is a progress event there are two possibilities:
-\begin{itemize}
-  \item If the progress event is on a signal, the last change of the signal, which is saved in the state of the node, is used as the argument of the function and the last change of that stream is not updated in the state.
-  \item If the progress event is on an eventstream it means that no events were produced upto and including that timestamp. This information can be used to produce timeouts if needed.
-\end{itemize}
-
-No matter the kind of the stream the progress event happened on, if the node that consumed it produced no new output for the computation at that evaluation timestamp, it will propagate the progress event to its children.
-With the addition of progress events the preliminary definition of enabledness for a node works for all kinds of \gls{tessla} functions.
 
 Now it is possible to restrict runs to a subset where each run models a rational evaluation of a specification.
 
@@ -779,8 +755,38 @@ Now it is possible to restrict runs to a subset where each run models a rational
   \end{itemize}
 \end{definition}
 
+As stated the definition for enabledness works for all output complete functions, while output incomplete functions have a problem.
+It is possible that an output incomplete functions will never produce a new output:
+E.g.\ think of a \(\mathit{FilterNode}\) where the second input is always \(\mathit{false}\).
+Even if new input events are added to the first input and the second input is known to be \(\mathit{false}\) upto any timestamp, the children of the node will never receive new events for that input queue.
+Therefore no children can ever again compute, because they don't have an event buffered on all inputs.
+
+There are two ways to fix this:\\
+All input queues could be extended with a progress timestamp, which denotes how far the parent node has progressed.
+Now everytime a node \(n\) with children \(N_c\) evaluates its function at a new evaluation timestamp the inputs of all nodes in \(N_c\) representing the stream of \(n\) would be updated to have that evaluation timestamp as their new progress, even if no new event was produced at that timestamp.
+
+The other way, which is used in this thesis, doesn't alter the input queues:
+First we need a new type of events: \emph{progress events}.
+A progress event holds no value and exists only to notify a node that a specific input has progressed upto the timestamp of the progress event.
+We will write a progress event as \(e^p_t\) where t is the timestamp of it.
+
+Now whenever a node performs its computation at an evaluation timestamp and no new event was produced a progress event with the evaluation timestamp is added to the corresponding input queue of all children.
+When a node is scheduled and one of the consumed events is a progress events, what happens depends on the function of the node, some examples are:
+
+\begin{itemize}
+  \item An \(\mathit{AddNode}\) has at an evaluation timestamp a progress event as the first input and no event as the second input, which means there is an event buffered on input queue two, else the node wouldn't have been scheduled, and that event has a bigger timestamp than the evaluation timestamp, else its timestamp would have been the evaluation timestamp. The node can't produce a new change for its output, since all new information is, that input one hasn't changed upto the new timestamp. Therefore the node will distribute a progress event with the evaluation timestmap to its children.
+  \item If the \(\mathit{Addnode}\) would have received a progress event on input one and a new change on input two at the same timestamp, it could emit a new change. The new event would have the value of the last change on the first input, which the node has to hold in its state, added with the value of the new change on the second input.
+  \item A \(\mathit{MergeNode}\) has a progress event as the first input at an evaluation timestamp and no event on the second input. By the same reasoning as in the first example, the node can't produce a new output and therefore will produce a progress event.
+\end{itemize}
+
+These examples show that progress events alters the categorization of \gls{tessla} functions: output complete functions could produce no new normal output, if inputs are progress events.
+This is no problem, since the main reason for the categorization was to explain the necessity of progress events.
+With progress events all functions are output complete, because they always emit either normal events or progress events.
+
+For the comparision of runs some more definitions are needed.
+
 \begin{definition}[name = Independence of Nodes]\label{def:node_independent}
-  A node A is called \emph{independent} of node B in an evaluation engine, if it is no descendant of that node.
+  A node \(a\) is called \emph{independent} of node \(b\) in an evaluation engine, if \(a\) is no descendant of \(b\).
 \end{definition}
 
 \begin{definition}[name = Independence of Transitions]\label{def:independence_transitions}
@@ -788,38 +794,40 @@ Now it is possible to restrict runs to a subset where each run models a rational
 \end{definition}
 
 \begin{lemma}[name = Exchange of Independent Transitions]\label{lemma:exchange_independent_transitions}
-  If a transition \(\tau_1\) is independent of a transition \(\tau_2\), then for all runs of the evaluation engine that produces the runs the following holds:
+  If a transition \(\tau_2\) is independent of a transition \(\tau_1\), then for all runs of the evaluation engine that produces the runs the following holds:
   \begin{align*}
-    r_1 = \langle (\lambda, s_0), \dots, (\tau_2, s_i), (\tau_1, s_j), \dots, (\tau_l, s_l) \rangle \text{is a valid run} \\
-    \rightarrow r_2 = \langle (\lambda, s_0), \dots, (\tau_1, s_i'), (\tau_2, s_j'), \dots, (\tau_l, s_l') \rangle \text{is a valid run}
+    \text{If } r_1 = \langle (\lambda, s_0), \dots, (\tau_1, s_i), (\tau_2, s_j), \dots, (\tau_l, s_l) \rangle \text{is a valid run} \\
+    \text{then } r_2 = \langle (\lambda, s_0), \dots, (\tau_2, s_i'), (\tau_1, s_j'), \dots, (\tau_l, s_l') \rangle \text{is a valid run}
   \end{align*}
 \end{lemma}
 
 \begin{proof}
-Because \(a = \mathit{node}(\tau_1)\) is no descendant of \(b = \mathit{node}(\tau_2)\), the stream \(\sigma\) with \(\mathit{node}(\sigma) = \mathit{node}(\tau_2)\) can be no input of \(a\).
-  Therefore the enabledness of \(a\) can't be changed by \(\tau_2\) as you can see from the definition of enabledness.
-  So \(a\) has to be enabled before \(\tau_2\) was taken by \(r_1\), else it couldn't be enabled afterwards.
-  Therefore \(r_2\) also fullfills the requirements for a valid run.
+  Because \(b = \mathit{node}(\tau_2)\) is no descendant of \(a = \mathit{node}(\tau_1)\), the stream \(\sigma\) with \(\mathit{node}(\sigma) = \mathit{node}(\tau_1)\) can be no input of \(b\).
+  Therefore the enabledness of \(b\) can't be changed by \(\tau_1\), taken directly from the definition of enabledness.
+  So \(b\) has to be enabled before \(\tau_1\) was taken by \(r_1\), else it couldn't be enabled afterwards and \(\tau_2\) couldn't be taken in the next step.
+  Therefore \(r_2\) also fulfills the requirements of a valid run.
 \end{proof}
 
-\begin{lemma}[name = Influence of Independent Nodes]\label{lemma:independent_nodes}
-  When a node a is independent of a node b, then it has no influence on the enabledness of node a if node b is scheduled before or after it.
-\end{lemma}
+% \begin{lemma}[name = Influence of Independent Nodes]\label{lemma:independent_nodes}
+%   When a node a is independent of a node b, then it has no influence on the enabledness of node a if node b is scheduled before or after it.
+% \end{lemma}
 
-\begin{proof}
-  Follows directly from Lemma~\ref{lemma:exchange_independent_transitions}
-\end{proof}
+% \begin{proof}
+%   Follows directly from Lemma~\ref{lemma:exchange_independent_transitions}
+% \end{proof}
 
 \begin{lemma}[name = Duration of Enabledness]\label{lemma:enabled_till_scheduled}
   A node which is enabled stays enabled at least until it is scheduled.
-  Formally: If a node \(n\) is enabled at step \(i\) in a run \(r\) it will stay enabled at least until step \(j > j\) with \(r(j) = (\tau,s), \mathit{node}(\tau) = n\).
-  Note that it doesn't have to be enabled after step \(j\), because there could have been multiple events buffered on it's inputs.
+  Formally: If a node \(n\) is enabled at step \(i\) in a run \(r\) it will stay enabled at least until step \(j > i\) with \(r(j) = (\tau,s), \mathit{node}(\tau) = n\).
+  Note that it doesn't have to be disabled after step \(j\), because there could have been multiple events buffered on it's inputs.
 \end{lemma}
 
 \begin{proof}
-TODO Idea: Two parts of enabledness: every consumed event by the transition of the node has to be produced earlier: this doesn't change, once an event was created it will be created forever.
-Second part: The Event wasn't consumed by that node earlier, stated otherwise: there is no transition of that node which contains one of the events
-Should be straightforward.
+  Let \(n\) be a node enabled at step \(i\) in a run \(r\).
+  Let \((\tau_x,s_x) = r(x), x = i + 1\).
+  If \(\mathit{node}(\tau_x) \neq n\), then the only influence that \(\tau_x\) can have on the node state \(\widetilde{n}\) of \(n\) is by appending produced events to one of the input queues, as per the definition of application of a transition.
+  Since \(\tau_x\) can't remove events from the input queues in \(\widetilde{n}\) and on all input queues was at least one event buffered before the transition was applied, else \(n\) wouldn't have been enabled at step \(i\), \(\widetilde{n}\) will have at least as many input events buffered on every input as in the step before.
+  This means that \(n\) is still enabled at step \(x\), and by induction at every step until a transition with \(n\) as the scheduled node is taken.
 \end{proof}
 
 
@@ -830,7 +838,7 @@ For a first step we specify and compare behaviours of different approaches to ev
 Without timing functions all nodes work only on values or the presence of events.
 This leads to behaviours that can be easily reason about, as seen in the next sections.
 
-All systems to evaluate \gls{tessla} specifications we will look at are based on the described structure in Section~\ref{sec:concepts:def:eval_engine}.
+All systems to evaluate \gls{tessla} specifications we will look at are based on the described structure in Section~\ref{def:eval_engine}.
 While there are other approaches to evaluation, a \gls{dag} based approach seems to fit most naturaly and focusing on one structure makes comparing systems easier.
 
 Each evaluation engine will work in steps, where each step is synonymous with an index in the run of the system.
