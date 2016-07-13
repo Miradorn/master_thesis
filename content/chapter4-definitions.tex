@@ -1,23 +1,19 @@
-% !TEX root = ../thesis-example.tex
-\chapter{Concepts}
-\label{sec:concepts}
+% !TEX root = ../thesis.tex
+\chapter{Definitions}
+\label{sec:definitions}
 
-In this chapter different ways to evaluate \gls{tessla} specifications are given and their equivalence is shown.
-To do so in Section~\ref{sec:concepts:defs} building blocks for evaluation approaches are defined, which are then used in later sections to define behaviour of them and show their equivalence.
-
-\section{Definitions}
-\label{sec:concepts:defs}
+In this chapter we will define concepts that are used in Chapter~\ref{sec:behaviours} to reason about the implemented runtime.
 
 While the \gls{tessla} specification itself defines a set of semantics, for this thesis we will slightly alter some of it and add some new definitions based on them.
-This is necessary to reason about the specifics how the evaluation engine is built (Note that \gls{tessla} doesn't define an operational semantic, therefore we will define our own) and how it behaves.
+This is necessary to reason about the specifics how the runtime is built (Note that \gls{tessla} doesn't define an operational semantic, therefore we will define our own) and how it behaves.
 
-\subsection{Time}
-\label{sec:concepts:defs:time}
+\section{Time}
+\label{sec:definitions:time}
 
 \gls{tessla} has a model of continuous time, where timestamps \(t \in \mathbb{T} \) are used to represent a certain point in time and \(\mathbb{T}\) has to be isomorphic to \(\mathbb{R}\).
 
-\subsection{Transducers}
-\label{sec:concepts:defs:transducers}
+\section{Transducers}
+\label{sec:definitions:transducers}
 
 Fundamentally \gls{tessla} is a special kind of a transducer.
 Therefore in this section we will define a model of transducers which can be used to reason about the evaluation of a \gls{tessla} specification.
@@ -145,8 +141,8 @@ In the following \(\sigma_i\) is used to get the element at position \(i\) and \
 
 \end{exmp}
 
-\subsection{Timed Transducers}
-\label{sec:concepts:defs:timed_transducer}
+\section{Timed Transducers}
+\label{sec:definitions:timed_transducer}
 
 For the second kind of equivalence we need to introduce \emph{timed sequences} and \emph{timed transducers}.
 Let \(\mathbb{T}\) be a timing model that is isomorphic to \(\mathbb{R}\).
@@ -321,11 +317,11 @@ Based on the definitions we can define an equivalence relationship on bounded ti
 
 \end{exmp}
 
-\subsection{Labeled Timed Transducers}
+\section{Labeled Timed Transducers}
 Maybe necessary, maybe not
 
-\subsection{Events}
-\label{sec:concepts:defs:events}
+\section{Events}
+\label{sec:definitions:events}
 
 Events are the atomic unit of information that all computations are based on.
 There are three types of events: external, output and internal events.
@@ -342,8 +338,8 @@ Internal events are mostly an implementation dmathit{node}il, which denote steps
 The stream of internal events is implicitly given by the node that produces the stream of the event.
 Note that \(E_e, E_o, E_n\) are pairwise disjoint and \(E_e \cup E_o \cup E_n = E\).
 
-\subsection{Streams}
-\label{sec:concepts:defs:streams}
+\section{Streams}
+\label{sec:definitions:streams}
 
 Streams are a collection of events with specific characteristics.
 While events are the atomic unit of information, streams represent the sequence of related events over time.
@@ -364,14 +360,14 @@ When working with signals, the function will return the latest event that happen
 The progress of a stream can be obtained with \(\mathit{progress}(\sigma) = t \in T\).
 Internal and output streams can be queried for the node that produced them with \(\mathit{node}(\sigma) = n \in N\).
 
-\subsection{Functions}
-\label{sec:concepts:defs:functions}
+\section{Functions}
+\label{sec:definitions:functions}
 
 A \gls{tessla} specification consists of functions over streams.
 Functions generate new streams by applying an operation on existing streams.
 \gls{tessla} itself defines a syntax to write a specification, a set of types and a standard library of functions, but an implementation is free to choose the functions it supports.
 
-An example function is \(add(S_D,S_D) \rightarrow S_D\): It takes two signals, which have to hold values of some numerical type, and produces a signal which holds values of the same type.
+An example function is \(\mathit{add}(S_D,S_D) \rightarrow S_D\): It takes two signals, which have to hold values of some numerical type, and produces a signal which holds values of the same type.
 The produced stream can either be assigned to a named identifier (think: a variable) or consumed by another function (function composition).
 
 Functions can be divided into three categories: pure, unpure and timing.
@@ -382,11 +378,11 @@ Timing functions are evaluated not only on the value of events but also on their
 While non timing functions will consume events at a specific timestamp and emit events with that timestamp, timing functions can emit events with a changed timestamp.
 In this thesis we will only look at past time functions, meaning functions can only delay timestamps, therefore can't depend on future values.
 
-Timing functions complicate the reasoning about schedules and causality and therefore aren't included in Section~\ref{sec:concepts:behaviour_without_timing}.
-In Section~\ref{sec:concepts:behaviour_with_timing} the conclusions of earlier sections will be extended to include timing functions.
+Timing functions complicate the reasoning about schedules and causality and therefore aren't included in Section~\ref{sec:behaviours:without_timing}.
+In Section~\ref{sec:behaviours:with_timing} the conclusions of earlier sections will be extended to include timing functions.
 
-\subsection{Nodes}
-\label{sec:concepts:defs:nodes}
+\section{Nodes}
+\label{sec:definitions:nodes}
 
 Nodes are the atomic unit of computation for the evaluation of a \gls{tessla} specification.
 A node implements a single function, e.g.:\ there is an \emph{AddNode} which takes two input signals and produces a new signal.
@@ -396,7 +392,7 @@ The function of a node \(n \in N\) is written as \(f_n\).
 
 Each node has a set of inputs, which are either external or internal streams, and one output, which is either an internal or an output stream.
 Nodes which have at least one external stream as an input are called \emph{sources}.
-Nodes have a state, described in Section~\ref{sec:concepts:def:state}, which contains \gls{fifo} queues, provided by the Erlang plattform, which buffer events from its inputs for later computation.
+Nodes have a state, described in Section~\ref{sec:definitions:state}, which contains \gls{fifo} queues, provided by the Erlang plattform, which buffer events from its inputs for later computation.
 
 Every new event added to a queue has to have a bigger timestamp than the last event added to it.
 This means a queue has a kind of progress timestamp, which denotes the timestamp of the latest event added to it and which is strictly increasing over time.
@@ -431,8 +427,8 @@ Queues support the standard operators for lists like \(\mathit{hd}, \mathit{tl},
 % To see why the computation of change timestamps is necessary lets assume that node \(c\) will receive a new event from node \(b\) with timestamp \(t_4\):
 % All inputs have progressed to \(t_4\), but on the stream from node \(a\) there are changes between \(t_1\) (where the last output was generated) and \(t_4\), therefore the \emph{change timestamps} are \(t_2, t_3, t_4\) and the node will have to compute its output based on the values of the streams at that timestamps.
 
-\subsection{\glsentryname{tessla} Evaluation Engine}
-\label{def:eval_engine}
+\section{\glsentryname{tessla} Evaluation Engine}
+\label{sec:definitions:eval_engine}
 
 Because functions in \gls{tessla} specifications depend on other functions, and these dependencies have to be circle free, the specification can be represented as a \gls{dag}, where the functions are vertices and the relationship between functions are edges.
 This is exactly how the \gls{tessla} compiler outputs a specification.
@@ -455,8 +451,8 @@ We will use the term \emph{step} to denote that one node was scheduled and perfo
 While some schedules are simply not rational (think of unfairness and causality), there are many different schedules that are feasible.
 It has to be prooven that a chosen schedule produces the correct conclusions for a specification, else the evaluation engine is not valid.
 
-This proof will be carried out for different kinds of schedules in Section~\ref{sec:concepts:equivalence_without_timing} and Section~\ref{sec:concepts:equivalence_with_timing}, showing that all of them can be used by an evaluation engine.
-For now we can define when to evaluation engines are called equivalent based on the work in Section~\ref{def:timed_transducer}:
+This proof will be carried out for different kinds of schedules in Section~\ref{sec:behaviours:without_timing} and Section~\ref{sec:behaviours:with_timing}, showing that all of them can be used by an evaluation engine.
+For now we can define when to evaluation engines are called equivalent based on the work in Section~\ref{sec:definitions:transducers}:
 
 \begin{definition}[name=Equivalence of Evaluation Engines]\label{def:equivalence_eval_engine}
   Two evaluation engines are called equivalent, if their produced relationships between inputs and outputs are observational equivalent.
@@ -468,8 +464,8 @@ Because the possible inputs are infinite we will restrict the definition of equi
   Two evaluation engines are called equivalent for a set of inputs, if the relationship for theese inputs and the produced outputs is observational equivalent.
 \end{definition}
 
-\subsection{\glsentryname{tessla} Functions}
-\label{sec:concepts:defs:tessla_functions}
+\section{\glsentryname{tessla} Functions}
+\label{sec:definitions:tessla_functions}
 
 \gls{tessla} puts no restrictions on the semantics of functions other than that they have to work on streams or constants and produce streams, but allows to restrict them for evaluation approaches.
 We are taking advantage of that to categorize functions based on how or if at all they can be encoded in our evaluation approach.
@@ -489,8 +485,8 @@ If a new change is present at the evaluation timestamp, it will be used and the 
 It is important to note that all functions always have to consume at least one input event, else an evaluation engine can enter a livelock, where new events are produced forever out of nowhere.
 Also all functions will only produce a finite amount of events at every evaluation, especially only timed functions can produce more than one event at an evaluation timestamp.
 
-\subsubsection{Complete Functions}
-\label{sec:concepts:defs:tessla_functions:complete}
+\subsection{Complete Functions}
+\label{sec:definitions:tessla_functions:complete}
 
 Complete functions will consume one event from every input and produce one event at every timestamp they are evaluated.
 Most complete functions are pretty simple and often have eventstreams as inputs or only have one input.
@@ -520,8 +516,8 @@ The complete functions that are present in the implemented runtime are explained
 
 The first four functions are sources which take an external event and format them for internal use, e.g.\ \(\mathit{variable\_values}\) takes a string containing the name and the value of a variable, casts the value to an appropriate type and produces a signal holding that produced value.
 
-\subsubsection{Output Complete Functions}
-\label{sec:concepts:defs:tessla_functions:output_complete}
+\subsection{Output Complete Functions}
+\label{sec:definitions:tessla_functions:output_complete}
 
 Output complete functions will produce a new event everytime they are evaluated but only have to consume one event from any input and not one from every input.
 Table~\ref{table:output_complete_functions} summarizes all input complete functions.
@@ -538,8 +534,8 @@ Table~\ref{table:output_complete_functions} summarizes all input complete functi
 \end{table}
 
 
-\subsubsection{Input Complete Functions}
-\label{sec:concepts:defs:tessla_functions:input_complete}
+\subsection{Input Complete Functions}
+\label{sec:definitions:tessla_functions:input_complete}
 
 Input complete function consume one events from every input but can produce zero or one output events everytime they are evaluated.
 Table~\ref{table:input_complete_functions} summarizes all input complete functions.
@@ -561,8 +557,8 @@ Table~\ref{table:input_complete_functions} summarizes all input complete functio
 \end{table}
 
 
-\subsubsection{Incomplete Functions}
-\label{sec:concepts:defs:tessla_functions:incomplete}
+\subsection{Incomplete Functions}
+\label{sec:definitions:tessla_functions:incomplete}
 Incomplete functions always consume at least one input from any input and will produce zero or one events.
 Table~\ref{table:incomplete_functions} lists all supported incomplete functions.
 If no explanation is given, why the function is incomplete it is the following:
@@ -596,15 +592,15 @@ For example the \(\mathit{add}\) function could consume two input events with th
 \label{table:incomplete_functions}
 \end{longtable}
 
-\subsubsection{Timing Functions}
-\label{sec:concepts:defs:tessla_functions:timing}
+\subsection{Timing Functions}
+\label{sec:definitions:tessla_functions:timing}
 
 Timing functions are a bit special, therefore they are mentioned here in their own section.
 Basically they are also incomplete functions, but they have to buffer multiple events until they are emitted and they can produce more than one event when evaluated.
 TODO
 
-\subsection{State and History}
-\label{sec:concepts:def:state}
+\section{State and History}
+\label{sec:definitions:state}
 
 All \gls{tessla} evaluation engines have to hold a state, which encodes information necessary to continue the evaluation, and a history, which encodes what happened on all streams in the evaluation engine.
 The state of a whole evaluation engine is made up of the states of its nodes.
@@ -619,7 +615,7 @@ We will denote the set of all global states as \(S\).
 A global state can be queried like \(s(n) = \widetilde{n}\) to yield the state of the node \(n\).
 
 Nodes, and therefore the whole evaluation engine, change their state when they are scheduled.
-The transition between states is described in Section~\ref{sec:concepts:defs:transitions}
+The transition between states is described in Section~\ref{sec:definitions:transitions}
 
 
 % \begin{itemize}
@@ -644,8 +640,8 @@ The transition between states is described in Section~\ref{sec:concepts:defs:tra
 
 The history of an evaluation engine is defined at every step (read: after every computation of a node) as all events that were produced by any node upto that step.
 
-\subsection{Transitions}
-\label{sec:concepts:defs:transitions}
+\section{Transitions}
+\label{sec:definitions:transitions}
 
 A transition describes what happens when the evaluation engine schedules a node:
 Events from the the inputs of a node are removed (at least one), output events can be generated (but don't have to) and distributed and the internal state of nodes are updated.
@@ -660,7 +656,7 @@ One part of a transition is a relation between two sets of events, why sometimes
 E.g.\ the relation \(\tau = (\{e_1,e_2\}, \{e_3\})\) means that two events were consumed by a node and one event was produced based on them.
 
 The empty transition, meaning no input was consumed and no output produced, is labeled with \(\lambda\).
-Note that all transitions, which produces events have to consume at least one event (therefore no events can be created from nowhere) and that it's possible that no event was produced based on the consumed events (see Section~\ref{sec:concepts:defs:tessla_functions}).
+Note that all transitions, which produces events have to consume at least one event (therefore no events can be created from nowhere) and that it's possible that no event was produced based on the consumed events (see Section~\ref{sec:definitions:tessla_functions}).
 Furthermore with timing functions it's possible to create multiple events in one transition.
 For example think of an \(\mathit{EchoNode}\), which duplicates an input after a specified amount of time.
 
@@ -678,8 +674,8 @@ For example think of an \(\mathit{EchoNode}\), which duplicates an input after a
 This means that the new global state is built with the old global state by altering only the node states of the node identified by the transition and its children.
 The node states are altered by removing all events that were consumed by the function from the inputs of the scheduled node, updating its internal state and adding the produced events to the queues representing it in the node states of its children.
 
-\subsection{Run}
-\label{sec:concepts:defs:run}
+\section{Run}
+\label{sec:definitions:run}
 
 A run of an evaluation engine is a sequence of transitions and states.
 The first element of the sequence is the empty transition and the initial state of the evaluation engine.
@@ -827,227 +823,5 @@ For the comparision of runs some more definitions are needed.
   Let \((\tau_x,s_x) = r(x), x = i + 1\).
   If \(\mathit{node}(\tau_x) \neq n\), then the only influence that \(\tau_x\) can have on the node state \(\widetilde{n}\) of \(n\) is by appending produced events to one of the input queues, as per the definition of application of a transition.
   Since \(\tau_x\) can't remove events from the input queues in \(\widetilde{n}\) and on all input queues was at least one event buffered before the transition was applied, else \(n\) wouldn't have been enabled at step \(i\), \(\widetilde{n}\) will have at least as many input events buffered on every input as in the step before.
-  This means that \(n\) is still enabled at step \(x\), and by induction at every step until a transition with \(n\) as the scheduled node is taken.
+  This means that \(n\) is still enabled at step \(x\), and by induction at every later step until a transition with \(n\) as its node is taken.
 \end{proof}
-
-
-\section{Behaviour of Different Schedules Without Timing Functions}
-\label{sec:concepts:behaviour_without_timing}
-
-For a first step we specify and compare behaviours of different approaches to evaluate \gls{tessla} specifications without timing functions.
-Without timing functions all nodes work only on values or the presence of events.
-This leads to behaviours that can be easily reason about, as seen in the next sections.
-
-All systems to evaluate \gls{tessla} specifications we will look at are based on the described structure in Section~\ref{def:eval_engine}.
-While there are other approaches to evaluation, a \gls{dag} based approach seems to fit most naturaly and focusing on one structure makes comparing systems easier.
-
-Each evaluation engine will work in steps, where each step is synonymous with an index in the run of the system.
-Therefore at each step one node is scheduled to perform it's operation, represented as the transition in the run.
-The transition will encode one of the following three things that can happen:
-
-\begin{itemize}
-  \item The next external event (external events have to be totally ordered by their timestamp) can be consumed by a source in the \gls{dag}, which generates internal events, that are propagated to its children.
-  \item An internal node, which has at least one new input buffered on all of its input queues, can perform
-    its computation and generate a new internal event, which is propagated to the children of that node, which therefore can compute in the next step.
-  \item An output node, which has at least one new input buffered on all of its input queues, can produce a new output.
-\end{itemize}
-
-Evaluation engines are free in the way they are scheduling their nodes, only limited by causality (no event can be consumed before it's produced).
-In the following evaluation engines are classified by their scheduling approaches.
-
-\subsection{Synchronous Evaluation Engines}
-\label{sec:concepts:behaviour_without_timing:synchronous}
-
-The first class of evaluation engines are synchronous ones.
-They are characterized by a specific, fixed schedule.
-The scheduling algorithm is as follows:
-
-\begin{itemize}
-  \item Select all nodes that are no sources, let their count be \(i\)
-  \item Label them with unique natural numbers from \([1,i]\) in reversed topological order
-  \item Label the remaining nodes with unique natural numbers bigger than \(i\)
-  \item Whenever a node has to be scheduled, schedule the enabled one with the lowest label
-\end{itemize}
-
-Obviously for many \glspl{dag} there is no unique reversed topological order, therefore one can be chosen by the evaluation engine.
-This schedule ensures that no node is scheduled which has a successor that can be scheduled, therefore events are \emph{pushed} through the \gls{dag} towards an output node as fast as possible.
-As shown in Section~\ref{sec:concepts:topological_schedule_is_fair} any schedule built like this is fair.
-
-\begin{definition}[name = Valid Evaluation Engines]\label{def:valid_eval_engine}
-  An evaluation engine is called \emph{valid}, if it is equivalent to a synchronous evaluation engine.
-\end{definition}
-
-
-\begin{figure}
-  \begin{tikzpicture}
-    [pre/.style={<-,shorten <=1pt,>=stealth,semithick}]
-    \node (s) at (2,5) {\(e_1\)};
-    \node [shape=circle,draw=black] (a) [label=right:5] at (2, 4) {a}
-      edge [pre] (s);
-    \node [shape=circle,draw=black] (b) [label=left:4] at (0,2.5) {b}
-      edge [pre] (a);
-    \node [shape=circle,draw=black] (c) [label=left:1] at (0,0) {c}
-      edge [pre] (b);
-    \node [shape=circle,draw=black] (d) [label=right:3] at (4,1) {d}
-      edge [pre] (a)
-      edge [pre] (b);
-    \node [shape=circle,draw=black] (e) [label=right:2] at (4,-1) {e}
-      edge [pre] (d);
-    \node (o1) at (0,-2) {\(o\)} edge [pre] (c);
-    \node (o2) at (4,-2) {\(u\)} edge [pre] (e);
-  \end{tikzpicture}
-  \begin{tikzpicture}
-    [pre/.style={<-,shorten <=1pt,>=stealth,semithick}]
-    \node [shape=circle,draw=black] (a) [label=right:5] at (2, 4) {a};
-    \node [shape=circle,draw=black] (b) [label=left:4] at (0,2.5) {b}
-      edge [pre] node[align=left,left,pos=0.6] {\(n_{a1}\)} (a);
-    \node [shape=circle,draw=black] (c) [label=left:1] at (0,0) {c}
-      edge [pre] (b);
-    \node [shape=circle,draw=black] (d) [label=right:3] at (4,1) {d}
-      edge [pre] node[align=right,right,pos=0.6] {\(n_{a1}\)} (a)
-      edge [pre] (b);
-    \node [shape=circle,draw=black] (e) [label=right:2] at (4,-1) {e}
-      edge [pre] (d);
-    \node (o1) at (0,-2) {\(o\)} edge [pre] (c);
-    \node (o2) at (4,-2) {\(u\)} edge [pre] (e);
-  \end{tikzpicture}
-  \caption{Visualization of a simple asynchronous system with a reversed topological order.}
-\label{fig:chap3:sec_sync:visual_dag}
-\end{figure}
-
-Figure~\ref{fig:chap3:sec_sync:visual_dag} visualizes a synchronous evaluation engine.
-It shows two \glspl{dag} representations of an evaluation engine  where the nodes a to e are labeled in a reversed topological order and \(o\) and \(u\) represents the output streams with that name.
-The left system is in its initial state and an input event \(e_1\) is present and can be consumed by the input node a.
-When a node is chosen to compute by the scheduler, only node a is enabled, therefore it is scheduled.
-The right system is the representation of the next step: node a has consumed the external event and produced an internal event \(n_{a1}\), which is propagated to all it's children: node b and d.
-In the next step node b would be scheduled, because it has the lowest number of any node that can compute (actually it's the only node that can compute at all, because d has to wait for the event from b).
-After b was scheduled, it would have produced the internal event \(n_{b1}\) which would then be distributed to nodes c and d.
-
-The complete run of the synchronous engine for one input is the following, where the states are not further defined:
-
-\begin{align*}
-  \langle
-    (\lambda,                             s_0),
-    ((\{ n_{a1}         \}, \{n_{b1}\}),  s_1),
-    ((\{ n_{b1}         \}, \{o_1\}),     s_2),\\
-    ((\{ n_{a1}, n_{b1} \}, \{n_{d1}\}),  s_3),
-    ((\{ n_{d1}         \}, \{u_1\}),     s_4)
-  \rangle
-\end{align*}
-
-If there were more then one input event, at this point node a would be scheduled again.
-It would consume the next external event and the following nodes would be scheduled in the same order as before, extending the run in an obvious way.
-
-\subsection{Asynchronous Evaluation}
-\label{sec:concepts:behaviour_without_timing:async}
-
-An asynchronous evaluation engine is one with a fair, but not fixed schedule.
-
-In contrast to the synchronous evaluation engine it has no fixed schedule, the only requirement is that the schedule is fair.
-Therefore predecessors of enabled nodes can perform multiple computations before their children are scheduled and events are not \emph{pushed} through the \gls{dag} as fast as possible.
-\todo{more later}
-
-\section{Equivalence of Different Schedules Without Timing Functions}
-\label{sec:concepts:equivalence_without_timing}
-
-Based on the described behaviours of the approaches we now can proof the equivalence of different schedules for the same evaluation engine for a \gls{tessla} specification.
-
-\begin{lemma}[name = Equivalence of Engines for one Input]\label{lemma:eval_equivalent_if_runs_equal}
-  Two evaluation engines are equivalent for an input, if their runs are equivalent for that input.
-\end{lemma}
-
-\begin{proof}
-  Since two runs are equal if they have the same last state, and all events which were produced are stored in the state, during both runs the same output events had to be generated or else their state would differ.
-\end{proof}
-
-As defined by definition~\ref{def:valid_eval_engine} any evaluation engine has to be equivalent to a synchronous one to be valid.
-
-The equivalence is shown in two steps: first in Section~\ref{sec:concepts:equivalence_without_timing:synchronous} it is shown, that all possible synchronous engines for a specification are equivalent, so there is only one valid evaluation for a specification over a fixed input.
-Afterwards in Section~\ref{sec:concepts:equivalence_without_timing:sync_async} it is shown that any asynchronous evaluation engine is equivalent to a synchronous one.
-
-
-\subsection{Equivalence of Synchronous Systems}
-\label{sec:concepts:equivalence_without_timing:synchronous}
-
-When given a series of input events, two synchronous evaluation engines for a specification with different schedules will have different runs.
-But both will produce all outputs that can be produced after consuming one specific input before the next input is consumed as reasoned in Section~\ref{sec:concepts:behaviour_without_timing:synchronous}.
-Also both runs will obviously have the same length (both engines are the same \gls{dag}, so they have the same number of nodes), let that length be \(l\).
-
-To proof the equivalence of both engines we can prove the equivalence of their runs.
-To show the equivalence we will show that there is always another run, which is equivalent to the second one, that is closer to the first one.
-If such a closer run always exist, we will show that the run with closeness \(l, 0\) to the first run, which has to be the first run itself, is also an equivalent run to the second run.
-
-\begin{theorem}[name = Equivalence of Different Synchronous Evaluation Engines]\label{theorem:equivalence_sync_eval_engines}
-  Two synchronous evaluation engines for a specification with different schedules are equivalent.
-\end{theorem}
-\begin{proof}
-
-  Let \(r_1, r_2\) be the runs of the two engines for a given \gls{tessla} specification.
-  Because each \gls{tessla} specification contains only a finite amount of functions and works on finite traces, the runs also have to be finite.
-
-If the two runs aren't equal, they must have a closeness which is smaller than \((l, 0)\).
-Let \([r_2]\) be the set of all runs that are equivalent to \(r_2\).
-All of those runs will also have a closeness from \(r_1\) which is smaller than \((l, 0)\).
-Select one run \(r_2' \in [r_2]\) which has a minimal closeness from \(r_1\).
-Let \((d,k) = \delta(r_1, r_2')\).
-
-This means that at step \(d\) the run \(r_2'\) has taken a different transition than run \(r_1\).
-Let the transitions the runs have taken be \(\tau_1\) for \(r_1\) and \(\tau_2\) for \(r_2'\).
-Run \(R_2'\) will take transition \(\tau_1\) at step \(d+k\) (as per the definition of the closeness).
-Obviously the two transitions have to be independent of each other, else they couldn't have been taken in different order by the two runs.
-
-If \(k > 1\) there will be a transition \(\tau_2' \neq \tau_1\) which is taken by the run \(r_2'\) at step \(d+(k-1)\).
-While this transition \(\tau_2'\) must also be taken in the first run as per Lemma~\ref{lemma:enabled_till_scheduled}, it's not possible, that it was taken before \(\tau_1\), beause then the two runs wouldn't have been the same upto the point where \(\tau_1\) was taken.
-Therefore \(\tau_1\) has to be independent of \(\tau_2'\), and because \(\tau_2'\) was scheduled by the second run before \(\tau_1\) both transitions are independent of each other.
-
-As of Lemma~\ref{lemma:independent_nodes} which one of them is taken first can't change the enabledness of the node of the second transition.
-Therefore there is a run \(r_2''\), which is equal to \(r_2'\), except that the transitions \(\tau_1, \tau_2'\) are scheduled the other way around.
-Figure~\ref{fig:chap3:sec_sync:commutativity_scheduling} visualizes how changing the order of the two transitions can't change the global state of the engine after both were taken.
-Therefore the runs \(r_2'\) and \(r_2''\) are equivalent and their closeness to \(r_1\) is \(d, k-1\), which contradicts the initial statement that \(r_1'\) was a run with a maximal closeness.
-This means that there is an equivalent run to \(r_2\) which has at least the closeness \((d, 1)\).
-
-If \(k = 1\) the transition \(\tau_2'\) from the previous case is equal to \(\tau_2\).
-Based on the same reasoning there also exist a run \(r_2''\) which is equal to \(r_2'\), except that the order of \(\tau_2\) and \(\tau_1\) is changed, and which is also equivalent to \(r_2'\) and to \(r_2\).
-This run has the closeness \((d, 0)\) to \(r_1\).
-This obviously doesn't make sense: The first element of the closeness is the last step where both runs are equal, the second element describes how many steps afterwards the differing transition was taken.
-But if it was taken right in the step after the last equal step, there is no difference at that position, so the closeness of \(r_1\) and \(r_2''\) can be at least \((d+1, x), x \in \mathbb{N}_{>0}\).
-This also contradicts our initial statement that \(r_2'\) was the run with the biggest closeness to \(r_1\) which is equivalent to \(r_2\).
-
-Combined we can now say, that there is no upper bound on the closeness of equivalent runs of \(r_2\) to \(r_1\), therefore the run with the closeness \((l, 0)\) also has to be equivalent to \(r_2\).
-
-\end{proof}
-
-
-\begin{figure}
-  \begin{tikzpicture}
-    [pre/.style={<-,shorten <=1pt,>=stealth,semithick}]
-    \node (A) at (0,0) {};
-    \node [shape=circle,draw=black] (B) at (2, 0) {\(s_{d+k-2}\)}
-      edge [pre] node[above] {\(\tau_{x}\)} (A);
-    \node [shape=circle,draw=black] (C) at (2, -3) {\(s_{d+k-1}\)}
-      edge [pre] node[left] {\(\tau_{2}'\)} (B);
-    \node [shape=circle,draw=black] (D) at (5, 0) {\(s_{d+k-1}'\)}
-      edge [pre] node[above] {\(\tau_{1}\)} (B);
-    \node [shape=circle,draw=black] (E) at (5, -3) {\(s_{d+k}\)}
-      edge [pre] node[right] {\(\tau_{2}'\)} (D)
-      edge [pre] node[above] {\(\tau_{1}\)} (C);
-  \end{tikzpicture}
-  \caption{Commutativity Diagramm of Node scheduling}
-\label{fig:chap3:sec_sync:commutativity_scheduling}
-\end{figure}
-
-
-
-\subsection{Equivalence of Synchronous and Asynchronous Schedules}
-\label{sec:concepts:equivalence_without_timing:sync_async}
-
-When the nodes of \(a\) aren't scheduled in reversed topological order, the system can consume inputs before producing all outputs based on the last consumed input.
-Therefore the reordering of runs has to be performed over wider parts of the run.
-% Idea: each step is a commutation of two internal events in regard to the rev top order.
-% => show commutativity of traces (note: only valid commutations, no two events, where one depends one the other, can be commuted, this is ensured by the scheduling of nodes that have input buffered)
-
-\section{Behaviour with Timing functions}
-\label{sec:concepts:behaviour_with_timing}
-\section{Equalitys with Timing functions}
-\label{sec:concepts:equivalence_with_timing}
-\section{Parallel computation}

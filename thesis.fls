@@ -528,8 +528,8 @@ INPUT content/chapter3-system.tex
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/public/tex-gyre/ec-qhvr-sc.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchr8t.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/public/tex-gyre/ec-qhvr.tfm
-INPUT content/chapter4-concepts.tex
-INPUT content/chapter4-concepts.tex
+INPUT content/chapter4-definitions.tex
+INPUT content/chapter4-definitions.tex
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchri8t.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchri8t.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/tex/latex/psnfss/ts1bch.fd
@@ -539,7 +539,12 @@ INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/public/lm/rm-lmri10.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/public/lm/rm-lmri8.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/public/lm/rm-lmri7.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/bitstrea/charter/bchr8c.tfm
-INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/public/tex-gyre/ec-qhvr-sc.tfm
+INPUT content/chapter5-behaviours.tex
+INPUT content/chapter5-behaviours.tex
+INPUT content/chapter6-conclusion.tex
+INPUT content/chapter6-conclusion.tex
+INPUT content/chapter7-appendix.tex
+INPUT content/chapter7-appendix.tex
 INPUT thesis.lof
 INPUT thesis.lof
 OUTPUT thesis.lof
