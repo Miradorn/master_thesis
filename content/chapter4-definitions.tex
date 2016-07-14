@@ -825,3 +825,16 @@ For the comparision of runs some more definitions are needed.
   Since \(\tau_x\) can't remove events from the input queues in \(\widetilde{n}\) and on all input queues was at least one event buffered before the transition was applied, else \(n\) wouldn't have been enabled at step \(i\), \(\widetilde{n}\) will have at least as many input events buffered on every input as in the step before.
   This means that \(n\) is still enabled at step \(x\), and by induction at every later step until a transition with \(n\) as its node is taken.
 \end{proof}
+
+With the notion of runs and especially enabledness we can now define which schedules are seen as fair.
+
+\begin{definition}[name = Fair Schedules]\label{def:fair_schedule}
+  A schedule of an evaluation engine is called fair, if for all runs \(r\)  it produces it holds, that:
+  \begin{align*}
+    &\forall i < \mathit{length}(r):\ &&\text{if }n\ \text{is enabled at step } i\\
+    &                                 &&\text{then } \exists\, j \geq i\ \text{such that n is scheduled at step } j
+\end{align*}
+  This simply means that a node, which is enabled at one step, will be scheduled after a finite amount of steps.
+\end{definition}
+
+Building on this we will investigate different fair schedules in the next chapter.

@@ -63,10 +63,16 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {lemma}{\numberline {4}\MakeUppercase {l}emma\thmtformatoptarg {Duration of Enabledness}}{34}{lemma.4}
 \defcounter {refsection}{0}\relax 
+\contentsline {definition}{\numberline {20}\MakeUppercase {d}efinition\thmtformatoptarg {Fair Schedules}}{35}{definition.20}
+\defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {20}\MakeUppercase {d}efinition\thmtformatoptarg {Valid Evaluation Engines}}{38}{definition.20}
+\contentsline {definition}{\numberline {21}\MakeUppercase {d}efinition}{38}{definition.21}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {5}\MakeUppercase {l}emma\thmtformatoptarg {Equivalence of Engines for one Input}}{40}{lemma.5}
+\contentsline {definition}{\numberline {22}\MakeUppercase {d}efinition\thmtformatoptarg {Valid Evaluation Engines}}{38}{definition.22}
 \defcounter {refsection}{0}\relax 
-\contentsline {theorem}{\numberline {1}\MakeUppercase {t}heorem\thmtformatoptarg {Equivalence of Different Greedy Evaluation Engines}}{40}{theorem.1}
+\contentsline {lemma}{\numberline {5}\MakeUppercase {l}emma\thmtformatoptarg {Greedy Schedules are Fair}}{39}{lemma.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {lemma}{\numberline {6}\MakeUppercase {l}emma\thmtformatoptarg {Equivalence of Engines for one Input}}{40}{lemma.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {theorem}{\numberline {1}\MakeUppercase {t}heorem\thmtformatoptarg {Equivalence of Different Greedy Evaluation Engines}}{41}{theorem.1}

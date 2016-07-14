@@ -9,7 +9,7 @@ This is done in multiple steps: starting with a small subset of allowed schedule
 \label{sec:behaviours:without_timing}
 
 For a first step we specify and compare behaviours of different approaches to evaluate \gls{tessla} specifications without timing functions.
-Without timing functions all nodes work only on values or the presence of events.
+Without timing functions all nodes work only on values or the presence of events and will emit exactly one event at every computation, either a normal or a progress event.
 This leads to behaviours that can be easily reason about, as seen in the next sections.
 
 All systems to evaluate \gls{tessla} specifications we will look at are based on the described structure in Section~\ref{sec:definitions:eval_engine}.
@@ -22,8 +22,7 @@ The transition will encode one of the following three things that can happen:
 
 \begin{itemize}
   \item The next external event (external events have to be totally ordered by their timestamp) can be consumed by a source in the \gls{dag}, which generates internal events, that are propagated to its children.
-  \item An internal node, which has at least one new input buffered on all of its input queues, can perform
-    its computation and generate a new internal event, which is propagated to the children of that node.
+  \item An internal node, which has at least one new input buffered on all of its input queues, can perform its computation and generate a new internal event, which is propagated to the children of that node.
   \item An output node, which has at least one new input buffered on all of its input queues, can produce a new output.
 \end{itemize}
 
@@ -34,22 +33,27 @@ In the following evaluation engines are classified by their scheduling approache
 \label{sec:behaviours:without_timing:greedy}
 
 The first class of evaluation engines are called greedy.
-They are characterized by a specific, fixed schedule.
-The scheduling algorithm is as follows:
 
-\begin{itemize}
-  \item Select all nodes that are no sources, let their count be \(i\)
-  \item Label them with unique natural numbers from \([1,i]\) in reversed topological order
-  \item Label the remaining nodes with unique natural numbers bigger than \(i\)
-  \item Whenever a node has to be scheduled, schedule the enabled one with the lowest label
-\end{itemize}
+\begin{definition}\label{def:greedy_schedule}
+  A schedule of an evaluation engine built by the following steps is called \emph{greedy}.
+  \begin{itemize}
+    \item Select all nodes that are no sources, let their count be \(i\)
+    \item Label them with unique natural numbers from \([1,i]\) in reversed topological order
+    \item Label the remaining nodes with unique natural numbers bigger than \(i\)
+    \item Whenever a node has to be scheduled, schedule the enabled one with the lowest label
+  \end{itemize}
+
+  We also call an evaluation engine greedy if we mean it's run with a greedy schedule.
+\end{definition}
 
 Obviously for many \glspl{dag} there is no unique reversed topological order, therefore one can be chosen by the evaluation engine.
-This schedule ensures that no node is scheduled which has a successor that can be scheduled, therefore events are \emph{pushed} through the \gls{dag} towards an output node as fast as possible.
-As shown in Section~\ref{sec:concepts:topological_schedule_is_fair} any schedule built like this is fair.
+We will show in Section~\ref{sec:behaviours:equivalence_without_timing:greedy} that all topological orders will produce observational equivalent behaviours.
+
+The greedy schedule ensures that no node is scheduled which has a successor that can be scheduled, therefore events are \emph{pushed} through the \gls{dag} towards an output node as fast as possible.
+As shown in Section~\ref{sec:behaviours:without_timing:greedy:is_fair} any schedule built like this is fair.
 
 \begin{definition}[name = Valid Evaluation Engines]\label{def:valid_eval_engine}
-  An evaluation engine is called \emph{valid}, if it is equivalent to a greedy evaluation engine.
+  An evaluation engine is called \emph{valid} if it is equivalent to a greedy evaluation engine.
 \end{definition}
 
 
@@ -112,6 +116,30 @@ The complete run of the greedy engine for one input is the following, where the 
 
 If there were more then one input event, at this point node a would be scheduled again.
 It would consume the next external event and the following nodes would be scheduled in the same order as before, extending the run in an obvious way.
+
+\subsubsection{Fairness of Greedy Schedules}
+\label{sec:behaviours:without_timing:greedy:is_fair}
+
+It remains to show that greedy schedules are fair.
+
+\begin{lemma}[name = Greedy Schedules are Fair]\label{lemma:greedy_schedules_are_fair}
+  Any greedy schedule is fair.
+\end{lemma}
+
+\begin{proof}
+  Let \(a\) be a node that is enabled at step \(i\) and no source.
+  Because evaluation engines can only contain a finite number of nodes there can only be a finite number of enabled nodes with a smaller label than \(n\).
+  Furthermore all nodes can only have a finite number of events buffered, since all nodes can only produce a finite number of events per computation and therefore only a finite number of events can be produced after a finite number of steps.
+  Therefore after a finite number of steps \(j\) all nodes with a smaller label than \(n\) will be disabled.
+  The only way new events could enter the system are through sources, but they have bigger labels than \(n\), as by the definition of the schedule, and therefore can't be scheduled before \(n\).
+  Because of Lemma~\ref{lemma:enabled_till_scheduled} \(n\) will still be enabled after these steps.
+  Therefore \(a\) is the enabled node with the lowest label at step \(i + j\) and therefore will be scheduled.
+
+  If \(a\) is a source it will be enabled at one step, because evaluation engines work over finite traces, therefore at some point no new external events will be present.
+  Even if \(a\) was never scheduled upto that point, now all sources will consume the remaining, buffered external events and become disabled.
+  Therefore \(a\) at one point will become the source with the smallest label and be scheduled.
+\end{proof}
+
 
 \subsection{Fair Evaluation Engines}
 \label{sec:behaviours:behaviour_without_timing:fair}
