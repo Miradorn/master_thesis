@@ -5,6 +5,27 @@
 Based on the definitions in Chapter~\ref{sec:definitions} we will now look at different schedules of evaluation engines and compare them.
 This is done in multiple steps: starting with a small subset of allowed schedules and functions and iteratively adding more complex cases.
 
+For the comparision we will use timed transducers from Section~\ref{sec:definitions:timed_transducer}.
+To do this the notion of a run of an evaluation engine is not sufficient: transducers describe a relationship between inputs and outputs, runs describe stepwise generation of internal and output events.
+Therefore the \emph{behaviour} of a run is defined, which maps a run to relationship between inputs and outputs.
+
+\begin{definition}[name = Behaviour of a Run]\label{def:behaviour_run}
+  Let \(r\) be a run of an evaluation engine.
+  The behaviour \(\beta_r\) of it is built stepwise:
+  The first transition \(r(1)\) obviously has to consume an input event \(e_1\).
+  Take the prefix \(r_1\) of \(r\) upto, but not including, the next step where an input is consumed.
+  Take all output events \(O_1\), which are possible none, that are produced at any step in \(r_1\).
+  The relationship \((e_1,O_1)\) is an element of the behaviour of \(r\).
+  Now take the next part \(r_2\) of \(r\) which starts at the step after \(r_1\) did end and ends one step before the next external event is consumed.
+  The first element of \(r_2\) has to be a transition consuming an external event \(e_2\).
+  Let \(O_2\) be the output events produced in \(r_2\).
+  The relationship \((e_1e_2, O_1O_2)\) is an element of the behaviour of \(r\).
+
+  Repeat these steps until the last consumed external event and the associated output events are added to the behaviour.
+\end{definition}
+
+The behaviour can be seen as a timed transducer since all events have timestamps and all consumed events are strictly ordered by their timestamp, since inputs to an evaluation engine are required to be ordered by their timestamp.
+
 \section{Behaviour of Different Schedules Without Timing Functions}
 \label{sec:behaviours:without_timing}
 
@@ -52,6 +73,8 @@ We will show in Section~\ref{sec:behaviours:equivalence_without_timing:greedy} t
 The greedy schedule ensures that no node is scheduled which has a successor that can be scheduled, therefore events are \emph{pushed} through the \gls{dag} towards an output node as fast as possible.
 As shown in Section~\ref{sec:behaviours:without_timing:greedy:is_fair} any schedule built like this is fair.
 
+Greedy evaluation engines offer a good start to reason about behaviours and will be used as a comparision for all other evaluation engines.
+
 \begin{definition}[name = Valid Evaluation Engines]\label{def:valid_eval_engine}
   An evaluation engine is called \emph{valid} if it is equivalent to a greedy evaluation engine.
 \end{definition}
@@ -95,12 +118,12 @@ As shown in Section~\ref{sec:behaviours:without_timing:greedy:is_fair} any sched
 \end{figure}
 
 Figure~\ref{fig:chap5:sec_greedy:visual_dag} visualizes a greedy evaluation engine.
-It shows two \glspl{dag} representations of an evaluation engine  where the nodes a to e are labeled in a reversed topological order and \(o\) and \(u\) represents the output streams with that name.
-The left system is in its initial state and an input event \(e_1\) is present and can be consumed by the input node a.
-When a node is chosen to compute by the scheduler, only node a is enabled, therefore it is scheduled.
-The right system is the representation of the next step: node a has consumed the external event and produced an internal event \(n_{a1}\), which is propagated to all it's children: node b and d.
-In the next step node b would be scheduled, because it has the lowest number of any node that can compute (actually it's the only node that can compute at all, because d has to wait for the event from b).
-After b was scheduled, it would have produced the internal event \(n_{b1}\) which would then be distributed to nodes c and d.
+It shows two \glspl{dag} representations of an evaluation engine  where the nodes \(a\) to \(e\) are labeled in a reversed topological order and \(o\) and \(u\) represents the output streams with that name.
+The left system is in its initial state and an input event \(e_1\) is present and can be consumed by the input node \(a\).
+When a node is chosen to compute by the scheduler, only node \(a\) is enabled, therefore it is scheduled.
+The right system is the representation of the next step: node \(a\) has consumed the external event and produced an internal event \(n_{a1}\), which is propagated to all its children: node \(b\) and \(d\).
+In the next step node \(b\) would be scheduled, because it has the lowest number of any node that can compute (actually it's the only node that can compute at all, because \(d\) has to wait for the event from \(b\)).
+After \(b\) was scheduled, it would have produced the internal event \(n_{b1}\) which would then be distributed to nodes \(c\) and \(d\).
 
 The complete run of the greedy engine for one input is the following, where the states are not further defined:
 
@@ -114,7 +137,7 @@ The complete run of the greedy engine for one input is the following, where the 
   \rangle
 \end{align*}
 
-If there were more then one input event, at this point node a would be scheduled again.
+If there were more then one input event, at this point node \(a\) would be scheduled again.
 It would consume the next external event and the following nodes would be scheduled in the same order as before, extending the run in an obvious way.
 
 \subsubsection{Fairness of Greedy Schedules}
@@ -133,29 +156,44 @@ It remains to show that greedy schedules are fair.
   Therefore after a finite number of steps \(j\) all nodes with a smaller label than \(n\) will be disabled.
   The only way new events could enter the system are through sources, but they have bigger labels than \(n\), as by the definition of the schedule, and therefore can't be scheduled before \(n\).
   Because of Lemma~\ref{lemma:enabled_till_scheduled} \(n\) will still be enabled after these steps.
-  Therefore \(a\) is the enabled node with the lowest label at step \(i + j\) and therefore will be scheduled.
+  So \(a\) is the enabled node with the lowest label at step \(i + j\) and therefore will be scheduled.
 
-  If \(a\) is a source it will be enabled at one step, because evaluation engines work over finite traces, therefore at some point no new external events will be present.
-  Even if \(a\) was never scheduled upto that point, now all sources will consume the remaining, buffered external events and become disabled.
-  Therefore \(a\) at one point will become the source with the smallest label and be scheduled.
+  Now let \(a\) be a source.
+  Sources are only scheduled when no internal node is enabled.
+  Based on the same reasoning as in the first case at some point all internal nodes will become disabled, therefore a source node has to be scheduled.
+  This source can either be \(a\) or another source.
+  If another source was scheduled, after a finite amount of steps all internal nodes will have to become disabled again.
+  Since finite traces are evaluated at some point either the trace will end without ever feeding an input to \(a\), then \(a\) will never be enabled, or at some point \(a\) will receive an external event.
+  When \(a\) receives an external event, it will be the only enabled node, since new external events are only added, when no nodes are enabled.
+  Therefore \(a\) will be scheduled.
 \end{proof}
 
 
 \subsection{Fair Evaluation Engines}
 \label{sec:behaviours:behaviour_without_timing:fair}
 
-A fair evaluation engine is one with a fair, but not fixed schedule.
+Obviously greedy schedules are only a small subset of all fair schedules.
+As a next step we will look at all fair schedules.
 
-In contrast to the greedy evaluation engine it has no fixed schedule, the only requirement is that the schedule is fair.
+\begin{definition}[name = Fair Evaluation Engines]\label{def:fair_evaluation_engines}
+  A fair evaluation engine is one with any fair schedule.
+\end{definition}
+
+In contrast to a greedy evaluation engine a fair one has no fixed schedule, meaning that at each step any enabled node can be scheduled.
 Therefore predecessors of enabled nodes can perform multiple computations before their children are scheduled and events are not \emph{pushed} through the \gls{dag} as fast as possible.
-\todo{more later}
+
+The difference between greedy and fair schedules are similar to the ones of synchronous and asynchronous transducers: A greedy schedule will ensure that outputs are produced as fast as possible while a fair can \emph{delay} the outputs by consuming multiple inputs first.
+But note that there is an important difference between synchronous transducers and the behaviour of a greedy evaluation engine: A greedy evaluation engine can consume multiple events and produce multiple events at every step, as it may have multiple sources and multiple outputs.
+
+
+STOP HERE.
 
 \section{Equivalence of Different Schedules Without Timing Functions}
 \label{sec:behaviours:equivalence_without_timing}
 
 Based on the described behaviours of the approaches we now can proof the equivalence of different schedules for the same evaluation engine for a \gls{tessla} specification.
 
-\begin{lemma}[name = Equivalence of Engines for one Input]\label{lemma:eval_equivalent_if_runs_equal}
+\begin{lemma}[name = Equivalence of Engines for One Input]\label{lemma:eval_equivalent_if_runs_equal}
   Two evaluation engines are equivalent for an input, if their runs are equivalent for that input.
 \end{lemma}
 

@@ -19,7 +19,7 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {definition}{\numberline {6}\MakeUppercase {d}efinition\thmtformatoptarg {Asynchronous equivalence of Transducers}}{14}{definition.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {1}\MakeUppercase {l}emma\thmtformatoptarg {Asynchronous equivalence is an equivalence Relationship}}{15}{lemma.1}
+\contentsline {lemma}{\numberline {1}\MakeUppercase {l}emma\thmtformatoptarg {Asynchronous equivalence is an equivalence Relation}}{15}{lemma.1}
 \defcounter {refsection}{0}\relax 
 \contentsline {exmp}{\numberline {4}Example\thmtformatoptarg {Asynchronous equivalence of Transducers}}{15}{exmp.4}
 \defcounter {refsection}{0}\relax 
@@ -67,12 +67,16 @@
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {21}\MakeUppercase {d}efinition}{38}{definition.21}
+\contentsline {definition}{\numberline {21}\MakeUppercase {d}efinition\thmtformatoptarg {Behaviour of a Run}}{37}{definition.21}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {22}\MakeUppercase {d}efinition\thmtformatoptarg {Valid Evaluation Engines}}{38}{definition.22}
+\contentsline {definition}{\numberline {22}\MakeUppercase {d}efinition}{38}{definition.22}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {5}\MakeUppercase {l}emma\thmtformatoptarg {Greedy Schedules are Fair}}{39}{lemma.5}
+\contentsline {definition}{\numberline {23}\MakeUppercase {d}efinition\thmtformatoptarg {Valid Evaluation Engines}}{39}{definition.23}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {6}\MakeUppercase {l}emma\thmtformatoptarg {Equivalence of Engines for one Input}}{40}{lemma.6}
+\contentsline {lemma}{\numberline {5}\MakeUppercase {l}emma\thmtformatoptarg {Greedy Schedules are Fair}}{40}{lemma.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {theorem}{\numberline {1}\MakeUppercase {t}heorem\thmtformatoptarg {Equivalence of Different Greedy Evaluation Engines}}{41}{theorem.1}
+\contentsline {definition}{\numberline {24}\MakeUppercase {d}efinition\thmtformatoptarg {Fair Evaluation Engines}}{41}{definition.24}
+\defcounter {refsection}{0}\relax 
+\contentsline {lemma}{\numberline {6}\MakeUppercase {l}emma\thmtformatoptarg {Equivalence of Engines for One Input}}{41}{lemma.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {theorem}{\numberline {1}\MakeUppercase {t}heorem\thmtformatoptarg {Equivalence of Different Greedy Evaluation Engines}}{42}{theorem.1}

@@ -10,7 +10,7 @@ This is necessary to reason about the specifics how the runtime is built (Note t
 \section{Time}
 \label{sec:definitions:time}
 
-\gls{tessla} has a model of continuous time, where timestamps \(t \in \mathbb{T} \) are used to represent a certain point in time and \(\mathbb{T}\) has to be isomorphic to \(\mathbb{R}\).
+\gls{tessla} has a model of continuous time, where timestamps \(\pi \in \mathbb{T} \) are used to represent a certain point in time and \(\mathbb{T}\) has to be isomorphic to \(\mathbb{R}\).
 
 \section{Transducers}
 \label{sec:definitions:transducers}
@@ -32,7 +32,7 @@ Let \(\Phi, \Gamma\) be two alphabets and \(\epsilon\) the empty word.
 \end{definition}
 
 \begin{exmp}[name = Deterministic and Nondeterministic Transducers]
-  \(t_d = \{(a,1),(b,2),(ab,12),(ba,21)\}\) is a deterministic transducer, \(t_{nd} = \{(a,1),(a,2)\}\) is nondeterministic, because it relates \(a\) to \(1\) and \(2\).
+  \(t_d = \{(a,1),(b,2),(ab,12),(ba,21)\}\) is a deterministic transducer, \(t_{nd} = \{(a,1),(a,2)\}\) is nondeterministic, because it relates input \(a\) to both outputs \(1\) and \(2\).
 \end{exmp}
 
 Transducers can furthermore be categorized as synchronous, asynchronous, causal and clairvoyant transducers:
@@ -89,7 +89,7 @@ In the following \(\sigma_i\) is used to get the element at position \(i\) and \
   \end{itemize}
 \end{definition}
 
-\begin{lemma}[name=Asynchronous equivalence is an equivalence Relationship]\label{lemma:async_equivalence_is_equivalence_relationship}
+\begin{lemma}[name=Asynchronous equivalence is an equivalence Relation]\label{lemma:async_equivalence_is_equivalence_relationship}
   Asynchronous equivalence is symmetric, reflexive and transitive.
 \end{lemma}
 \begin{proof}$ $\newline
@@ -154,7 +154,7 @@ For the examples we will use \(\mathbb{R}\) for \(\mathbb{T}\).
   The function
   \[\mathit{timed: } {(\Gamma \times \mathbb{T})}^* \rightarrow {(\Gamma \times \mathbb{T})}^* \]
   reorders a timed sequence \(\sigma\) by its timestamps, such that:
-  \[ \forall i,j \in \mathbb{N}:\text{ if } i < j \text{ then } t_i < t_j \text{ with } (o_i, t_i) = \sigma_i \text{ and } (o_j, t_j) = \sigma_j \]
+  \[ \forall i,j \in \mathbb{N}:\text{ if } i < j \text{ then } \pi_i < \pi_j \text{ with } (o_i, \pi_i) = \sigma_i \text{ and } (o_j, \pi_j) = \sigma_j \]
   The function
   \[\mathit{upto: } \mathbb{T} \times {(\Gamma\times\mathbb{T})}^* \rightarrow {(\Gamma\times\mathbb{T})}^*\]
   removes all elements from a timed sequence, that have a timestamp bigger than the first argument.\\
@@ -329,12 +329,12 @@ There are three types of events: external, output and internal events.
 The set of all events is denoted as \(E\).
 Each event carries a value, which can be \emph{nothing} or a value of a type (types are formally defined in the \gls{tessla} specification, but aren't important for this thesis), a timestamp and the stream it's perceived on (e.g.\ a function call of a specific function or the name of an output stream).
 
-The value of an event can be queried with the function \(\upsilon\), its timestamp with \(\pi\) and its stream with \(\mathit{stream}\).
+The value of an event can be queried with the function \(\upsilon\), its timestamp with \(\mathit{time}\) and its stream with \(\mathit{stream}\).
 
 \(E_e \subset E\) is the set of all external events, their stream corresponds to a specific trace.
 \(E_o \subset E\) is the set of all output events, their stream is specified by an output name of the \gls{tessla} specification.
 \(E_n \subset E\) is the set of all internal events.
-Internal events are mostly an implementation dmathit{node}il, which denote steps of computation inside the runtime.
+Internal events are mostly an implementation detail, which denote steps of computation inside the runtime.
 The stream of internal events is implicitly given by the node that produces the stream of the event.
 Note that \(E_e, E_o, E_n\) are pairwise disjoint and \(E_e \cup E_o \cup E_n = E\).
 
@@ -350,14 +350,14 @@ Signals can be described by a sequence of changes, where a change denotes that t
 The only difference between a signal and an eventstreams is that signals always have a value while an eventstream may return \(\bot\) when queried for its value at a specific time, which denotes that no event happened at that time.
 Based on the similarity of signals and eventstreams in the following we will mainly reason about eventstreams, but most things can also be applied to signals.
 
-Formally a stream \(\sigma\) can be represented as the product of a sequence of events \(\langle e_1, \dots e_n\rangle\) where \(\pi(e_i) < \pi(e_{i+1}),\ \forall i < n \in \mathbb{N}\) and a value from \(\mathbb{T}\) which marks the progress of the stream and has to be equal or bigger to the timestamp of the last event.
-The set of all streams \(\Sigma\) is defined as all possible finite sequences of events \(\Sigma = \{\sigma | \sigma \in E^* \} \times \mathbb{T}\).
+Formally a stream \(\sigma\) can be represented as the product of a sequence of events \(\langle e_1, \dots e_n\rangle\) where \(\mathit{time}(e_i) < \mathit{time}(e_{i+1}),\ \forall i < n \in \mathbb{N}\).
+The set of all streams \(\Sigma\) is defined as all possible finite sequences of events \(\Sigma = \{\sigma | \sigma \in E^* \}\).
 An external stream \(\sigma_e\) is a stream consisting only of external events, the set of all external streams is \(\Sigma_e = \{\sigma_e | \sigma_e \in E_e^*\} \times \mathbb{T}\).
 Output and internal streams are defined analogous.
 
-To get the event of a stream \(\sigma\) at a timestamp \(t\) it can be queried like a function: \(\sigma(t) = e\) with \(\pi(e) = t \).
+To get the event of a stream \(\sigma\) at a timestamp \(\pi\) it can be queried like a function: \(\sigma(\pi) = e\) with \(\mathit{time}(e) = \pi \).
 When working with signals, the function will return the latest event that happened at or before t while an eventstream may return \(\bot\).
-The progress of a stream can be obtained with \(\mathit{progress}(\sigma) = t \in T\).
+The progress of a stream, which is the timestamp of the last event that happened on them, can be obtained with \(\mathit{progress}(\sigma) = \pi \in \mathbb{T}\).
 Internal and output streams can be queried for the node that produced them with \(\mathit{node}(\sigma) = n \in N\).
 
 \section{Functions}
@@ -394,7 +394,7 @@ Each node has a set of inputs, which are either external or internal streams, an
 Nodes which have at least one external stream as an input are called \emph{sources}.
 Nodes have a state, described in Section~\ref{sec:definitions:state}, which contains \gls{fifo} queues, provided by the Erlang plattform, which buffer events from its inputs for later computation.
 
-Every new event added to a queue has to have a bigger timestamp than the last event added to it.
+Every new event added to a queue has to have a bigger timestamp than the previous event added to the queue.
 This means a queue has a kind of progress timestamp, which denotes the timestamp of the latest event added to it and which is strictly increasing over time.
 Queues support the standard operators for lists like \(\mathit{hd}, \mathit{tl}, ++\) to respectively get the head, the tail or to append to the end.
 
@@ -430,7 +430,7 @@ Queues support the standard operators for lists like \(\mathit{hd}, \mathit{tl},
 \section{\glsentryname{tessla} Evaluation Engine}
 \label{sec:definitions:eval_engine}
 
-Because functions in \gls{tessla} specifications depend on other functions, and these dependencies have to be circle free, the specification can be represented as a \gls{dag}, where the functions are vertices and the relationship between functions are edges.
+Because functions in \gls{tessla} specifications depend on other functions, and these dependencies have to be cycle free, the specification can be represented as a \gls{dag}, where the functions are vertices and the relationship between functions are edges.
 This is exactly how the \gls{tessla} compiler outputs a specification.
 One can now use the \gls{dag} of a \gls{tessla} specification to synthesize a system to evaluate it over inputs:
 The vertices of the \gls{dag} become nodes representing the functions and the edges are the input and output streams between the nodes.
@@ -440,7 +440,7 @@ When fed with inputs (or \emph{traces}) the engine will produce outputs.
 The relationship between inputs and outputs that is produced can be seen as a timed transducer.
 The input to an evaluation engine has to have strictly increasing timestamps.
 This is needed to have a known progress which can be distributed through the system.
-If inputs weren't ordered by their timestamp for example the absense of input events on a specific stream couldn't be detected because they always could be present at a later position of the input trace.
+If inputs weren't ordered by their timestamp for example the absense of input events on a specific stream couldn't be detected because events could be present at a later position of the input trace.
 Especially for offline monitoring this obviously is no problem because the traces can simply be reordered into a strictly increasing sequence, except when multiple input events are at the same timestamp.
 This can be solved in two ways: either increase the timing precision when generating the traces or manipulate the timestamps in the traces by adding a minimal offset to them if they are equal to another timestamp.
 
@@ -449,7 +449,7 @@ To do so the nodes have to run their computations until no more events are prese
 This leads to the question in which order nodes should be scheduled to perform their computation.
 We will use the term \emph{step} to denote that one node was scheduled and performed its computation.
 While some schedules are simply not rational (think of unfairness and causality), there are many different schedules that are feasible.
-It has to be prooven that a chosen schedule produces the correct conclusions for a specification, else the evaluation engine is not valid.
+It has to be proven that a chosen schedule produces the correct conclusions for a specification, else the evaluation engine is not valid.
 
 This proof will be carried out for different kinds of schedules in Section~\ref{sec:behaviours:without_timing} and Section~\ref{sec:behaviours:with_timing}, showing that all of them can be used by an evaluation engine.
 For now we can define when to evaluation engines are called equivalent based on the work in Section~\ref{sec:definitions:transducers}:
@@ -472,18 +472,19 @@ We are taking advantage of that to categorize functions based on how or if at al
 The categorization is based upon the relationship between consumption and production of input and output events that a node representing the function in an evaluation engine produces.
 For this we will use the terms node and functions somewhat interchangeable in the following subsections.
 
-Nodes are only scheduled, if they are enabled, meaning they have events on their inputs buffered.
+Nodes can only be scheduled when they are enabled, meaning they have events on their inputs buffered.
 When a node is scheduled, it will compute the minimal timestamp of all buffered events.
 The function implemented by the node is then evaluated at that timestamp, which is called the \emph{evaluation timestamp}.
 This is important to understand the completeness criteria: It means that when the function is evaluated there is at least one event with that timestamp on one input.
-The inverse of that statement shows shows why this is important: a function is never evaluated at a timestamp where no event is present, therefore the system can't arbitrarily produce new timestamps.
+The inverse of that statement shows why this is important: a function is never evaluated at a timestamp where no event is present, therefore the system can't arbitrarily produce new timestamps.
 
 Nodes having signals as inputs always have to remember the last occured change of them in their state.
 When such a node is scheduled, the function will work on the remembered value if no new change is present at the evaluation timestamp for the signal.
-If a new change is present at the evaluation timestamp, it will be used and the state of the node has to be updated to remember the new change.
+If a new change is present at the evaluation timestamp, it will be used and the state of the node will be updated to remember the new change.
 
-It is important to note that all functions always have to consume at least one input event, else an evaluation engine can enter a livelock, where new events are produced forever out of nowhere.
-Also all functions will only produce a finite amount of events at every evaluation, especially only timed functions can produce more than one event at an evaluation timestamp.
+It is important to note that all functions always have to consume an event from at least one input queue, else an evaluation engine can enter a livelock, where new events are produced forever out of nowhere.
+Also all functions will only produce a finite amount of events at every evaluation.
+Especially only timed functions can produce more than one event at an evaluation timestamp.
 
 \subsection{Complete Functions}
 \label{sec:definitions:tessla_functions:complete}
@@ -496,16 +497,16 @@ The complete functions that are present in the implemented runtime are explained
   \begin{tabularx}{\textwidth}{lllX}
     Name                                  & Domain  & Range   & Explanation \\
     \toprule \\
-    \(\mathit{instruction\_executions}\)  & Events  & Events  & Converts a string to an event that denotes the execution of a specific instruction in the monitored program. \\
-    \(\mathit{function\_returns}\)        & Events  & Events  & Converts a string to an event that denotes the return from a function in the monitored program. \\
-    \(\mathit{function\_calls}\)          & Events  & Events  & Converts a string to an event that denotes the call of a function in the monitored program. \\
-    \(\mathit{variable\_values}\)         & Events  & Signal  & Converts a string to a change that denotes the value of a variable in a monitored program. \\
+    \(\mathit{instruction\_executions}\)  & Events  & Events  & Converts a trace to an event that denotes the execution of a specific instruction in the monitored program. \\
+    \(\mathit{function\_returns}\)        & Events  & Events  & Converts a trace to an event that denotes the return from a function in the monitored program. \\
+    \(\mathit{function\_calls}\)          & Events  & Events  & Converts a trace to an event that denotes the call of a function in the monitored program. \\
+    \(\mathit{variable\_values}\)         & Events  & Signal  & Converts a trace to a change that denotes the value of a variable in a monitored program. \\
     \(\mathit{signalAbs}\)                & Signal  & Signal  & Computes the absolute value of a signal. \\
     \(\mathit{eventAbs}\)                 & Events  & Events  & Computes the absolute value of an event. \\
     \(\mathit{changeOf}\)                 & Signal  & Events  & Emits an event everytime the signal changes its value holding the new value. \\
-    \(\mathit{neg}\)                      & Signal  & Signal  & Emits the mathematical opposite of the value of a signal. \\
-    \(\mathit{signalNot}\)                & Signal  & Signal  & Emits the boolean negation of a signal. \\
-    \(\mathit{eventNot}\)                 & Events  & Events  & Emits the boolean negation of an event. \\
+    \(\mathit{neg}\)                      & Signal  & Signal  & Emits the mathematical opposite of the value of a real signal. \\
+    \(\mathit{signalNot}\)                & Signal  & Signal  & Emits the Boolean negation of a Boolean signal. \\
+    \(\mathit{eventNot}\)                 & Events  & Events  & Emits the Boolean negation of a Boolean event. \\
     \(\mathit{eventCount}\)               & Events  & Signal  & Emits a signal holding the number of times an event occured on the input. \\
     \(\mathit{timestamps}\)               & Events  & Events  & Emits an event holding the timestamp of an input event everytime one occurs. \\
     \(\mathit{sma}\)                      & Events  & Events  & Emits an event holding the simple moving average over the last specified number of events that occured. \\
@@ -519,14 +520,14 @@ The first four functions are sources which take an external event and format the
 \subsection{Output Complete Functions}
 \label{sec:definitions:tessla_functions:output_complete}
 
-Output complete functions will produce a new event everytime they are evaluated but only have to consume one event from any input and not one from every input.
+Output complete functions will produce a new event everytime they are evaluated but only have to consume events from some inputs and not from all.
 Table~\ref{table:output_complete_functions} summarizes all input complete functions.
 
 \begin{table}[!htb]
   \begin{tabularx}{\textwidth}{lllX}
     Name                 & Domain        & Range   & Explanation \\
     \toprule \\
-    \(\mathit{merge}\)            & Events \(\times\) Events  & Events  & Emits an event holding the value of the first input if there is an event at that timestamp or else of the second input. Not input complete because if an event on the second input occurs at a timestamp where no event of the first input occurs no event of the first input is removed. \\
+    \(\mathit{merge}\)            & Events \(\times\) Events  & Events  & Merges two eventstreams. When an event is present on the first input, will emit an event with the same value, else with the value from the event on the second input. Not input complete because if an event on the second input occurs at a timestamp where no event of the first input occurs no event of the first input is removed. \\
     \(\mathit{occurAny}\)         & Events \(\times\) Events  & Events  & Emits an event without a value everytime an event occurs on any input. Not input complete because events are only removed from both inputs if they have the same timestamp. \\
   \end{tabularx}
 \caption{List of output complete functions}
@@ -563,31 +564,31 @@ Incomplete functions always consume at least one input from any input and will p
 Table~\ref{table:incomplete_functions} lists all supported incomplete functions.
 If no explanation is given, why the function is incomplete it is the following:
 The function is not input complete, because it only consumes events or changes that have the timestamp at which it is evaluated, if one input only has events with bigger timestamps no event or change is removed from them and the remembered last change of them is used as a base for computation if it is a signal.
-Also it is not output complete, because changes of a signal are only produced, if the value actually changes.
-For example the \(\mathit{add}\) function could consume two input events with the same timestamp, but the sum of their values is the same value as the old value of the signal.
+Also it is not output complete, because changes of a signal are only produced if the value actually changes.
+For example, if the values of the inputs of an \(\mathit{add}\) are switched at a timestamp it would not produce a new change for that timestamp but consume changes from both inputs.
 
 \begin{longtable}{lp{3cm}lp{6cm}}
   Name                 & Domain                    & Range   & Explanation \\
   \toprule \\
   \(\mathit{add}\)              & Signal \(\times\) Signal  & Signal  & Adds both inputs. \\
-  \(\mathit{and}\)              & Signal \(\times\) Signal  & Signal  & Performs a boolean and over both inputs. \\
+  \(\mathit{and}\)              & Signal \(\times\) Signal  & Signal  & Performs a Boolean and over both inputs. \\
   \(\mathit{div}\)              & Signal \(\times\) Signal  & Signal  & Divides the first input by the second input. \\
   \(\mathit{eq}\)               & Signal \(\times\) Signal  & Signal  & Emits if both inputs are equal. \\
   \(\mathit{geq}\)              & Signal \(\times\) Signal  & Signal  & Emits if the first input is greater or equal to the second input. \\
   \(\mathit{gt}\)               & Signal \(\times\) Signal  & Signal  & Emits if the first input is greater than the second.\\
-  \(\mathit{implies}\)          & Signal \(\times\) Signal  & Signal  & Emits the boolean implies relationship between both inputs.\\
+  \(\mathit{implies}\)          & Signal \(\times\) Signal  & Signal  & Emits the Boolean implies relationship between both inputs.\\
   \(\mathit{leq}\)              & Signal \(\times\) Signal  & Signal  & Emits if the first input is smaller or equal to the second.\\
   \(\mathit{lt}\)               & Signal \(\times\) Signal  & Signal  & Emits if the first input is smaller than the second.\\
   \(\mathit{\max}\)              & Signal \(\times\) Signal  & Signal  & Emits the bigger value of both inputs. \\
   \(\mathit{\min}\)              & Signal \(\times\) Signal  & Signal  & Emits the smaller value of both inputs.\\
   \(\mathit{mul}\)              & Signal \(\times\) Signal  & Signal  & Multiplies the first input by the second.\\
-  \(\mathit{or}\)               & Signal \(\times\) Signal  & Signal  & Performs a boolean or over both inputs.\\
+  \(\mathit{or}\)               & Signal \(\times\) Signal  & Signal  & Performs a Boolean or over both inputs.\\
   \(\mathit{sub}\)              & Signal \(\times\) Signal  & Signal  & Subtracts the second input from the first.\\
-  \(\mathit{filter}\)           & Events \(\times\) Signal  & Events  & Emits events whenever an event occurs on the first input with the value of that event if the second input has the value true. Is not output complete because it doesn't emit events when the second input is false. \\
-  \(\mathit{ifThen}\)           & Events \(\times\) Signal  & Events  & Emits an event with the value of the second input everytime an event occurs on the first input. Is not output complete because it only emits outputs when an event occured on the first input. \\
+  \(\mathit{filter}\)           & Events \(\times\) Signal  & Events  & Emits events whenever an event occurs on the first input with the value of that event if the second input has the value true. It is not output complete because it doesn't emit events when the second input is false. \\
+  \(\mathit{ifThen}\)           & Events \(\times\) Signal  & Events  & Emits an event with the value of the second input everytime an event occurs on the first input. It is not output complete because it only emits outputs when an event occured on the first input. \\
   \(\mathit{ifThenElse}\)       & Signal \(\times\) Signal \newline \(\times\) Signal  & Signal  & Emits the value of the second input inf the first is true, else of the third input.\\
   \(\mathit{sample}\)           & Signal \(\times\) Events  & Events  & Same as \(\mathit{ifThen}\) with switched arguments. \\
-  \(\mathit{occurAll}\)         & Events \(\times\) Events  & Events  & Emits an event whenever an event occurs on both inputs. Not output complete because it only emits events whenever event shappen on both inputs.\\
+  \(\mathit{occurAll}\)         & Events \(\times\) Events  & Events  & Emits an event whenever events occur on both inputs. Not output complete because it only emits events whenever events happen on both inputs.\\
   \caption{List of incomplete functions}
 \label{table:incomplete_functions}
 \end{longtable}
@@ -764,14 +765,14 @@ Now everytime a node \(n\) with children \(N_c\) evaluates its function at a new
 The other way, which is used in this thesis, doesn't alter the input queues:
 First we need a new type of events: \emph{progress events}.
 A progress event holds no value and exists only to notify a node that a specific input has progressed upto the timestamp of the progress event.
-We will write a progress event as \(e^p_t\) where t is the timestamp of it.
+We will write a progress event as \(e^p_\pi\) where \(\pi\) is the timestamp of it.
 
 Now whenever a node performs its computation at an evaluation timestamp and no new event was produced a progress event with the evaluation timestamp is added to the corresponding input queue of all children.
-When a node is scheduled and one of the consumed events is a progress events, what happens depends on the function of the node, some examples are:
+When a node is scheduled and one of the consumed events is a progress event, what happens depends on the function of the node, some examples are:
 
 \begin{itemize}
   \item An \(\mathit{AddNode}\) has at an evaluation timestamp a progress event as the first input and no event as the second input, which means there is an event buffered on input queue two, else the node wouldn't have been scheduled, and that event has a bigger timestamp than the evaluation timestamp, else its timestamp would have been the evaluation timestamp. The node can't produce a new change for its output, since all new information is, that input one hasn't changed upto the new timestamp. Therefore the node will distribute a progress event with the evaluation timestmap to its children.
-  \item If the \(\mathit{Addnode}\) would have received a progress event on input one and a new change on input two at the same timestamp, it could emit a new change. The new event would have the value of the last change on the first input, which the node has to hold in its state, added with the value of the new change on the second input.
+  \item If the \(\mathit{AddNode}\) would have received a progress event on input one and a new change on input two at the same timestamp, it could emit a new change. The new event would have the value of the last change on the first input, which the node has to hold in its state, added with the value of the new change on the second input.
   \item A \(\mathit{MergeNode}\) has a progress event as the first input at an evaluation timestamp and no event on the second input. By the same reasoning as in the first example, the node can't produce a new output and therefore will produce a progress event.
 \end{itemize}
 
