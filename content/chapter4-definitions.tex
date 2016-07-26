@@ -1,5 +1,5 @@
 % !TEX root = ../thesis.tex
-\chapter{Definitions}
+\chapter{Preliminaries}
 \label{sec:definitions}
 
 In this chapter we will define concepts that are used in Chapter~\ref{sec:behaviours} to reason about the implemented runtime.
@@ -144,7 +144,10 @@ In the following \(\sigma_i\) is used to get the element at position \(i\) and \
 \section{Timed Transducers}
 \label{sec:definitions:timed_transducer}
 
-For the second kind of equivalence we need to introduce \emph{timed sequences} and \emph{timed transducers}.
+For the second kind of equivalence we need to introduce \emph{timed sequences}, originally introduced as timed words in~\cite{Alur1994}, and \emph{timed transducers}.
+Note that timed sequences don't have to be monotonically increasing like in the original definition.
+Quite on the contrary the unorderdness of outputs is an important key principle to much of the later work as you will see.
+
 Let \(\mathbb{T}\) be a timing model that is isomorphic to \(\mathbb{R}\).
 For the examples we will use \(\mathbb{R}\) for \(\mathbb{T}\).
 
@@ -451,18 +454,11 @@ We will use the term \emph{step} to denote that one node was scheduled and perfo
 While some schedules are simply not rational (think of unfairness and causality), there are many different schedules that are feasible.
 It has to be proven that a chosen schedule produces the correct conclusions for a specification, else the evaluation engine is not valid.
 
-This proof will be carried out for different kinds of schedules in Section~\ref{sec:behaviours:without_timing} and Section~\ref{sec:behaviours:with_timing}, showing that all of them can be used by an evaluation engine.
-For now we can define when to evaluation engines are called equivalent based on the work in Section~\ref{sec:definitions:transducers}:
+An evaluation engine is run inside an environment.
+The environment has knowledge over the state of the nodes, most important which nodes are enabled.
+Based on that information the environment is responsible of feeding the trace data to the engine: only when no sources are enabled the next trace is added to the queue of an input node.
+This ensures that the consumption of input signals is strictly ordered by timestamp, which is important as we will see in Section~\ref{sec:behaviours}.
 
-\begin{definition}[name=Equivalence of Evaluation Engines]\label{def:equivalence_eval_engine}
-  Two evaluation engines are called equivalent, if their produced relationships between inputs and outputs are observational equivalent.
-\end{definition}
-
-Because the possible inputs are infinite we will restrict the definition of equivalence to a specified set of inputs:
-
-\begin{definition}[name=Equivalence of Evaluation Engines for Specified Inputs]\label{def:equivalence_eval_engine_specific_inputs}
-  Two evaluation engines are called equivalent for a set of inputs, if the relationship for theese inputs and the produced outputs is observational equivalent.
-\end{definition}
 
 \section{\glsentryname{tessla} Functions}
 \label{sec:definitions:tessla_functions}
@@ -570,6 +566,7 @@ For example, if the values of the inputs of an \(\mathit{add}\) are switched at 
 \begin{longtable}{lp{3cm}lp{6cm}}
   Name                 & Domain                    & Range   & Explanation \\
   \toprule \\
+  \endhead{}
   \(\mathit{add}\)              & Signal \(\times\) Signal  & Signal  & Adds both inputs. \\
   \(\mathit{and}\)              & Signal \(\times\) Signal  & Signal  & Performs a Boolean and over both inputs. \\
   \(\mathit{div}\)              & Signal \(\times\) Signal  & Signal  & Divides the first input by the second input. \\
@@ -662,14 +659,19 @@ Furthermore with timing functions it's possible to create multiple events in one
 For example think of an \(\mathit{EchoNode}\), which duplicates an input after a specified amount of time.
 
 \begin{definition}[name = Application of a Transition on a State]\label{def:application_transition}
-  Given a global state \(s_0\) and a transition \(\tau = (\widetilde{E}, \widetilde{E'}) = (\{e_1,e_2,\dots,e_i\}, \{e_1',e_2',\dots,e_i'\})\) with \(n = \mathit{node}(\tau_1)\) and \(N_c\) the set of all nodes that are children of \(n\).
-  When we \emph{apply} \(\tau\) to \(s_0\) we get a new global state \(s_1\) with\\
-  \(\forall \widetilde{n}_i = s_0(i)\)
-  \begin{itemize}
-    \item if \(\mathit{node}(\widetilde{n}_i) \not\in N_c \cup \{n\} \text{ then } s_1(i) = \widetilde{n}_i\) (no node states changes except the one from the node of the transition and its children)
-    \item else if \(\mathit{node}(\widetilde{n}_i) \in N_c\) then append all events in \(\widetilde{E'}\) to the input representing the stream from \(n\)
-    \item else remove all events in \(\widetilde{E}\) from the inputs representing their streams and update the internal information based on the function \(n\) is modelling.
-  \end{itemize}
+  Given global state \(s_0\) and transition \(\tau = (\widetilde{E}, \widetilde{E'}) = (\{e_1,e_2,\dots,e_i\}, \{e_1',e_2',\dots,e_i'\})\) with \(n = \mathit{node}(\tau_1)\) and \(N_c\) the set of all nodes that are children of \(n\).
+  When we \emph{apply} \(\tau\) to \(s_0\), written \(\mathit{apply}(s_0, \tau) = s_1\), we get a new global state \(s_1\) with
+  \begin{align*}
+    &\forall \widetilde{n}_i = s_0(i)\\
+    &\hspace{2em} \text{if } \mathit{node}(\widetilde{n}_i) \not\in N_c \cup \{n\}\\
+    &\hspace{4em} \text{then } s_1(i) = \widetilde{n}_i\\
+    &\hspace{4em} \text{(nothing changes for independent nodes)} \\
+    &\hspace{2em} \text{else if } \mathit{node}(\widetilde{n}_i) \in N_c\\
+    &\hspace{4em} \text{then append all events in } \widetilde{E'}\ \text{to the input representing the stream from } n \\
+    &\hspace{2em} \text{else}\\
+    &\hspace{4em} \text{remove all events in } \widetilde{E}\ \text{from the inputs representing their streams}\\
+    &\hspace{4em} \text{and update the internal information based on the function } n\ \text{is modelling}
+  \end{align*}
 \end{definition}
 
 This means that the new global state is built with the old global state by altering only the node states of the node identified by the transition and its children.

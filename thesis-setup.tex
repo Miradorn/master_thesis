@@ -103,12 +103,17 @@ bodyfont=\normalfont\itshape,
 headformat=\NAME~\NUMBER:\NOTE,
 postheadspace = \newline
 ]{default}
-\theoremstyle{break}
+\declaretheoremstyle[
+notefont=\bfseries, notebraces={}{},
+bodyfont=\normalfont\itshape,
+headformat=\NAME~\NUMBER:,
+postheadspace = \newline
+]{example}
 
 \declaretheorem[style=default]{lemma}
 \declaretheorem[style=default]{definition}
 \declaretheorem[style=default]{theorem}
-\declaretheorem[style=default, name = Example]{exmp}
+\declaretheorem[style=example, name = Example]{exmp}
 
 \newcommand{\defeq}{\mathrel{\texttt{:=}}}
 
