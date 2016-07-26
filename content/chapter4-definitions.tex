@@ -688,27 +688,6 @@ A run can be queried by it's index to return the element at that index: \(r(i)=(
 
 The run \(\langle (\lambda, s_0), (\tau_1, s_1) \rangle\) means, that the engine was in it's initial state, took the transition \(\tau_1\) and thereby reached the state \(s_1\).
 
-% \begin{definition}[name = Equivalence of Runs]\label{def:equivalence_runs}
-%   Two runs are called equivalent if they have an equal state at their last position.
-% \end{definition}
-
-% Because the state can be built from the transitions that were taken, equivalence can also be defined over transitions.
-
-% \begin{lemma}[name = Equivalence of Runs over Transitions]\label{lemma:equivalent_runs_with_transitions}
-%   If the set of transitions of two runs are equal, the runs are equivalent.
-% \end{lemma}
-
-% \begin{proof}
-%   Let \(r_1, r_2\) be the runs of two engines with the same set of transitions \(\widetilde{T}\).
-%   Let \(s_1\) be the final state of the run \(r_1\) and \(s_2\) of \(r_2\).
-%   If the two global states weren't equal, there would have to be at least one \(i\) with \(s_1(i) \neq s_2(i)\), meaning the same Node has to have a different state in both engines.
-%   Let \(\widetilde{n}_1, \widetilde{n}_2\) be the node states of one such node in both engines.
-%   If the two node states are different, one of them has to contain at least one event on an input or output that isn't on the same stream in the other state.
-%   Let that event be \(e_d\).
-%   To be added to the state, there has to be a transition \(\tau = (e, e')\) with \(e_d \in e \lor e_d \in e'\).
-%   This transition has to be in \(\widetilde{T}\), which means it was taken by both engines, therefore \(e_d\) is in the history of the node in both runs, therefore its the two node States are equal in both engines.
-% \end{proof}
-
 \begin{definition}[name = Closeness of Runs]\label{def:runs_closeness}
   The closeness \(\delta\) of a run \(r_1\) to a run \(r_2\) is a pair \(\delta(r_1,r_2) = (x,y)\), where \(x\) is the index before the first position where the two runs differ and y is the number of steps between the index of the first difference and the position where \(r_2\) takes the transition that \(r_1\) took after step \(x\).
   The closeness of runs is ordered element-wise: \((x,y) > (x',y') \leftrightarrow ((x > x') \lor (x = x' \land y < y))\).
@@ -741,7 +720,7 @@ Based on that definition we will see the problems that output incomplete functio
 
 \begin{definition}[name = Enabledness of a Node]\label{def:node_enabled}
   A node \(n\) with the node state \(\widetilde{n}\) containing the input queues \(\widetilde{\sigma}\) in an evaluation engine is called \emph{enabled} at a step \(i\) of a run \(r\) of that engine, if at least one input is buffered on each input queue:
-  \[\forall \sigma_x \in \widetilde{\sigma}: \mathit{hd}(\sigma_x) = e_x \]
+  \[\forall \sigma_x \in \widetilde{\sigma}: \neg \mathit{empty}(\sigma_x)\]
 \end{definition}
 
 Now it is possible to restrict runs to a subset where each run models a rational evaluation of a specification.
@@ -750,11 +729,11 @@ Now it is possible to restrict runs to a subset where each run models a rational
   A run \(r\) is called \emph{valid}, if
   \begin{itemize}
     \item \(\forall i \in [0,\mathit{length}(r)]: r(i) = (\tau_i,s_i) \land \mathit{node}(\tau_i)\) is enabled at step \(i\)
-    \item and \(s_i\) is built by applying \(\tau_i\) to \(s_{i-1}\)
+    \item and \(s_i = \mathit{apply}(s_{i-1}, \tau_i)\)
   \end{itemize}
 \end{definition}
 
-As stated the definition for enabledness works for all output complete functions, while output incomplete functions have a problem.
+As stated, the definition for enabledness works for all output complete functions, while output incomplete functions have a problem.
 It is possible that an output incomplete functions will never produce a new output:
 E.g.\ think of a \(\mathit{FilterNode}\) where the second input is always \(\mathit{false}\).
 Even if new input events are added to the first input and the second input is known to be \(\mathit{false}\) upto any timestamp, the children of the node will never receive new events for that input queue.
@@ -770,7 +749,7 @@ A progress event holds no value and exists only to notify a node that a specific
 We will write a progress event as \(e^p_\pi\) where \(\pi\) is the timestamp of it.
 
 Now whenever a node performs its computation at an evaluation timestamp and no new event was produced a progress event with the evaluation timestamp is added to the corresponding input queue of all children.
-When a node is scheduled and one of the consumed events is a progress event, what happens depends on the function of the node, some examples are:
+When a node is scheduled and one of the consumed events is a progress event, what happens depends on the function of the node. Some examples are:
 
 \begin{itemize}
   \item An \(\mathit{AddNode}\) has at an evaluation timestamp a progress event as the first input and no event as the second input, which means there is an event buffered on input queue two, else the node wouldn't have been scheduled, and that event has a bigger timestamp than the evaluation timestamp, else its timestamp would have been the evaluation timestamp. The node can't produce a new change for its output, since all new information is, that input one hasn't changed upto the new timestamp. Therefore the node will distribute a progress event with the evaluation timestmap to its children.
