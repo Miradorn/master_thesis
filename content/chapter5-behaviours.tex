@@ -12,21 +12,22 @@ Therefore the \emph{behaviour} of a run is defined, which maps a run to relation
 \begin{definition}[name = Behaviour of a Run]\label{def:behaviour_run}
   Let \(r\) be a run of an evaluation engine.
   The behaviour \(\beta_r\) of it is built stepwise:
-  The first transition \(r(1)\) obviously has to consume an input event \(e_1\).
-  Take the prefix \(r_1\) of \(r\) upto, but not including, the next step where an input is consumed.
-  Take all output events \(O_1\), which are possible none, that are produced at any step in \(r_1\).
-  The relationship \((e_1,O_1)\) is an element of the behaviour of \(r\).
-  Now take the next part \(r_2\) of \(r\) which starts at the step after \(r_1\) did end and ends one step before the next external event is consumed.
-  The first element of \(r_2\) has to be a transition consuming an external event \(e_2\).
-  Let \(O_2\) be the output events produced in \(r_2\).
-  The relationship \((e_1e_2, O_1O_2)\) is an element of the behaviour of \(r\).
+  \begin{enumerate}
+    \item Let \(\beta_r = \emptyset\)
+    \item Take the prefix \(r_p\) of \(r\), where the first transition consumes an input upto but not including the next transition where an input is consumed.
+    \item Select all output events \(O_1\), which are possible none, that are produced at any step in \(r_1\).
+    \item Add the tuple \((e_1,O_1)\) to \(\beta_r\).
+    \item Remove \(r_p\) from \(r\).
+    \item Goto step 2 if \(r\) is not empty, else terminate.
+  \end{enumerate}
 
-  Repeat these steps until the last consumed external event and the associated output events are added to the behaviour.
+  Stated simple the run is chopped into pieces, where each piece begins with the consumption of an input events and ends before the next input is consumed.
+  Then all outputs produced in one piece is in a relation with the consumed input.
 \end{definition}
 
 The behaviour can be seen as a timed transducer since all events have timestamps and all consumed events are strictly ordered by their timestamp, since inputs to an evaluation engine are required to be ordered by their timestamp.
 
-Since the bahviour encodes the relationship between inputs and outputs a run produces it provides the foundation to reason about equivalence between different runs and whole evaluation engines.
+Since the behaviour encodes the relationship between inputs and outputs a run produces it provides the foundation to reason about equivalence between different runs and whole evaluation engines.
 
 \begin{definition}[name=Equivalence of Runs]\label{def:equivalence_runs}
   Two runs are called equivalent if their behaviour is observational equivalent.
@@ -50,7 +51,7 @@ While there are other approaches to evaluation, a \gls{dag} based approach seems
 
 Let's recap and summarize how an evaluation engine performs its computation.
 Each evaluation engine will work in steps, where each step is synonymous with an index in the run of the system.
-Therefore at each step one enabled node is scheduled to perform it's operation, represented as the transition in the run.
+Therefore at each step one enabled node is scheduled to perform its operation, represented as the transition in the run.
 The transition will encode one of the following three things that can happen:
 
 \begin{itemize}
@@ -69,17 +70,17 @@ The first class of evaluation engines are called greedy.
 
 \begin{definition}\label{def:greedy_schedule}
   A schedule of an evaluation engine built by the following steps is called \emph{greedy}.
-  \begin{itemize}
+  \begin{enumerate}
     \item Select all nodes that are no sources, let their count be \(i\)
-    \item Label them with unique natural numbers from \([1,i]\) in reversed topological order
+    \item Label them with unique natural numbers from \([1,i]\) in reverse topological order
     \item Label the remaining nodes with unique natural numbers bigger than \(i\)
-    \item Whenever a node has to be scheduled, schedule the enabled one with the lowest label
-  \end{itemize}
+    \item Schedule the enabled node with the lowest label first
+  \end{enumerate}
 
   We also call an evaluation engine greedy if we mean it's run with a greedy schedule.
 \end{definition}
 
-Obviously for many \glspl{dag} there is no unique reversed topological order, therefore one can be chosen by the evaluation engine.
+Obviously for many \glspl{dag} there is no unique reverse topological order, therefore one can be chosen by the evaluation engine.
 We will show in Section~\ref{sec:behaviours:equivalence_without_timing:greedy} that all topological orders will produce observational equivalent behaviours.
 
 The greedy schedule ensures that no node is scheduled which has a successor that can be scheduled, therefore events are \emph{pushed} through the \gls{dag} towards an output node as fast as possible.
@@ -130,14 +131,14 @@ Greedy evaluation engines offer a good start to reason about behaviours and will
 \end{figure}
 
 Figure~\ref{fig:chap5:sec_greedy:visual_dag} visualizes a greedy evaluation engine.
-It shows two \glspl{dag} representations of an evaluation engine  where the nodes \(a\) to \(e\) are labeled in a reversed topological order and \(o\) and \(u\) represents the output streams with that name.
+It shows two \glspl{dag} representations of an evaluation engine  where the nodes \(a\) to \(e\) are labeled in a reversed topological order and \(o\) and \(u\) represents two output streams.
 The left system is in its initial state and an input event \(e_1\) is present and can be consumed by the input node \(a\).
 When a node is chosen to compute by the scheduler, only node \(a\) is enabled, therefore it is scheduled.
-The right system is the representation of the next step: node \(a\) has consumed the external event and produced an internal event \(n_{a1}\), which is propagated to all its children: node \(b\) and \(d\).
-In the next step node \(b\) would be scheduled, because it has the lowest number of any node that can compute (actually it's the only node that can compute at all, because \(d\) has to wait for the event from \(b\)).
-After \(b\) was scheduled, it would have produced the internal event \(n_{b1}\) which would then be distributed to nodes \(c\) and \(d\).
+The right system is the representation of the next step: node \(a\) has consumed the external event and produced an internal event \(n_{a1}\), which is propagated to all its children: nodes \(b\) and \(d\).
+In the next step node, \(b\) would be scheduled, because it has the lowest number of any node that can compute (actually it's the only node that can compute at all, because \(d\) has to wait for the event from \(b\)).
+After \(b\) is scheduled, it would produce the internal event \(n_{b1}\) which would then be distributed to nodes \(c\) and \(d\).
 
-The complete run of the greedy engine for one input is the following, where the states are not further defined:
+The complete run of the greedy engine for one input is the following, where the states are omitted:
 
 \begin{align*}
   \langle
@@ -149,7 +150,7 @@ The complete run of the greedy engine for one input is the following, where the 
   \rangle
 \end{align*}
 
-If there were more then one input event, at this point node \(a\) would be scheduled again.
+If there were more than one input event, at this point node \(a\) would be scheduled again.
 It would consume the next external event and the following nodes would be scheduled in the same order as before, extending the run in an obvious way.
 
 \subsubsection{Fairness of Greedy Schedules}
@@ -162,12 +163,12 @@ It remains to show that greedy schedules are fair.
 \end{lemma}
 
 \begin{proof}
-  Let \(a\) be a node that is enabled at step \(i\) and no source.
+  Let \(a\) be a node with the label \(n\), which is enabled at step \(i\) and is no source.
   Because evaluation engines can only contain a finite number of nodes there can only be a finite number of enabled nodes with a smaller label than \(n\).
   Furthermore all nodes can only have a finite number of events buffered, since all nodes can only produce a finite number of events per computation and therefore only a finite number of events can be produced after a finite number of steps.
   Therefore after a finite number of steps \(j\) all nodes with a smaller label than \(n\) will be disabled.
   The only way new events could enter the system are through sources, but they have bigger labels than \(n\), as by the definition of the schedule, and therefore can't be scheduled before \(n\).
-  Because of Lemma~\ref{lemma:enabled_till_scheduled} \(n\) will still be enabled after these steps.
+  Because of Lemma~\ref{lemma:enabled_till_scheduled}, \(a\) will still be enabled after these steps.
   So \(a\) is the enabled node with the lowest label at step \(i + j\) and therefore will be scheduled.
 
   Now let \(a\) be a source.
@@ -246,7 +247,6 @@ If such a closer run always exist, we will show that the run with closeness \(l,
 
   As of Lemma~\ref{lemma:exchange_independent_transitions} which one of them is taken first can't change the enabledness of the node of the second transition.
   Therefore there is a run \(r_2''\), which is equal to \(r_2'\), except that the transitions \(\tau_1, \tau_2'\) are scheduled the other way around.
-  Figure~\ref{fig:chap5:sec_greedy:commutativity_scheduling} visualizes how changing the order of the two transitions can't change the global state of the engine after both were taken.
   Therefore the runs \(r_2'\) and \(r_2''\) are equivalent and their closeness to \(r_1\) is \(d, k-1\), which contradicts the initial statement that \(r_1'\) was a run with a maximal closeness.
   This means that there is an equivalent run to \(r_2\) which has at least the closeness \((d, 1)\).
 
@@ -260,27 +260,6 @@ If such a closer run always exist, we will show that the run with closeness \(l,
   Combined we can now say, that there is no upper bound on the closeness of equivalent runs of \(r_2\) to \(r_1\), therefore the run with the closeness \((l, 0)\) also has to be equivalent to \(r_2\).
 
 \end{proof}
-
-
-\begin{figure}
-  \begin{tikzpicture}
-    [pre/.style={<-,shorten <=1pt,>=stealth,semithick}]
-    \node (A) at (0,0) {};
-    \node [shape=circle,draw=black] (B) at (2, 0) {\(s_{d+k-2}\)}
-      edge [pre] node[above] {\(\tau_{x}\)} (A);
-    \node [shape=circle,draw=black] (C) at (2, -3) {\(s_{d+k-1}\)}
-      edge [pre] node[left] {\(\tau_{2}'\)} (B);
-    \node [shape=circle,draw=black] (D) at (5, 0) {\(s_{d+k-1}'\)}
-      edge [pre] node[above] {\(\tau_{1}\)} (B);
-    \node [shape=circle,draw=black] (E) at (5, -3) {\(s_{d+k}\)}
-      edge [pre] node[right] {\(\tau_{2}'\)} (D)
-      edge [pre] node[above] {\(\tau_{1}\)} (C);
-  \end{tikzpicture}
-  \caption{Commutativity Diagramm of Node scheduling}
-\label{fig:chap5:sec_greedy:commutativity_scheduling}
-\end{figure}
-
-
 
 \subsection{Equivalence of Greedy and Fair Evaluation Engines}
 \label{sec:behaviours:equivalence_without_timing:greedy_fair}

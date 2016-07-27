@@ -57,24 +57,26 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {lemma}{\numberline {3}\MakeUppercase {l}emma\thmtformatoptarg {Exchange of Independent Transitions}}{34}{lemma.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {4}\MakeUppercase {l}emma\thmtformatoptarg {Duration of Enabledness}}{34}{lemma.4}
+\contentsline {lemma}{\numberline {4}\MakeUppercase {l}emma\thmtformatoptarg {Duration of Enabledness}}{35}{lemma.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {18}\MakeUppercase {d}efinition\thmtformatoptarg {Fair Schedules}}{35}{definition.18}
+\contentsline {lemma}{\numberline {5}\MakeUppercase {l}emma\thmtformatoptarg {Finiteness of Enabledness}}{36}{lemma.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {definition}{\numberline {18}\MakeUppercase {d}efinition\thmtformatoptarg {Fair Schedules}}{37}{definition.18}
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {19}\MakeUppercase {d}efinition\thmtformatoptarg {Behaviour of a Run}}{37}{definition.19}
+\contentsline {definition}{\numberline {19}\MakeUppercase {d}efinition\thmtformatoptarg {Behaviour of a Run}}{39}{definition.19}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {20}\MakeUppercase {d}efinition\thmtformatoptarg {Equivalence of Runs}}{37}{definition.20}
+\contentsline {definition}{\numberline {20}\MakeUppercase {d}efinition\thmtformatoptarg {Equivalence of Runs}}{40}{definition.20}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {21}\MakeUppercase {d}efinition\thmtformatoptarg {Equivalence of Evaluation Engines}}{38}{definition.21}
+\contentsline {definition}{\numberline {21}\MakeUppercase {d}efinition\thmtformatoptarg {Equivalence of Evaluation Engines}}{40}{definition.21}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {22}\MakeUppercase {d}efinition}{39}{definition.22}
+\contentsline {definition}{\numberline {22}\MakeUppercase {d}efinition}{41}{definition.22}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {23}\MakeUppercase {d}efinition\thmtformatoptarg {Valid Evaluation Engines}}{39}{definition.23}
+\contentsline {definition}{\numberline {23}\MakeUppercase {d}efinition\thmtformatoptarg {Valid Evaluation Engines}}{41}{definition.23}
 \defcounter {refsection}{0}\relax 
-\contentsline {lemma}{\numberline {5}\MakeUppercase {l}emma\thmtformatoptarg {Greedy Schedules are Fair}}{40}{lemma.5}
+\contentsline {lemma}{\numberline {6}\MakeUppercase {l}emma\thmtformatoptarg {Greedy Schedules are Fair}}{42}{lemma.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {definition}{\numberline {24}\MakeUppercase {d}efinition\thmtformatoptarg {Fair Evaluation Engines}}{41}{definition.24}
+\contentsline {definition}{\numberline {24}\MakeUppercase {d}efinition\thmtformatoptarg {Fair Evaluation Engines}}{43}{definition.24}
 \defcounter {refsection}{0}\relax 
-\contentsline {theorem}{\numberline {1}\MakeUppercase {t}heorem\thmtformatoptarg {Equivalence of Different Greedy Evaluation Engines}}{42}{theorem.1}
+\contentsline {theorem}{\numberline {1}\MakeUppercase {t}heorem\thmtformatoptarg {Equivalence of Different Greedy Evaluation Engines}}{44}{theorem.1}

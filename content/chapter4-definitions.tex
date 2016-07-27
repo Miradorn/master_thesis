@@ -775,28 +775,58 @@ For the comparision of runs some more definitions are needed.
   If a transition \(\tau_2\) is independent of a transition \(\tau_1\), then for all runs of the evaluation engine that produces the runs the following holds:
   \begin{align*}
     \text{If } r_1 = \langle (\lambda, s_0), \dots, (\tau_1, s_i), (\tau_2, s_j), \dots, (\tau_l, s_l) \rangle \text{is a valid run} \\
-    \text{then } r_2 = \langle (\lambda, s_0), \dots, (\tau_2, s_i'), (\tau_1, s_j'), \dots, (\tau_l, s_l') \rangle \text{is a valid run}
+    \text{then } r_2 = \langle (\lambda, s_0), \dots, (\tau_2, s_i'), (\tau_1, s_j), \dots, (\tau_l, s_l) \rangle \text{is a valid run}
   \end{align*}
 \end{lemma}
 
 \begin{proof}
+  As a first step we will show, that the transitions \(\tau_1\) and \(\tau_2\) can be exchanged because their enabledness doesn't depend on each other.
+
   Because \(b = \mathit{node}(\tau_2)\) is no descendant of \(a = \mathit{node}(\tau_1)\), the stream \(\sigma\) with \(\mathit{node}(\sigma) = \mathit{node}(\tau_1)\) can be no input of \(b\).
   Therefore the enabledness of \(b\) can't be changed by \(\tau_1\), taken directly from the definition of enabledness.
   So \(b\) has to be enabled before \(\tau_1\) was taken by \(r_1\), else it couldn't be enabled afterwards and \(\tau_2\) couldn't be taken in the next step.
   Therefore \(r_2\) also fulfills the requirements of a valid run.
+
+  As a second step we have to show, that the state \(s_j\) will stay the same, no matter the order of the two transitions and only the state \(s_i\) will be changed to \(s_i'\).
+  If this holds, the subsequent states can't change either, since they are deterministically built by applying the subsequent transitions, which didn't change.
+  Now if all subsequent states stay the same, all subsequent transitions will stay enabled, since enabledness of a node only depends on the state.
+  Figure~\ref{fig:chap4:sec_run:exchange_transitions} visualizes the exchange of the transitions and the argument why the state stays the same.
+
+  Remember that \(s_i = \mathit{apply}(s_{i-1}, \tau_1)\) and \(s_i' = \mathit{apply}(s_{i-1}, \tau_2)\).
+  We have to show that \(\mathit{apply}(\mathit{apply}(s_{i-1}, \tau_1),\tau_2) = \mathit{apply}(\mathit{apply}(s_{i-1}, \tau_2),\tau_1)\).
+  This is straightforward when recalling what a transition does when it's being applied.
+  \(\mathit{apply}(\mathit{apply}(s_{i-1}, \tau_1),\tau_2)\) appends all events produced by \(\tau_1\) to the queue representing \(n_1 = \mathit{node}(\tau_1)\) in the node states of the children of \(n_1\) and updates the node state of \(n_1\).
+  Then it appends all events produced by \(\tau_2\) to the queue representing \(n_2 = \mathit{node}(\tau_2)\) in the node state of the children of \(n_2\) and updates the node state of \(n_2\).
+
+  Since \(n_1\) and \(n_2\) are independent of each other, neither of them have input queues representing the other, therefore no event can be added to a queue of \(n_2\) with \(t_1\) and the same with \(n_1\) and \(\tau_2\).
+  Therefore all events that were appended by applying \(\tau_1\) will still be in the queues after \(\tau_2\) was applied, since only events from the queues of \(n_2\) can be consumed, and the same if they were applied in reversed order.
+
+  To conclude: All events appended to any node states will still be present after both transitions were applied and the node states of \(n_1\) and \(n_2\) will be updates based on the same events, no matter in which order the transitions are run.
+  Therefore the state after both transitions are applied have to be the same, no matter the order in which they are applied.
+
 \end{proof}
 
-% \begin{lemma}[name = Influence of Independent Nodes]\label{lemma:independent_nodes}
-%   When a node a is independent of a node b, then it has no influence on the enabledness of node a if node b is scheduled before or after it.
-% \end{lemma}
-
-% \begin{proof}
-%   Follows directly from Lemma~\ref{lemma:exchange_independent_transitions}
-% \end{proof}
+\begin{figure}
+  \begin{tikzpicture}
+    [pre/.style={<-,shorten <=1pt,>=stealth,semithick}]
+    \node (A) at (0,0) {};
+    \node [shape=circle,draw=black] (B) at (2, 0) {\(s_{i-1}\)}
+      edge [pre] node[above] {} (A);
+    \node [shape=circle,draw=black] (C) at (2, -3) {\(s_i'\)}
+      edge [pre] node[left] {\(\tau_2\)} (B);
+    \node [shape=circle,draw=black] (D) at (5, 0) {\(s_i'\)}
+      edge [pre] node[above] {\(\tau_1\)} (B);
+    \node [shape=circle,draw=black] (E) at (5, -3) {\(s_j\)}
+      edge [pre] node[right] {\(\tau_2\)} (D)
+      edge [pre] node[above] {\(\tau_1\)} (C);
+  \end{tikzpicture}
+  \caption{Influence of the order of independent transitions on the global state of an evaluation engine}
+\label{fig:chap4:sec_run:exchange_transitions}
+\end{figure}
 
 \begin{lemma}[name = Duration of Enabledness]\label{lemma:enabled_till_scheduled}
   A node which is enabled stays enabled at least until it is scheduled.
-  Formally: If a node \(n\) is enabled at step \(i\) in a run \(r\) it will stay enabled at least until step \(j > i\) with \(r(j) = (\tau,s), \mathit{node}(\tau) = n\).
+  Formally: If a node \(n\) is enabled at step \(i\) in a run \(r\) it will stay enabled at least until the first step \(j > i\) with \(r(j) = (\tau,s), \mathit{node}(\tau) = n\).
   Note that it doesn't have to be disabled after step \(j\), because there could have been multiple events buffered on it's inputs.
 \end{lemma}
 
@@ -808,15 +838,39 @@ For the comparision of runs some more definitions are needed.
   This means that \(n\) is still enabled at step \(x\), and by induction at every later step until a transition with \(n\) as its node is taken.
 \end{proof}
 
+\begin{lemma}[name = Finiteness of Enabledness]\label{lemma:finiteness_enabledness}
+  Whenever a node is enabled in a run, it can only be scheduled a limited number of times until becoming disabled.
+\end{lemma}
+
+\begin{proof}
+  Let \(n\) be an enabled node at step \(i\) with the node state \(\widetilde{n}\).
+
+  First let's assume that no parent of \(n\) are scheduled after step \(i\) and before \(n\) becomes disabled.
+  Since the input queues of \(n\) are filled by previous transitions and only finite number of events are produced at every step, all of the queues can only have a finite number of events buffered at step \(i\).
+  Since no parents of \(n\) are scheduled, the queues can't get fuller.
+  Because all nodes represent functions, and all functions have to consume at least one input event (See~\ref{sec:definitions:tessla_functions}), everytime \(n\) is scheduled at least one input queue of \(n\) will have one event less buffered after it performed its computation.
+  Therefore the worst case is when \(n\) only consumes one event per computation.
+  The maximum number of time \(n\) can be scheduled is therefore bounded by the sum of the number of events on all input queues at step \(i\).
+
+  Now let's assume that also input nodes of \(n\) can be scheduled after step \(i\).
+  Everytime an input node is scheduled it will add a finite amount of events to one input queue of \(n\).
+  This leads to a cyclic behaviour: If an input queue can be scheduled ininitely often, infinite many events will be added to the input queue and \(n\) can possibly be scheduled infinitely often.
+  If input queues can not compute infinitely often, only a finite amount of events is added to the inputs of \(n\) and therefore \(n\) can only be scheduled a limited number of times.
+  Closer inspection of the nature of evaluation engines show, why this is no problem: Only if the external trace fed to an evaluation engine is infinte the source nodes can compute infintely often.
+  Hence for finite traces no node can compute infinitely often.
+  Again the worst case is when \(n\) only consumes one event per computation.
+  The number of times it can be scheduled is limited by the sum of the number of events buffered on the inputs at step \(i\) and the number of events that are produced by inputs of \(n\) after step \(i\).
+\end{proof}
+
 With the notion of runs and especially enabledness we can now define which schedules are seen as fair.
 
 \begin{definition}[name = Fair Schedules]\label{def:fair_schedule}
-  A schedule of an evaluation engine is called fair, if for all runs \(r\)  it produces it holds, that:
+  A schedule of an evaluation engine is called fair, if for all runs \(r\)  it produces the following holds:
   \begin{align*}
     &\forall i < \mathit{length}(r):\ &&\text{if }n\ \text{is enabled at step } i\\
     &                                 &&\text{then } \exists\, j \geq i\ \text{such that n is scheduled at step } j
 \end{align*}
-  This simply means that a node, which is enabled at one step, will be scheduled after a finite amount of steps.
+In other words, every enabled node is scheduled after a finite number of steps.
 \end{definition}
 
 Building on this we will investigate different fair schedules in the next chapter.
