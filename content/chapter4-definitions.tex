@@ -166,7 +166,7 @@ For the examples we will use \(\mathbb{R}\) for \(\mathbb{T}\).
   returns the biggest Timestamp in a timed sequence.
 \end{definition}
 
-\begin{exmp}[name=Functions on timed Sequences]
+\begin{exmp}[name=Functions on Timed Sequences]
 Let \(\sigma = a_1a_{0.5}a_{1.5}a_0\).\\
   Then is
     \begin{align*}
@@ -221,6 +221,10 @@ Based on the definitions we can define an equivalence relationship on bounded ti
   \end{align*}
   and the same for switched \(t_1, t_2\).
 \end{definition}
+
+What does observational equivalence between two transducers intuitively mean?
+It means that two transducers eventually produce the same output values for the same timed inputs, maybe in a different order, but with the same timestamps, which is very important.
+Since the values are associated with timestamps the outputs can be reordered by them and therefore be exactly equal.
 
 \begin{lemma}[name=Observational Equivalence is an Equivalence Relationship for Bounded Transducers]\label{lemma:observational_equivalence_equivalence_relationship}
   \(\equiv_o\) is symmetric, reflexive and transitive for bounded timed transducers.
@@ -695,7 +699,7 @@ The run \(\langle (\lambda, s_0), (\tau_1, s_1) \rangle\) means, that the engine
   Note that two runs have no closeness if they don't contain the same transitions.
 \end{definition}
 
-\begin{exmp}
+\begin{exmp}[name = Closeness of Runs]
   Let
   \[r_1 = \langle (\lambda, s_0), (\tau_1,s_1), (\tau_2,s_2), (\tau_3,s_3), (\tau_4,s_4), (\tau_5,s_5), (\tau_6,s_6) \rangle\]
   \[r_2 = \langle (\lambda, s_0), (\tau_1,s_1), (\tau_2,s_2), (\tau_5,s_3'), (\tau_4,s_4'), (\tau_6,s_5'), (\tau_3,s_6') \rangle\]
@@ -784,11 +788,11 @@ For the comparision of runs some more definitions are needed.
 
   Because \(b = \mathit{node}(\tau_2)\) is no descendant of \(a = \mathit{node}(\tau_1)\), the stream \(\sigma\) with \(\mathit{node}(\sigma) = \mathit{node}(\tau_1)\) can be no input of \(b\).
   Therefore the enabledness of \(b\) can't be changed by \(\tau_1\), taken directly from the definition of enabledness.
-  So \(b\) has to be enabled before \(\tau_1\) was taken by \(r_1\), else it couldn't be enabled afterwards and \(\tau_2\) couldn't be taken in the next step.
-  Therefore \(r_2\) also fulfills the requirements of a valid run.
+  So \(b\) has to be enabled before \(\tau_1\) was taken in \(r_1\) or else it couldn't be enabled afterwards and \(\tau_2\) couldn't be taken in the next step.
+  Therefore \(r_2\) also fulfills the requirements of a valid run up to and including the steps \((\tau_2,s_i')(\tau_1,s_j)\).
 
-  As a second step we have to show, that the state \(s_j\) will stay the same, no matter the order of the two transitions and only the state \(s_i\) will be changed to \(s_i'\).
-  If this holds, the subsequent states can't change either, since they are deterministically built by applying the subsequent transitions, which didn't change.
+  As a second step we have to show, that the state \(s_j\) will stay the same, no matter the order of the two transitions and only the state \(s_i\) may be changed to \(s_i'\) in \(r_2\).
+  If this holds, the subsequent states can't change either, since they are deterministically built by applying the same transitions.
   Now if all subsequent states stay the same, all subsequent transitions will stay enabled, since enabledness of a node only depends on the state.
   Figure~\ref{fig:chap4:sec_run:exchange_transitions} visualizes the exchange of the transitions and the argument why the state stays the same.
 
@@ -814,7 +818,7 @@ For the comparision of runs some more definitions are needed.
       edge [pre] node[above] {} (A);
     \node [shape=circle,draw=black] (C) at (2, -3) {\(s_i'\)}
       edge [pre] node[left] {\(\tau_2\)} (B);
-    \node [shape=circle,draw=black] (D) at (5, 0) {\(s_i'\)}
+    \node [shape=circle,draw=black] (D) at (5, 0) {\(s_i\)}
       edge [pre] node[above] {\(\tau_1\)} (B);
     \node [shape=circle,draw=black] (E) at (5, -3) {\(s_j\)}
       edge [pre] node[right] {\(\tau_2\)} (D)
@@ -839,7 +843,7 @@ For the comparision of runs some more definitions are needed.
 \end{proof}
 
 \begin{lemma}[name = Finiteness of Enabledness]\label{lemma:finiteness_enabledness}
-  Whenever a node is enabled in a run, it can only be scheduled a limited number of times until becoming disabled.
+  Whenever a node is enabled in a run, it can only be scheduled continously a limited number of times until becoming disabled.
 \end{lemma}
 
 \begin{proof}
@@ -854,9 +858,9 @@ For the comparision of runs some more definitions are needed.
 
   Now let's assume that also input nodes of \(n\) can be scheduled after step \(i\).
   Everytime an input node is scheduled it will add a finite amount of events to one input queue of \(n\).
-  This leads to a cyclic behaviour: If an input queue can be scheduled ininitely often, infinite many events will be added to the input queue and \(n\) can possibly be scheduled infinitely often.
-  If input queues can not compute infinitely often, only a finite amount of events is added to the inputs of \(n\) and therefore \(n\) can only be scheduled a limited number of times.
-  Closer inspection of the nature of evaluation engines show, why this is no problem: Only if the external trace fed to an evaluation engine is infinte the source nodes can compute infintely often.
+  This leads to a cyclic behaviour: If an input queue can be scheduled infinitely often, infinite many events will be added to the input queue and \(n\) can possibly be scheduled infinitely often.
+  If input queues can not compute infinitely often, only a finite amount of events are added to the inputs of \(n\) and therefore \(n\) can only be scheduled a limited number of times.
+  Closer inspection of the nature of evaluation engines show why this is no problem: Only if the external trace fed to an evaluation engine is infinte the source nodes can compute infintely often.
   Hence for finite traces no node can compute infinitely often.
   Again the worst case is when \(n\) only consumes one event per computation.
   The number of times it can be scheduled is limited by the sum of the number of events buffered on the inputs at step \(i\) and the number of events that are produced by inputs of \(n\) after step \(i\).

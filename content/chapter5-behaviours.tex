@@ -11,21 +11,40 @@ Therefore the \emph{behaviour} of a run is defined, which maps a run to relation
 
 \begin{definition}[name = Behaviour of a Run]\label{def:behaviour_run}
   Let \(r\) be a run of an evaluation engine.
-  The behaviour \(\beta_r\) of it is built stepwise:
+  The behaviour \(\beta_r\) of it is a timed transducer: A set of tuples of timed sequences.
+  It is calculated as follows:
   \begin{enumerate}
-    \item Let \(\beta_r = \emptyset\)
-    \item Take the prefix \(r_p\) of \(r\), where the first transition consumes an input upto but not including the next transition where an input is consumed.
-    \item Select all output events \(O_1\), which are possible none, that are produced at any step in \(r_1\).
-    \item Add the tuple \((e_1,O_1)\) to \(\beta_r\).
-    \item Remove \(r_p\) from \(r\).
+    \item Let \(\beta_r = \emptyset\) and \(r_p\) an empty prefix of \(r\).
+    \item Remove the prefix  from \(r\), where the first transition consumes an input upto but not including the next transition where an input is consumed, and append it to \(r_p\).
+    \item Select the sequence of all output events \(O_p\) (which is possible empty) that are produced at any step in \(r_p\).
+    \item Select the sequence of all input events \(E_p\) that are consumed at any step in \(r_p\).
+    \item Add the tuple \((E_p,O_p)\) to \(\beta_r\).
     \item Goto step 2 if \(r\) is not empty, else terminate.
   \end{enumerate}
 
   Stated simple the run is chopped into pieces, where each piece begins with the consumption of an input events and ends before the next input is consumed.
-  Then all outputs produced in one piece is in a relation with the consumed input.
+  The pieces are then merged from left to right: First take all inputs and outputs consumed and produced upto the current piece and add them to the behaviour, then merge the current piece with the next and repeat.
 \end{definition}
 
-The behaviour can be seen as a timed transducer since all events have timestamps and all consumed events are strictly ordered by their timestamp, since inputs to an evaluation engine are required to be ordered by their timestamp.
+\begin{exmp}[name = Construction of a Behaviour]\label{exmp:construction_of_behaviour}
+  In Table~\ref{table:chap5:sec_behaviour:construction_run} it is shown how a behaviour is built from a run.
+  The run ist denoted only by its transitions, events are labeled based on their type: \(e_i\) are external (read: input) events, \(i_i\) are internal events and \(o_i\) are output events.
+  Parts of the run in the same color are the transitions that end up in the same piece when applying the constuction algorithm.
+  The tuples show how the sequence of input and output events from the pieces are extracted.
+  The behaviour of the run is the set of the tuples.
+
+  \begin{table}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{llllll}
+      Run    & \multicolumn{5}{l}{\textcolor{red}{\(    (\{e_1\},\{i_1\})\ (\{i_1\},\{i_2\})\ (\{i_1,i_2\},\{o_1\})\ \)}\textcolor{Cyan}{\((\{e_2\},\{i_3\})\ (\{i_2,i_3\},\{o_2\})\)}\(\hookleftarrow\)} \\
+      & \multicolumn{5}{l}{\hspace{1em}\textcolor{Cyan}{\(    (\{i_3\},\{o_3\})\ \)}\textcolor{OliveGreen}{\((\{e_3\},\{i_4\})\ \)}\textcolor{BurntOrange}{\((\{e_4\},\{i_5\})\ (\{i_4,i_5\},\{o_4\})\)}} \\
+      Tuples & \textcolor{red}{\((e_1,o_1)\)} & \textcolor{Cyan}{\((e_1e_2,o_1o_2o_3)\)} & \textcolor{OliveGreen}{\((e_1e_2e_3,o_1o_2o_3)\)} & \textcolor{BurntOrange}{\((e_1e_2e_3e_4,o_1o_2o_3o_4)\)} \\
+    \end{tabular}
+    \caption{Example how the behaviour of a run is constructed}\label{table:chap5:sec_behaviour:construction_run}
+  \end{table}
+\end{exmp}
+
+The behaviour of a run is a timed transducer since all events have timestamps and all consumed events are strictly ordered by their timestamp, since inputs to an evaluation engine are required to be ordered by their timestamp.
 
 Since the behaviour encodes the relationship between inputs and outputs a run produces it provides the foundation to reason about equivalence between different runs and whole evaluation engines.
 
@@ -68,7 +87,7 @@ In the following evaluation engines are classified by their scheduling approache
 
 The first class of evaluation engines are called greedy.
 
-\begin{definition}\label{def:greedy_schedule}
+\begin{definition}[name = Greedy schedule]\label{def:greedy_schedule}
   A schedule of an evaluation engine built by the following steps is called \emph{greedy}.
   \begin{enumerate}
     \item Select all nodes that are no sources, let their count be \(i\)
@@ -165,8 +184,8 @@ It remains to show that greedy schedules are fair.
 \begin{proof}
   Let \(a\) be a node with the label \(n\), which is enabled at step \(i\) and is no source.
   Because evaluation engines can only contain a finite number of nodes there can only be a finite number of enabled nodes with a smaller label than \(n\).
-  Furthermore all nodes can only have a finite number of events buffered, since all nodes can only produce a finite number of events per computation and therefore only a finite number of events can be produced after a finite number of steps.
-  Therefore after a finite number of steps \(j\) all nodes with a smaller label than \(n\) will be disabled.
+  Because of Lemma~\ref{lemma:finiteness_enabledness}, all nodes with a smaller label than \(n\) will become disabled after a finite number of steps.
+  Let that number be \(j\).
   The only way new events could enter the system are through sources, but they have bigger labels than \(n\), as by the definition of the schedule, and therefore can't be scheduled before \(n\).
   Because of Lemma~\ref{lemma:enabled_till_scheduled}, \(a\) will still be enabled after these steps.
   So \(a\) is the enabled node with the lowest label at step \(i + j\) and therefore will be scheduled.
@@ -196,14 +215,14 @@ In contrast to a greedy evaluation engine a fair one has no fixed schedule, mean
 Therefore predecessors of enabled nodes can perform multiple computations before their children are scheduled and events are not \emph{pushed} through the \gls{dag} as fast as possible.
 
 The difference between greedy and fair schedules are similar to the ones of synchronous and asynchronous transducers: A greedy schedule will ensure that outputs are produced as fast as possible while a fair can \emph{delay} the outputs by consuming multiple inputs first and scheduling internal nodes multiple times before scheduling an output node.
-But note that there is an important difference between synchronous transducers and the behaviour of a greedy evaluation engine: A greedy evaluation engine can consume multiple events and produce multiple events at every step, as it may have multiple sources and multiple outputs.
+But note that there is an important difference between synchronous transducers and the behaviour of a greedy evaluation engine: A greedy evaluation engine can produce multiple events at every step.
 
 \section{Equivalence of Different Schedules Without Timing Functions}
 \label{sec:behaviours:equivalence_without_timing}
 
 The behaviour of a run of an evaluation engine with a given schedule allows us to reason about equivalence.
 
-As defined by definition~\ref{def:valid_eval_engine} any evaluation engine has to be equivalent to a greedy one to be valid.
+As by Definition~\ref{def:valid_eval_engine} any evaluation engine has to be equivalent to a greedy one to be valid.
 
 The equivalence is shown in two steps: first in Section~\ref{sec:behaviours:without_timing:greedy} it is shown, that all possible greedy engines for a specification are equivalent, so there is only one valid evaluation for a specification over a fixed input.
 Afterwards in Section~\ref{sec:behaviours:equivalence_without_timing:greedy_fair} it is shown that any fair evaluation engine is equivalent to a greedy one.
@@ -217,57 +236,132 @@ But both will produce all outputs that can be produced after consuming one speci
 Also both runs will obviously have the same length (both engines are the same \gls{dag}, so they have the same number of nodes), let that length be \(l\).
 
 To proof the equivalence of both engines we can prove the equivalence of their runs.
-To show the equivalence we will show that there is always another run, which is equivalent to the second one, that is closer to the first one.
-If such a closer run always exist, we will show that the run with closeness \(l, 0\) to the first run, which has to be the first run itself, is also an equivalent run to the second run.
+To show the equivalence it is shown that two runs \(r_1\) and \(r_2\) of two evaluation engines based on the same graph but with a different greedy schedule can always be reordered to become closer while preserving observational equivalence.
+If such a closer run always exist, we will show that the run with closeness \((l, 0)\) to \(r_1\), which has to be \(r_1\) itself, is also observational equivalent to \(r_2\).
 
 \begin{theorem}[name = Equivalence of Different Greedy Evaluation Engines]\label{theorem:equivalence_greedy_eval_engines}
   Two greedy evaluation engines for a specification with different schedules are equivalent.
 \end{theorem}
 
-\begin{proof}
+\begin{figure}
+  \centering
+  \includegraphics[height = 0.5\textheight]{content/figs/maximize_closeness}
+  \caption{Visualization of the runs from Proof~\ref{proof:equiv_greedy_engines}. Dotted edges represent multiple transitions. The visualization shows how the three runs \emph{branch} and \emph{merge} after certain steps. As you can see the run \(r_2''\) has a bigger closeness to \(r_1\) since it takes \(\tau_1\) before \(\tau_2'\). Note that \(r_1\) is only known upto step \(d\), especially the transitions \(\tau_2, \tau_2'\) will be taken eventually, but it isn't known when or in which order.}
+\label{fig:chap5:sec_greedy:maximize_closeness}
+\end{figure}
 
-  todo reason based on behaviour.
-  Let \(r_1, r_2\) be the runs of the two engines for a given \gls{tessla} specification.
+\begin{proof}\label{proof:equiv_greedy_engines}
+  Let \(r_1, r_2\) be the runs of two greedy evaluation engines for the same specification which received the same inputs.
   Because each \gls{tessla} specification contains only a finite amount of functions and works on finite traces, the runs also have to be finite.
 
   If the two runs aren't equal, they must have a closeness which is smaller than \((l, 0)\).
-  Let \([r_2]\) be the set of all runs that are equivalent to \(r_2\).
-  All of those runs will also have a closeness from \(r_1\) which is smaller than \((l, 0)\).
-  Select one run \(r_2' \in [r_2]\) which has a minimal closeness from \(r_1\).
+  Let \([r_2]\) be the set of all runs that are observational equivalent to \(r_2\).
+  If \(r_1\) is in this set, we would be done.
+  Let's assume that \(r_1\) is not in the set.
+  Therefore all runs in the set have to have a smaller closeness than \((l,0)\) to \(r_1\), since the only run with a closeness of \((l,0)\) to another run is the run itself.
+  Select one run \(r_2' \in [r_2]\) which has the biggest closeness to \(r_1\).
   Let \((d,k) = \delta(r_1, r_2')\).
 
   This means that at step \(d\) the run \(r_2'\) has taken a different transition than run \(r_1\).
   Let the transitions the runs have taken be \(\tau_1\) for \(r_1\) and \(\tau_2\) for \(r_2'\).
-  Run \(R_2'\) will take transition \(\tau_1\) at step \(d+k\) (as per the definition of the closeness).
+  Run \(r_2'\) will take transition \(\tau_1\) at step \(d+k\) (as per the definition of the closeness).
   Obviously the two transitions have to be independent of each other, else they couldn't have been taken in different order by the two runs.
 
   If \(k > 1\) there will be a transition \(\tau_2' \neq \tau_1\) which is taken by the run \(r_2'\) at step \(d+(k-1)\).
   While this transition \(\tau_2'\) must also be taken in the first run as per Lemma~\ref{lemma:enabled_till_scheduled}, it's not possible, that it was taken before \(\tau_1\), beause then the two runs wouldn't have been the same upto the point where \(\tau_1\) was taken.
   Therefore \(\tau_1\) has to be independent of \(\tau_2'\), and because \(\tau_2'\) was scheduled by the second run before \(\tau_1\) both transitions are independent of each other.
 
-  As of Lemma~\ref{lemma:exchange_independent_transitions} which one of them is taken first can't change the enabledness of the node of the second transition.
-  Therefore there is a run \(r_2''\), which is equal to \(r_2'\), except that the transitions \(\tau_1, \tau_2'\) are scheduled the other way around.
-  Therefore the runs \(r_2'\) and \(r_2''\) are equivalent and their closeness to \(r_1\) is \(d, k-1\), which contradicts the initial statement that \(r_1'\) was a run with a maximal closeness.
-  This means that there is an equivalent run to \(r_2\) which has at least the closeness \((d, 1)\).
+  As of Lemma~\ref{lemma:exchange_independent_transitions} which one of them is taken first won't change the rest of the run at all after both transitions were applied and the run stays valid.
+  Therefore there is a valid run \(r_2''\), which is equal to \(r_2'\), except that the transitions \(\tau_1, \tau_2'\) are scheduled the other way around.
+  See Figure~\ref{fig:chap5:sec_greedy:maximize_closeness} for a visualization of the runs.
+
+  When two adjacent transitions are exchaned besically two things can happen:
+
+  \begin{itemize}
+    \item Outputs can be produced later, maybe moving them to the next piece in the contsruction of a behaviour (this happen when a transition producing outputs is exchanged with the next transition which consumes an external event)
+    \item Outputs can be produced earlier, which can move them to an earlier piece in the construction of the behaviour (this happens in the opposite case, where a transition consuming an external event is pushed before one that produces outputs)
+  \end{itemize}
+
+  While the order of outputs in the tuples of the behaviour will change when two transitions producing outputs are exchanged, observational equivalence isn't influenced, since it is defined over reordered outputs.
+
+  Let's test if \(r_2''\) is observational equivalent to \(r_2'\):
+  We will compare how the behaviour of the run \(r_2'\) changes when the transition \(\tau_1\) is exchanged with \(\tau_2'\).
+  The comparision is based on the different cases the transitions can encode.
+  Some of the cases are not feasible, they are listed for the sake of completeness and to explain why they can't happen.
+  The cases are:
+
+  \begin{enumerate}
+    \item No inputs are consumed and no outputs produced by either transition. This obviously won't change the behaviour at all.
+    \item \(\tau_2'\) consumes an input and doesn't produce an output and
+      \begin{enumerate}
+        \item \(\tau_1\) doesn't consume an input and doesn't produce an output. This won't change the behaviour, since \(\tau_1\) didn't added anything to it in the first place.
+        \item\label{sec:behaviours:without_timing:greedy:non_greedy_1} \(\tau_1\) doesn't consume an input, but produces one or more outputs. This changes the behaviour, since \(\tau_1\) is now part of the piece starting before \(\tau_2'\). Therefore the produced outputs are now part of one more tuple of the behaviour. But note that it still is part of all tuples built from the later pieces of the run. Therefore the two behaviours are still observational equivalent: All tuples in the behaviour are still the same, except that one or more output events are produced one step earlier, which doesn't hurt observational equivalence.
+        \item\label{sec:behaviours:without_timing:greedy:impossible_case} \(\tau_1\) consumes an input but doesn't produce an output. This case can't happen, since inputs to evaluation engines are totally ordered by their timestamp and therefore \(\tau_2'\) couldn't have been scheduled after \(\tau_1\) in \(r_1\) and before \(\tau_1\) in \(r_2\).
+        \item \(\tau_1\) consumes an input and produces outputs. This case can't happen for the same reason.
+      \end{enumerate}
+    \item \(\tau_2'\) produces one or more outputs and doesn't consume an input and
+      \begin{enumerate}
+        \item \(\tau_1\) doesn't consume an input and doesn't produce an output. This won't change the behaviour, since \(\tau_1\) didn't added anything to it in the first place.
+        \item \(\tau_1\) doesn't consume an input, but produces one or more outputs. This only changes the order of the output events in the behaviour, but since they are reordered by their timestamp and the order of events with the same timestamp isn't important for observational equivalence, the new run is still observational equivalent.
+        \item \(\tau_1\) consumes an input but doesn't produce an output. This will \emph{delay} the production of the outputs from \(\tau_2'\) by one piece of the chopped run. While this changes the behaviour it preserves observational equivalence.
+        \item \(\tau_1\) consumes an input and produces outputs. This is kind of a combination of the previous two cases. The outputs from \(\tau_2'\) are \emph{delayed} by one piece and the outputs of \(\tau_1\) are now produced before them. But still all outputs are produced, only in different order and maybe one step later. Therefore observational equivalence holds. Also note that such a transition isn't very useful as argued in the next case.
+      \end{enumerate}
+    \item \(\tau_2'\) produces one or more outputs and consumes an input. First of all note that this is a rather made up combination that can only happen when a source is an output node at the same time and therefore doesn't have much of a purpose. But for the sake of completeness let's look at the cases following from this:
+      \begin{enumerate}
+        \item \(\tau_1\) doesn't consume an input and doesn't produce an output. Again won't change the behaviour, as in earlier cases.
+        \item\label{sec:behaviours:without_timing:greedy:non_greedy_2} \(\tau_1\) doesn't consume an input, but produces one or more outputs. Preserves observational equivalence since the outputs of \(\tau_1\) are only produced one step earlier than before.
+        \item \(\tau_1\) consumes an input. This case can't happen as reasoned by Case~\ref{sec:behaviours:without_timing:greedy:impossible_case}.
+      \end{enumerate}
+  \end{enumerate}
+
+  So for all cases that can happen, the run which is obtained by exchanging the two adjacent transitions is observational equivalent to the run without the change.
+  The exchange of the two transitions brings the closeness of the new run by construction one step closer to \(r_1\).
+  This means, since observational equivalence is transitive, that there is an observational equivalent run to \(r_2\), the run \(r_2''\),  which has at least the closeness \((d, 1)\).
 
   If \(k = 1\) the transition \(\tau_2'\) from the previous case is equal to \(\tau_2\).
-  Based on the same reasoning there also exist a run \(r_2''\) which is equal to \(r_2'\), except that the order of \(\tau_2\) and \(\tau_1\) is changed, and which is also equivalent to \(r_2'\) and to \(r_2\).
-  This run has the closeness \((d, 0)\) to \(r_1\).
+  The reasoning for all cases stays exactly the same, in the end we will obtain a run \(r_2''\) which is observational equivalent to \(r_2'\) but has the closeness \((d, 0)\) to \(r_1\).
   This obviously doesn't make sense: The first element of the closeness is the last step where both runs are equal, the second element describes how many steps afterwards the differing transition was taken.
   But if it was taken right in the step after the last equal step, there is no difference at that position, so the closeness of \(r_1\) and \(r_2''\) can be at least \((d+1, x), x \in \mathbb{N}_{>0}\).
-  This also contradicts our initial statement that \(r_2'\) was the run with the biggest closeness to \(r_1\) which is equivalent to \(r_2\).
+  This also contradicts our initial statement that \(r_2'\) was the run with the biggest closeness to \(r_1\) which is observational equivalent to \(r_2\).
 
-  Combined we can now say, that there is no upper bound on the closeness of equivalent runs of \(r_2\) to \(r_1\), therefore the run with the closeness \((l, 0)\) also has to be equivalent to \(r_2\).
-
+  Combined we can now say, that there is no upper bound on the closeness of observational equivalent runs of \(r_2\) to \(r_1\), therefore the run with the closeness \((l, 0)\) also has to be equivalent to \(r_2\).
+  And as already stated, only the run \(r_1\) can have the closeness of \((l, 0)\) to \(r_1\).
+  Therefore \(r_1\) has to be observational equivalent to \(r_2\).
 \end{proof}
+
+This characteristic of greedy schedules gives us a baseline to compare other schedules to.
+Since all greedy schedules of an evaluation engine produce observational equivalent behaviours we can choose any run produced by such a schedule and compare any other run to it.
+In the next section we will do this for all fair schedules.
 
 \subsection{Equivalence of Greedy and Fair Evaluation Engines}
 \label{sec:behaviours:equivalence_without_timing:greedy_fair}
 
-When the nodes of \(a\) aren't scheduled in reversed topological order, the system can consume inputs before producing all outputs based on the last consumed input.
-Therefore the reordering of runs has to be performed over wider parts of the run.
-% Idea: each step is a commutation of two internal events in regard to the rev top order.
-% => show commutativity of traces (note: only valid commutations, no two events, where one depends one the other, can be commuted, this is ensured by the scheduling of nodes that have input buffered)
+Let's recap what fairness of a schedule means: Whenever a node becomes enabled in a run it has to be scheduled eventually.
+What makes fair schedules harder to reason about than greedy ones is that for one they don't have to be deterministic and furthermore that it's possible that an enabled node is not scheduled for a very long time.
+
+Before reasoning about equivalence of greedy and fair schedules let's look at a kind of fair schedule that can be seen as worst case.
+Basically it is the reverse of a greedy schedule: Always schedule the enabled node that is closest to a source.
+Note that this schedule is not fair for infinite input traces.
+Stated simple this schedule will consume all input events and produce all output events per \emph{level} of the \gls{dag}, starting at the sources and moving towards the outputs.
+The behaviours of runs with such a schedule are pretty special: Since no output is produced before all external events are consumed (except if a source is also an output) only one tuple of the behaviour will contain any outputs, to be specific the one which contains the sequence of all inputs as the first element.
+An abbreviated example of such a run is \((e_1,())\ (e_1e_2,())\ (e_1e_2e_3,())\ (e_1e_2e_3e_4,o_1o_2o_3o_4o_5)\).
+Such a run needs obviously more reordering than a greedy one to become observational equivalent to another greedy one since greedy schedules try to produce outputs as early as possible.
+
+This example shows what the difference is when reordering a fair run in contrast to a greedy run: basically more transitions have to be reordered since outputs can be produced later.
+
+Let's revisit the cases from Proof~\ref{proof:equiv_greedy_engines}:
+Actually the cases~\ref{sec:behaviours:without_timing:greedy:non_greedy_1} and~\ref{sec:behaviours:without_timing:greedy:non_greedy_2} can't happen for greedy runs.
+If in a run \(r_1\) a transition \(\tau_1\), which produces an output, has to be exchanged with an earlier transition \(\tau_2\), that consumed an external event, to become closer to a greedy run \(r_2\), \(r_1\) couldn't have been greedy in the first place:
+Greedy schedules ensure by construction that all outputs that can be produced based on consumed external events are produced before the next external event is consumed.
+If \(\tau_1\) happened before \(\tau_2\) in a greedy run, the outputs from \(\tau_1\) can be produced without consuming the external event from \(\tau_2\) before, hence a run in which \(\tau_2\) happens before \(\tau_1\) couldn't be produced by a greedy schedule.
+
+It's noteworthy that actually the whole proof of Theorem~\ref{theorem:equivalence_greedy_eval_engines} doesn't depend on the fact, that the runs are produced by greedy schedules.
+The only real requirement is fairness, meaning that all transitions that can happen will eventually happen.
+Therefore the proof does hold without change for Theorem~\ref{theorem:equivalence_greedy_fair_engines}.
+
+\begin{theorem}[name = Equivalence of Fair and Greedy Evaluation Engines]\label{theorem:equivalence_greedy_fair_engines}
+  Any fair evaluation engine is equivalent to a greedy evaluation engine for the same specification.
+\end{theorem}
 
 \section{Behaviour with Timing functions}
 \label{sec:behaviours:with_timing}
