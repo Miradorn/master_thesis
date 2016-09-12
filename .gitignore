@@ -13,3 +13,9 @@
 *.fdb_latexmk
 README.html
 CHANGELOG.html
+*.fls
+*.glo
+*.glg
+*.gls
+*.ist
+*.loe
