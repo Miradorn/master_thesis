@@ -9,7 +9,7 @@ sub run_makeglossaries {
     system "makeglossaries '$_[0]'";
   };
 }
-$pdflatex = "xelatex %O %S";
+$pdflatex = "xelatex --synctex=1 %O %S";
 $pdf_mode = 1; $postscript_mode = $dvi_mode = 0;
 push @generated_exts, 'glo', 'gls', 'glg';
 push @generated_exts, 'acn', 'acr', 'alg';

@@ -42,15 +42,15 @@
 % --------------------------
 %\pagenumbering{roman}     % roman page numbing (invisible for empty page style)
 %\pagestyle{empty}       % no header or footers
-%\input{content/titlepages}    % INCLUDE: all titlepages
-%\cleardoublepage
+\input{content/titlepages}    % INCLUDE: all titlepages
+% \cleardoublepage
 
 \pagestyle{plain}       % display just page numbers
-%\input{content/abstract}    % INCLUDE: the abstracts (english and german)
-%\cleardoublepage
+\input{content/abstract}    % INCLUDE: the abstracts (english and german)
+\cleardoublepage
 %%
-%\input{content/acknowledgement} % INCLUDE: acknowledgement
-%\cleardoublepage
+\input{content/acknowledgement} % INCLUDE: acknowledgement
+\cleardoublepage
 %%
 \setcounter{tocdepth}{2}    % define depth of toc
 \tableofcontents        % display table of contents
@@ -68,6 +68,7 @@
 \input{content/chapter3-system} % INCLUDE: system
 \input{content/chapter4-definitions} % INCLUDE: definitions
 \input{content/chapter5-behaviours} % INCLUDE: behaviours
+\input{content/chapter8-evaluation} % INCLUDE: evaluation
 \input{content/chapter6-conclusion} % INCLUDE: conclusion
 \input{content/chapter7-appendix} % INCLUDE: appendix
 

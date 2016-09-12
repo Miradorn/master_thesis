@@ -10,7 +10,7 @@
 
 % Information and Commands for Reuse
 % **************************************************
-\newcommand{\thesisTitle}{An asynchronous evaluation engine for stream based specifications}
+\newcommand{\thesisTitle}{An Asynchronous Evaluation Engine for Stream Based Specifications}
 \newcommand{\thesisName}{Alexander Schramm}
 \newcommand{\thesisSubject}{Master Thesis}
 \newcommand{\thesisDate}{November 20, 2016}
@@ -20,9 +20,9 @@
 \newcommand{\thesisFirstReviewerUniversity}{\protect{University of Luebeck}}
 \newcommand{\thesisFirstReviewerDepartment}{Institute For Software Engineering and Programming Languages}
 
-\newcommand{\thesisSecondReviewer}{Who Knöws}
-\newcommand{\thesisSecondReviewerUniversity}{\protect{University of Luebeck}}
-\newcommand{\thesisSecondReviewerDepartment}{We will see}
+% \newcommand{\thesisSecondReviewer}{Who Knöws}
+% \newcommand{\thesisSecondReviewerUniversity}{\protect{University of Luebeck}}
+% \newcommand{\thesisSecondReviewerDepartment}{We will see}
 
 \newcommand{\thesisFirstSupervisor}{Cesar Sanchez}
 % \newcommand{\thesisSecondSupervisor}{John Smith}
@@ -40,35 +40,36 @@
 % **************************************************
 \usepackage[english]{babel} % babel system, adjust the language of the content
 \PassOptionsToPackage{% setup clean thesis style
-    figuresep=colon,%
-    sansserif=false,%
-    hangfigurecaption=false,%
-    hangsection=true,%
-    hangsubsection=true,%
-    colorize=full,%
-    colortheme=bluemagenta,%
-    bibsys=biber,%
-    bibfile=bib-refs,%
-    bibstyle=numeric,%
-    wrapfooter=false,%
+  figuresep=colon,%
+  sansserif=false,%
+  hangfigurecaption=false,%
+  hangsection=true,%
+  hangsubsection=true,%
+  colorize=full,%
+  colortheme=bluemagenta,%
+  bibsys=biber,%
+  bibfile=bib-refs,%
+  bibstyle=numeric,%
+  wrapfooter=false,%
 }{cleanthesis}
 \usepackage{cleanthesis}
 
 \hypersetup{% setup the hyperref-package options
-    pdftitle={\thesisTitle},    %   - title (PDF meta)
-    pdfsubject={\thesisSubject},%   - subject (PDF meta)
-    pdfauthor={\thesisName},    %   - author (PDF meta)
-    plainpages=false,           %   -
-    colorlinks=false,           %   - colorize links?
-    pdfborder={0 0 0},          %   -
-    breaklinks=true,            %   - allow line break inside links
-    bookmarksnumbered=true,     %
-    bookmarksopen=true          %
+  pdftitle={\thesisTitle},    %   - title (PDF meta)
+  pdfsubject={\thesisSubject},%   - subject (PDF meta)
+  pdfauthor={\thesisName},    %   - author (PDF meta)
+  plainpages=false,           %   -
+  colorlinks=false,           %   - colorize links?
+  pdfborder={0 0 0},          %   -
+  breaklinks=true,            %   - allow line break inside links
+  bookmarksnumbered=true,     %
+  bookmarksopen=true          %
 }
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{thmtools}
+\usepackage{lscape}
 \usepackage[toc]{glossaries}
 \loadglsentries{glossary}
 \makeglossaries
@@ -93,22 +94,38 @@
 }
 \newcommand{\n}[1]{N[event, label={[event label]above:#1}]}
 
+\usepackage{listings}
+\lstset{
+  numbers=left,
+  stepnumber=3,
+  numbersep=5pt,
+  numberstyle=\small\color{black},
+  basicstyle=\ttfamily,
+  keywordstyle=\color{ctcolormain},
+  commentstyle=\color{black},
+  stringstyle=\color{ctcoloraccessory},
+  tabsize=2,
+  captionpos=b,
+  frame=top,frame=bottom,
+  aboveskip=20pt,
+}
+
 \usepackage{todonotes}
 \usepackage{color}
 \cthesissetcolor{RGB}{0,75,90}{160,187,47}
 \addbibresource{bib-refs}
 
 \declaretheoremstyle[
-notefont=\bfseries, notebraces={}{},
-bodyfont=\normalfont\itshape,
-headformat=\NAME~\NUMBER:\NOTE,
-postheadspace = \newline
+  notefont=\bfseries, notebraces={}{},
+  bodyfont=\normalfont\itshape,
+  headformat=\NAME~\NUMBER:\NOTE,
+  postheadspace = \newline
 ]{default}
 \declaretheoremstyle[
-notefont=\bfseries, notebraces={}{},
-bodyfont=\normalfont\itshape,
-headformat=\NAME~\NUMBER:,
-postheadspace = \newline
+  notefont=\bfseries, notebraces={}{},
+  bodyfont=\normalfont\itshape,
+  headformat=\NAME~\NUMBER:,
+  postheadspace = \newline
 ]{example}
 
 \declaretheorem[style=default]{lemma}
