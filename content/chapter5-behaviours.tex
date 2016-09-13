@@ -2,10 +2,10 @@
 \chapter{Behaviours of Evaluation Engines}
 \label{sec:behaviours}
 
-Based on the definitions in Chapter~\ref{sec:definitions} we will now look at different schedules of evaluation engines and compare them.
+Based on the definitions in \cref{sec:definitions} we will now look at different schedules of evaluation engines and compare them.
 This is done in multiple steps: starting with a small subset of allowed schedules and functions and iteratively adding more complex cases.
 
-For the comparision we will use timed transducers from Section~\ref{sec:definitions:timed_transducer}.
+For the comparision we will use timed transducers from \cref{sec:definitions:timed_transducer}.
 To do this the notion of a run of an evaluation engine is not sufficient: transducers describe a relationship between inputs and outputs, runs describe stepwise generation of internal and output events.
 Therefore the \emph{behaviour} of a run is defined, which maps a run to relationship between inputs and outputs.
 
@@ -27,7 +27,7 @@ Therefore the \emph{behaviour} of a run is defined, which maps a run to relation
 \end{definition}
 
 \begin{exmp}[name = Construction of a Behaviour]\label{exmp:construction_of_behaviour}
-  In Table~\ref{table:chap5:sec_behaviour:construction_run} it is shown how a behaviour is built from a run.
+  In \cref{table:chap5:sec_behaviour:construction_run} it is shown how a behaviour is built from a run.
   The run ist denoted only by its transitions, events are labeled based on their type: \(e_i\) are external (read: input) events, \(i_i\) are internal events and \(o_i\) are output events.
   Parts of the run in the same color are the transitions that end up in the same piece when applying the constuction algorithm.
   The tuples show how the sequence of input and output events from the pieces are extracted.
@@ -65,7 +65,7 @@ For a first step we specify and compare behaviours of different approaches to ev
 Without timing functions all nodes work only on values or the presence of events and will emit exactly one event at every computation, either a normal or a progress event.
 This leads to behaviours that can be easily reason about, as seen in the next sections.
 
-All systems to evaluate \gls{tessla} specifications we will look at are based on the described structure in Section~\ref{sec:definitions:eval_engine}.
+All systems to evaluate \gls{tessla} specifications we will look at are based on the described structure in \cref{sec:definitions:eval_engine}.
 While there are other approaches to evaluation, a \gls{dag} based approach seems to fit most naturaly and focusing on one structure makes comparing systems easier.
 
 Let's recap and summarize how an evaluation engine performs its computation.
@@ -100,10 +100,10 @@ The first class of evaluation engines are called greedy.
 \end{definition}
 
 Obviously for many \glspl{dag} there is no unique reverse topological order, therefore one can be chosen by the evaluation engine.
-We will show in Section~\ref{sec:behaviours:equivalence_without_timing:greedy} that all topological orders will produce observational equivalent behaviours.
+We will show in \cref{sec:behaviours:equivalence_without_timing:greedy} that all topological orders will produce observational equivalent behaviours.
 
 The greedy schedule ensures that no node is scheduled which has a successor that can be scheduled, therefore events are \emph{pushed} through the \gls{dag} towards an output node as fast as possible.
-As shown in Section~\ref{sec:behaviours:without_timing:greedy:is_fair} any schedule built like this is fair.
+As shown in \cref{sec:behaviours:without_timing:greedy:is_fair} any schedule built like this is fair.
 
 Greedy evaluation engines offer a good start to reason about behaviours and will be used as a comparision for all other evaluation engines.
 
@@ -149,7 +149,7 @@ Greedy evaluation engines offer a good start to reason about behaviours and will
   \label{fig:chap5:sec_greedy:visual_dag}
 \end{figure}
 
-Figure~\ref{fig:chap5:sec_greedy:visual_dag} visualizes a greedy evaluation engine.
+\Cref{fig:chap5:sec_greedy:visual_dag} visualizes a greedy evaluation engine.
 It shows two \glspl{dag} representations of an evaluation engine  where the nodes \(a\) to \(e\) are labeled in a reversed topological order and \(o\) and \(u\) represents two output streams.
 The left system is in its initial state and an input event \(e_1\) is present and can be consumed by the input node \(a\).
 When a node is chosen to compute by the scheduler, only node \(a\) is enabled, therefore it is scheduled.
@@ -184,10 +184,10 @@ It remains to show that greedy schedules are fair.
 \begin{proof}
   Let \(a\) be a node with the label \(n\), which is enabled at step \(i\) and is no source.
   Because evaluation engines can only contain a finite number of nodes there can only be a finite number of enabled nodes with a smaller label than \(n\).
-  Because of Lemma~\ref{lemma:finiteness_enabledness}, all nodes with a smaller label than \(n\) will become disabled after a finite number of steps.
+  Because of \cref{lemma:finiteness_enabledness}, all nodes with a smaller label than \(n\) will become disabled after a finite number of steps.
   Let that number be \(j\).
   The only way new events could enter the system are through sources, but they have bigger labels than \(n\), as by the definition of the schedule, and therefore can't be scheduled before \(n\).
-  Because of Lemma~\ref{lemma:enabled_till_scheduled}, \(a\) will still be enabled after these steps.
+  Because of \cref{lemma:enabled_till_scheduled}, \(a\) will still be enabled after these steps.
   So \(a\) is the enabled node with the lowest label at step \(i + j\) and therefore will be scheduled.
 
   Now let \(a\) be a source.
@@ -222,17 +222,17 @@ But note that there is an important difference between synchronous transducers a
 
 The behaviour of a run of an evaluation engine with a given schedule allows us to reason about equivalence.
 
-As by Definition~\ref{def:valid_eval_engine} any evaluation engine has to be equivalent to a greedy one to be valid.
+As by \cref{def:valid_eval_engine} any evaluation engine has to be equivalent to a greedy one to be valid.
 
-The equivalence is shown in two steps: first in Section~\ref{sec:behaviours:without_timing:greedy} it is shown, that all possible greedy engines for a specification are equivalent, so there is only one valid evaluation for a specification over a fixed input.
-Afterwards in Section~\ref{sec:behaviours:equivalence_without_timing:greedy_fair} it is shown that any fair evaluation engine is equivalent to a greedy one.
+The equivalence is shown in two steps: first in \cref{sec:behaviours:without_timing:greedy} it is shown, that all possible greedy engines for a specification are equivalent, so there is only one valid evaluation for a specification over a fixed input.
+Afterwards in \cref{sec:behaviours:equivalence_without_timing:greedy_fair} it is shown that any fair evaluation engine is equivalent to a greedy one.
 
 
 \subsection{Equivalence of Greedy Systems}
 \label{sec:behaviours:equivalence_without_timing:greedy}
 
 When given a series of input events, two greedy evaluation engines for a specification with different schedules will have different runs.
-But both will produce all outputs that can be produced after consuming one specific input before the next input is consumed as reasoned in Section~\ref{sec:behaviours:without_timing:greedy}.
+But both will produce all outputs that can be produced after consuming one specific input before the next input is consumed as reasoned in \cref{sec:behaviours:without_timing:greedy}.
 Also both runs will obviously have the same length (both engines are the same \gls{dag}, so they have the same number of nodes), let that length be \(l\).
 
 To proof the equivalence of both engines we can prove the equivalence of their runs.
@@ -262,12 +262,12 @@ If such a closer run always exist, we will show that the run with closeness \((l
   Obviously the two transitions have to be independent of each other, else they couldn't have been taken in different order by the two runs.
 
   If \(k > 1\) there will be a transition \(\tau_2' \neq \tau_1\) which is taken by the run \(r_2'\) at step \(d+(k-1)\).
-  While this transition \(\tau_2'\) must also be taken in the first run as per Lemma~\ref{lemma:enabled_till_scheduled}, it's not possible, that it was taken before \(\tau_1\), beause then the two runs wouldn't have been the same upto the point where \(\tau_1\) was taken.
+  While this transition \(\tau_2'\) must also be taken in the first run as per \cref{lemma:enabled_till_scheduled}, it's not possible, that it was taken before \(\tau_1\), beause then the two runs wouldn't have been the same upto the point where \(\tau_1\) was taken.
   Therefore \(\tau_1\) has to be independent of \(\tau_2'\), and because \(\tau_2'\) was scheduled by the second run before \(\tau_1\) both transitions are independent of each other.
 
-  As of Lemma~\ref{lemma:exchange_independent_transitions} which one of them is taken first won't change the rest of the run at all after both transitions were applied and the run stays valid.
+  As of \cref{lemma:exchange_independent_transitions} which one of them is taken first won't change the rest of the run at all after both transitions were applied and the run stays valid.
   Therefore there is a valid run \(r_2''\), which is equal to \(r_2'\), except that the transitions \(\tau_1, \tau_2'\) are scheduled the other way around.
-  See Figure~\ref{fig:chap5:sec_greedy:maximize_closeness} for a visualization of the runs.
+  See \cref{fig:chap5:sec_greedy:maximize_closeness} for a visualization of the runs.
   Dotted edges represent multiple transitions. The visualization shows how the three runs \emph{branch} and \emph{merge} after certain steps.
   The run \(r_1\) is marked in red, \(r_2''\) in green and \(r_2'\) in blue.
   As you can see the run \(r_2''\) has a bigger closeness to \(r_1\) since it takes \(\tau_1\) before \(\tau_2'\).
@@ -307,7 +307,7 @@ If such a closer run always exist, we will show that the run with closeness \((l
         (H.265) edge [path2, dashed] node {} (X.95)
         (H.275) edge [path3, dashed] node {} (X.85);
       \end{tikzpicture}
-      \caption{Visualization of three runs of an evaluation engine as explained in Proof~\ref{proof:equiv_greedy_engines}. }
+      \caption{Visualization of three runs of an evaluation engine as explained in \cref{proof:equiv_greedy_engines}. }
       \label{fig:chap5:sec_greedy:maximize_closeness}
     \end{figure}
 
@@ -346,7 +346,7 @@ If such a closer run always exist, we will show that the run with closeness \((l
         \begin{enumerate}
           \item \(\tau_1\) doesn't consume an input and doesn't produce an output. Again won't change the behaviour, as in earlier cases.
           \item\label{sec:behaviours:without_timing:greedy:non_greedy_2} \(\tau_1\) doesn't consume an input, but produces one or more outputs. Preserves observational equivalence since the outputs of \(\tau_1\) are only produced one step earlier than before.
-          \item \(\tau_1\) consumes an input. This case can't happen as reasoned by Case~\ref{sec:behaviours:without_timing:greedy:impossible_case}.
+          \item \(\tau_1\) consumes an input. This case can't happen as reasoned in \cref{sec:behaviours:without_timing:greedy:impossible_case}.
         \end{enumerate}
     \end{enumerate}
 
@@ -386,22 +386,21 @@ If such a closer run always exist, we will show that the run with closeness \((l
 
   This example shows what the difference is when reordering a fair run in contrast to a greedy run: basically more transitions have to be reordered since outputs can be produced later.
 
-  Let's revisit the cases from Proof~\ref{proof:equiv_greedy_engines}:
-  Actually the cases~\ref{sec:behaviours:without_timing:greedy:non_greedy_1} and~\ref{sec:behaviours:without_timing:greedy:non_greedy_2} can't happen for greedy runs.
+  Let's revisit the cases from \cref{proof:equiv_greedy_engines}:
+  Actually the \cref{sec:behaviours:without_timing:greedy:non_greedy_1,sec:behaviours:without_timing:greedy:non_greedy_2} can't happen for greedy runs.
   If in a run \(r_1\) a transition \(\tau_1\), which produces an output, has to be exchanged with an earlier transition \(\tau_2\), that consumed an external event, to become closer to a greedy run \(r_2\), \(r_1\) couldn't have been greedy in the first place:
   Greedy schedules ensure by construction that all outputs that can be produced based on consumed external events are produced before the next external event is consumed.
   If \(\tau_1\) happened before \(\tau_2\) in a greedy run, the outputs from \(\tau_1\) can be produced without consuming the external event from \(\tau_2\) before, hence a run in which \(\tau_2\) happens before \(\tau_1\) couldn't be produced by a greedy schedule.
 
-  It's noteworthy that actually the whole proof of Theorem~\ref{theorem:equivalence_greedy_eval_engines} doesn't depend on the fact, that the runs are produced by greedy schedules.
+  It's noteworthy that actually the whole proof of \cref{theorem:equivalence_greedy_eval_engines} doesn't depend on the fact, that the runs are produced by greedy schedules.
   The only real requirement is fairness, meaning that all transitions that can happen will eventually happen.
-  Therefore the proof does hold without change for Theorem~\ref{theorem:equivalence_greedy_fair_engines}.
+  Therefore the proof does hold without change for \cref{theorem:equivalence_greedy_fair_engines}.
 
   \begin{theorem}[name = Equivalence of Fair and Greedy Evaluation Engines]\label{theorem:equivalence_greedy_fair_engines}
     Any fair evaluation engine is equivalent to a greedy evaluation engine for the same specification.
   \end{theorem}
 
-  \section{Behaviour with Timing functions}
-  \label{sec:behaviours:with_timing}
-  \section{Equalitys with Timing functions}
-  \label{sec:behaviours:with_timing}
+  \section{Timing functions}
+  \label{sec:behaviours:timing_functions}
+
   \section{Parallel computation}
