@@ -19,7 +19,7 @@ The following benchmarks will show the performance characteristics of both appro
 \subsection{Number of Processors}
 \label{sec:evaluation:runtime_benchmarks:num_cores}
 
-Since one of the main motivations to choose Erlang and BEAM as the plattform for the runtime was its support for parallel execution on many processor cores, we explore the performance characteristic in regard to available cores in this section.
+Since one of the main motivations to choose Erlang as the plattform for the runtime was its support for parallel execution on many processor cores, we explore the performance characteristic in regard to available cores in this section.
 To do so a simple \gls{tessla} specification is given, that includes as many nodes as the maximal number of processors available.
 Such a spec for eigth processors is given in \cref{listing:runtime_parallel_spec_8}.
 
@@ -39,18 +39,18 @@ The complete data can be found in \cref{table:tessla_server_v1_num_cores_data,ta
 \label{fig:chap_eval:runtime_num_cores}
 \end{figure}
 
-One thing that was recognized during benchmarking was that the older implementation approach used big amounts of RAM and the usage grows exponentially with the amount of cores used .
+One thing that was recognized during benchmarking was that the older implementation approach used big amounts of \gls{ram} and the usage grows exponentially with the amount of cores used .
 For example, with two used cores the runtime would use around 2GB RAM, with 4 Cores already over 8GB.
 This can be explained easily: in the old implementation all data has to be sent between all cores while in the new implementation only the generated events have to be sent around.
-The excessive usage of RAM even lead to timeout under some circumstances and crashes the whole runtime.
+The excessive usage of \gls{ram} even lead to timeout under some circumstances and crashes the whole runtime.
 The amount of data send between processes can even lead to negative performance impacts when more cores are added.
 
 This behaviour was one of the main reasons to switch to a new approach.
-To test if reduced RAM usage would lead to better performance and eliminate crashes, the old architecture was changed in a small way: Each stream was limited to only hold the last 20 events, all older events were thrown away.
+To test if reduced \gls{ram} usage would lead to better performance and eliminate crashes, the old architecture was changed in a small way: Each stream was limited to only hold the last 20 events, all older events were thrown away.
 Since the specification used for benchmarking only works on the most recent event of each stream, this would not alter the conclusion of the engine.
 For example a specification computing the average of the last 21 events wouldn't work with this adaption.
-See \cref{sec:evaluation:runtime_benchmarks:num_events} for a benchmark of RAM usage.
-The obvious reduction of RAM usage of the adapted first approach motivated the decision to refactor the runtime to use the new approach.
+See \cref{sec:evaluation:runtime_benchmarks:num_events} for a benchmark of \gls{ram} usage.
+The obvious reduction of \gls{ram} usage of the adapted first approach motivated the decision to refactor the runtime to use the new approach.
 
 TODO: describe how V2 scales with core number.
 
@@ -67,18 +67,18 @@ The first benchmark compares the execution time of the implementation approaches
 
 \begin{figure}[!htb]
   \includegraphics[width=\textwidth]{gfx/runtime_num_events_benchmark}
-  \caption[Average execution time of the different implementations when fed with different amounts of input events.]{Average execution time of the different implementations when fed with different amounts of input events. V1 refers to the old approach, V1.5 to the adapted old approach and V2 to the new approach. V1 has no data for 10\,000 events since the enormous RAM usage constantly lead to timeouts.}
+  \caption[Average execution time of the different implementations when fed with different amounts of input events.]{Average execution time of the different implementations when fed with different amounts of input events. V1 refers to the old approach, V1.5 to the adapted old approach and V2 to the new approach. V1 has no data for 10\,000 events since the enormous \gls{ram} usage constantly lead to timeouts.}
 \label{fig:chap_eval:runtime_num_events}
 \end{figure}
 
 The number of events also increase memory usage, espacially in the first implementation approach.
-The second benchmark therefore tests the ram usage of the different approaches under different number of input events.
-\Cref{fig:chap_eval:runtime_ram_usage} illustrates the RAM usage of the different approaches.
+The second benchmark therefore tests the \gls{ram} usage of the different approaches under different number of input events.
+\Cref{fig:chap_eval:runtime_ram_usage} illustrates the \gls{ram} usage of the different approaches.
 The complete data can be found in \cref{table:tessla_server_v1_events_ram_usage_data,table:tessla_server_v1_5_events_ram_usage_data,table:tessla_server_v2_events_ram_usage_data}.
 
 \begin{figure}[!htb]
   \includegraphics[width=\textwidth]{gfx/runtime_ram_usage_benchmark}
-  \caption[RAM usage of the different versions of the runtime]{RAM usage of the different versions of the runtime in regard to input events. V1 refers to the old approach, V1.5 to the adapted old approach and V2 to the new approach. V1 has no data for 10\,000 events since the enormous RAM usage constantly lead to timeouts.}
+  \caption[\gls{ram} usage of the different versions of the runtime]{\gls{ram} usage of the different versions of the runtime in regard to input events. V1 refers to the old approach, V1.5 to the adapted old approach and V2 to the new approach. V1 has no data for 10\,000 events since the enormous \gls{ram} usage constantly lead to timeouts.}
 \label{fig:chap_eval:runtime_ram_usage}
 \end{figure}
 
@@ -86,7 +86,7 @@ The complete data can be found in \cref{table:tessla_server_v1_events_ram_usage_
 
 As a last metric the performance of the runtime is evaluated over specifications with different amount of nodes.
 Therefore the specification from \cref{listing:runtime_parallel_spec_8} was modified to include higher number of nodes by appending more nodes computing the absolute.
-All benchmarks in this section were performed on a processor with 4 cores at 2.4GHz speed and 8GB of RAM.
+All benchmarks in this section were performed on a processor with 4 cores at 2.4GHz speed and 8GB of \gls{ram}.
 \Cref{fig:chap_eval:runtime_num_nodes} visualizes the performance, the complete data can be found in \cref{table:tessla_server_v1_num_nodes,table:tessla_server_v1_5_num_nodes,table:tessla_server_v2_num_nodes}.
 
 \begin{figure}

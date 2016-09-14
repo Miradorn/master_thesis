@@ -17,15 +17,51 @@ Because the format of the traces can differ heavily, depending on how and why th
 \section{TesslaServer}
 \label{sec:implementation:tesslaserver}
 
-The runtime to evaluate specifications is implemented in the programming language Elixir, which itself is built on top of Erlang, BEAM and OTP.
+The runtime to evaluate specifications is implemented in the programming language Elixir, which itself is built on top of Erlang, the \gls{beam} \gls{vm} and \gls{otp}.
 To understand why this plattform was choosen we will look at the Erlang ecosystem in the next section.
 
 \subsection{Erlang and Elixir}
 \label{sec:implementation:tesslaserver:erlang_elixir}
-BEAM, Actors/Thread, multiplattform (nerves project)
+
+Erlang was originally developed 1987 as a language to program systems with limited resources which had to be highly fault tolerant.
+The primary purpose of the language were phone switches, which have to handle large amounts of connections at the same time.
+Since the switches weren't deployed at a central location but wherever they are needed crashes would entail long downtimes of the system.
+Also, since customers expect permanent service, the platform had to provide a way to update the software without downtimes.
+With these requirements the language and the \gls{otp} platform were developed.
+
+While the requirements of TesslaServer are quite different we will see that the Erlang platform is a great fit for the implementation.
+
+The rather new programming language Elixir\footnote{\url{http://elixir-lang.org}} can be seen as a dialect of Erlang.
+Elixir code is compiled into bytecode for \gls{beam} and can therefore interoperate with Erlang code.
+The rationale to use Elixir instead of Erlang is twofold:
+On the one hand Erlangs syntax is pretty different from that of most modern general purpose programming languages while Elixirs syntax was developed based on modern language design principles.
+Also Elixir supports metaprogramming, meaning you can write code that generates code at compile time, which is heavily used as described in \cref{sec:implementation:tesslaserver:architecture}.
+
+One of the core strengths of the Erlang platform is it support to use multiple processor cores, even if these cores are deployed over multiple machines in a network.
+The plattform offers tools to develop code that can be distributed over multiple processors.
+This distribution is transparent to the developer.
+The underlying concept of the distribution is the actor model, first introduced in \cite{Hewitt1973}.
+
+An actor is basically a self contained entity, that holds a state and can receive and send messages to other actors.
+Since an actor holds its own state that can't be altered by anything but the actor itself, it doesn't matter on which processor the actor is scheduled to perform its computation.
+When an actor receives a message from another actor the \gls{beam} \gls{vm} will eventually schedule the code responsible for handling the message on a core.
+The code can then access the state, alter it and send a response to the sender of the message.
+In this sense an actor can be seen as a state machine, which alters the state everytime it receives a message.
+Since actors are independent of each other they can be scheduled in parallel on multiple processors.
+Only when two actors synchronously communicate one has to wait for the other.
+
+
+Another reason to choose the Erlang platform was its support for multiple plattforms, including resource restricted ones.
+While not part of this thesis it may be a future goal to perform online monitoring with TesslaServer.
+To enable this the runtime has to be able to run on the hardware architecture the monitored program runs on.
+An example of the variety of the supported plattforms of Erlang and Elixir is the Nerves project\footnote{\url{http://nerves-project.org}} which allows developers to build embedded software.
+
+
+\subsection{Architecture}
+\label{sec:implementation:tesslaserver:architecture}
+
 Timing model: reason why events have to carry timestamps in contrast to interweaved monitors
 Compare V1 and V2
-
 \subsection{Instrumentation Pass}
 \label{sec:implementation:instrumentation}
 
