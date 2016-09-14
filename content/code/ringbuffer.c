@@ -69,7 +69,6 @@ void* consumer_main(void* thread_id) {
   }
 }
 
-
 void create_consumers(int num_consumers) {
   pthread_t threads[num_consumers];
   int thread_ids[num_consumers];

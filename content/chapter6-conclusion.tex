@@ -3,6 +3,20 @@
 \chapter{Conclusion}
 \label{sec:conclusion}
 
+\section{Conclusion for TesslaServer}
+
+\section{Conclusion for the Instrumentation Pass}
+
+In the benchmarks of the instrumentation it is obvious that it adds a lot of overhead, especially when compiler optimizations are turned on or the amount of instrumented function calls are big.
+While the overhead is big, it is stable (see the standard deviation in \cref{sec:evaluation:instrumentation_benchmark:instr_vs_non_inst}).
+
+For now the instrumentation should be seen as a proof of concept and test tool.
+The generated traces should be mostly used for analysing test settings, where compiler optimizations are turned off.
+When used for timing specifications, the instrumented code can be benchmarked against a non instrumented version of it and the results can be used to transform the actual timing requirements to ones for the instrumented code.
+This will at least give an approximation of actual results.
+ALso it is recommended to write small and specific \gls{tessla} specifications, so that the instrumentations only have to be applied to a small amount of functions.
+Obviously it is strongly discouraged to use the instrumented code in any production setting.
+
 \section{Further Work}
 \label{sec:conclusion:further_work}
 

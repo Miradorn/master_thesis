@@ -119,8 +119,8 @@ Following specification were tested over the traces:
 
 \begin{itemize}
   \item Data is only processed, when it is available, meaning that at each point of the trace the amount of changes of \lstinline{write_ptr} is bigger than the number of calls to \lstinline{process}.
-  \item The given buffer size of five is never exceeded, meaning the difference of the amount of changes of both event types is never bigger than 5.
-  \item No data stays unprocessed for longer than 1ms.
+  \item The given buffer size of five is never exceeded, meaning the difference of the amount of changes of both event types is never bigger than five.
+  \item Everytime new data is added, there is a call to process in the next milisecond.
 \end{itemize}
 
 The specifications were intentionally chosen and written in such a way, that they use a big amount of different nodes.
@@ -189,14 +189,4 @@ The complete dataset can be found in \cref{table:instrumented_amount_benchmark}.
 Note that the x-axis is logarithmic.
 As expected the performance impact scales directly with the amount of calls to the instrumented function.
 At some point no more speed up will happen, since no calls to the instrumented functions will be made.
-
-\subsection{Conclusion for the Instrumentation}
-
-It can be seen, that the instrumentation adds a lot of overhead, especially when compiler optimizations are turned on and the amount of instrumented function calls are big.
-While the overhead is big, it is stable (see the standard deviation in \cref{sec:evaluation:instrumentation_benchmark:instr_vs_non_inst}).
-This leads to the following conclusions: The generated traces should be mostly used for analysing test settings, where compiler optimizations are turned off.
-When used for timing specifications, the instrumented code can be benchmarked against a non instrumented version of it and the results can be used to transform the actual timing requirements to ones for the instrumented code.
-This will at least give an approximation of actual results.
-ALso it is recommended to write small and specific \gls{tessla} specifications, so that the instrumentations only have to be applied to a small amount of functions.
-Obviously it is strongly discouraged to use the instrumented code in any production setting.
 
