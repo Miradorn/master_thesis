@@ -1,9 +1,11 @@
 % !TEX root = ../thesis.tex
 %
-\chapter{System}
-\label{sec:system}
+\chapter{Implementation Details}
+\label{sec:implementation}
 
-TODO: This will become Implementation details chapter, move unrelated stuff to Related work
+TODO: TS1 vs TS2
+      Implicit greedy schedules with Call vs Fair schedules with cast
+      Evaluation Model: JSON parsing -> GenServer -> MessageQueue for inputs -> Evaluation of each Node \dots
 
 Besides the theoretical basics presented in \cref{sec:related} the \gls{tessla} runtime of this thesis is built upon a number of technologies.
 To better understand decisions made during the implementation this chapter will give an overview of them and show why they were choosen.
@@ -12,31 +14,21 @@ As already mentioned, the implemented runtime itself is independent of the way t
 Therefore we will not only look at building blocks for the runtime itself but also examine related projects which can be used to obtain traces, which then can be monitored by the runtime.
 Because the format of the traces can differ heavily, depending on how and why they were collected, they are not only used to test the runtime but also to determine how it can consume them.
 
-\section{\glsentryname{tessla} Runtime}
-\label{sec:system:runtime}
+\section{TesslaServer}
+\label{sec:implementation:tesslaserver}
 
-The runtime to evaluate specifications is implemented in the programming language Elixir, which itself is built on top of Erlang.
+The runtime to evaluate specifications is implemented in the programming language Elixir, which itself is built on top of Erlang, BEAM and OTP.
 To understand why this plattform was choosen we will look at the Erlang ecosystem in the next section.
 
 \subsection{Erlang and Elixir}
-\label{sec:system:eval_engine:erlang_elixir}
-\todo{BEAM, Actors/Thread, multiplattform (nerves project)}
-\subsection{Implementation}
-\todo{Timing model: reason why events have to carry timestamps in contrast to interweaved monitors}
+\label{sec:implementation:tesslaserver:erlang_elixir}
+BEAM, Actors/Thread, multiplattform (nerves project)
+Timing model: reason why events have to carry timestamps in contrast to interweaved monitors
+Compare V1 and V2
 
-\section{Trace Data}
-\label{sec:system:traces}
+\subsection{Instrumentation Pass}
+\label{sec:implementation:instrumentation}
 
-Problem: Many traces don't carry timestamp (see DeCapo, CRV 15)
 
-\url{http://lttng.org}
-\url{http://diamon.org/ctf/}
-\url{https://github.com/efficios/barectf}
-\subsection{Debie}
-\subsection{TraceBench}
-\subsection{Aspect oriented programming}
-\subsection{CIL}
-\subsection{Google XRay}
 \subsection{GCC instrument functions}
-\subsection{Sampling}
 \subsection{LLVM/clang AST matchers}

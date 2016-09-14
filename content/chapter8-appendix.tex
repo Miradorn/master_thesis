@@ -1,0 +1,443 @@
+% !TEX root = ../thesis.tex
+%
+\chapter{Appendix}
+\label{sec:appendix}
+
+\section{Runtime Benchmark Data}
+\label{sec:appendix:runtime_benchmark_data}
+
+This section includes all data from the benchmarks of TesslaServer.
+
+\subsection{Execution Time in Regard to Used Processor Cores}
+\label{sec:appendix:runtime_benchmark_data:execution_time_cores}
+
+\begin{table}[!htb]
+  \centering
+  \caption{Execution time of multiple runs of TesslaServer V1 with 10\,000 input events with different number of used processor cores.}
+  \label{table:tessla_server_v1_num_cores_data}
+  \begin{tabular}{clllll}
+    Run \# &\multicolumn{1}{c}{1} & \multicolumn{1}{c}{2} & \multicolumn{1}{c}{4} & \multicolumn{1}{c}{8} & \multicolumn{1}{c}{16} \\ \hline
+    1 & 38.2684 s & 95.8390 s  & 33.2289 s & 18.3235 s & 21.9672 s \\
+    2 & 38.9833 s & 98.9827 s  & 32.3660 s   & 17.9681 s & 19.4063 s \\
+    3 & 38.1630 s & 77.4360 s  & 36.0462 s & 17.0076 s & 27.6495 s \\
+    5 & 38.4424 s & 222.9723 s & 29.4773 s & 17.2925 s & 17.3606 s \\
+    6 &  39.2239 s & 75.5560 s  & 32.1869 s & 15.3906 s & 19.1662 s  \\
+    7 &  38.7815 s & 81.0928 s  & 44.7217 s & 18.3882 s & 21.9974 s \\
+    8 &  38.7514 s & 119.1012 s & 38.0911 s & 18.0104 s & 20.2454 s \\
+    9 &  37.8491 s & 60.2407 s  & 35.0671 s & 17.9517 s & 17.2825 s \\
+    10 &  38.2721 s & 83.5956 s  & 37.5839 s & 17.1108 s & 15.5887 s \\
+    11 &  38.5657 s & 105.2514 s & 43.8580 s & 15.8287 s & 22.0196 s \\
+    12 &  38.1699 s & 75.6985 s   & 32.4470 s  & 15.7641 s & 18.3230 s \\
+    13 &  37.9775 s & 104.0994 s & 37.0281 s & 24.5554 s & 17.0857 s \\
+    14 &  38.8215 s & 75.0534 s    & 34.8001 s & 14.3733 s & 19.5598 s \\
+    15 &  38.3913 s & 74.5584 s  & 32.7344 s & 17.9163 s  & 17.3179 s \\
+    16 &  40.4536 s & 111.3214 s & 35.7434 s  & 16.6162 s & 20.2855 s \\
+    17 &  39.0735 s & 87.0386 s  & 35.6367 s & 15.5962 s & 21.7681 s \\
+    18 &  38.8830 s & 114.2697 s & 33.4537 s & 28.1556 s & 17.2382 s \\
+    19 &  39.0799 s & 103.1956 s & 32.7134 s & 17.7034 s & 23.5276 s \\
+    20 &  39.3866 s & 117.2423 s & 39.1457 s & 15.6895 s & 18.4146 s
+  \end{tabular}
+\end{table}
+
+\begin{table}[!htb]
+  \centering
+  \caption{Execution time of multiple runs of TesslaServer V1.5 with 10\,000 input events with different number of used processor cores}
+  \label{table:tessla_server_v1_5_num_cores_data}
+  \begin{tabular}{clllll}
+    Run \# & \multicolumn{1}{c}{1} & \multicolumn{1}{c}{2} & \multicolumn{1}{c}{4} & \multicolumn{1}{c}{8} & \multicolumn{1}{c}{16} \\ \hline
+    1 &  6.3722 s & 0.1256 s & 0.1309 s   & 0.1378 s & 2.6756 s \\
+    2 &  6.2417 s & 0.1300 s & 0.1333 s & 0.1444 s & 2.6292 s   \\
+    3 &  6.2953 s & 0.1301 s   & 0.1325 s & 0.1379 s & 2.6453 s \\
+    5 &  6.5148 s   & 0.1433 s & 0.1315 s & 0.1451 s & 2.5836 s \\
+    6 &  6.6828 s & 0.1347 s & 0.1480 s & 0.1468 s & 2.6670 s   \\
+    7 &  6.8090 s & 0.1386 s & 0.1294 s & 0.1414 s & 2.6671 s \\
+    8 &  6.3252 s & 0.1307 s  & 0.1330 s & 0.1385 s & 2.7755 s \\
+    9 &  6.0975 s & 0.1304 s & 0.1339 s & 0.1362 s & 2.6097 s \\
+    10 & 6.1274 s & 0.1328 s & 0.1325 s & 0.1371 s & 2.6335 s \\
+    11 & 5.7481 s & 0.1479 s & 0.1299 s & 0.1398 s & 2.6477 s \\
+    12 & 6.0317 s & 0.1318 s & 0.1435 s & 0.1311 s   & 2.6343 s \\
+    13 & 6.1565 s & 0.1293 s & 0.1260 s   & 0.1361 s & 2.6603 s \\
+    14 & 6.3439 s & 0.1223 s & 0.1309 s & 0.1313 s & 2.5560 s \\
+    15 & 6.3749 s & 0.1318 s & 0.1335 s & 0.1338 s & 2.6739 s \\
+    16 & 6.3289 s & 0.1321 s & 0.1323 s & 0.1503 s & 2.5466 s   \\
+    17 & 6.3894 s & 0.1253 s & 0.1323 s & 0.1397 s & 2.6240 s \\
+    18 & 6.3943 s & 0.1288 s & 0.1320 s & 0.1316 s & 2.6939 s \\
+    19 & 6.4089 s & 0.1319 s & 0.1347 s & 0.1302 s & 2.5940 s \\
+    20 & 6.3865 s & 0.1698 s & 0.1336 s & 0.1312 s & 2.6347 s
+  \end{tabular}
+\end{table}
+
+\begin{table}[!htb]
+  \centering
+  \caption{Execution time of multiple runs of TesslaServer V2 with 10\,000 input events with different number of used processor cores}
+  \label{table:tessla_server_v2_num_cores_data}
+  \begin{tabular}{clllll}
+    Run \# & \multicolumn{1}{c}{1} & \multicolumn{1}{c}{2} & \multicolumn{1}{c}{4} & \multicolumn{1}{c}{8} & \multicolumn{1}{c}{16} \\ \hline
+  \end{tabular}
+\end{table}
+
+\clearpage
+
+\subsection{Execution Time in Regard to Number of Input Events}
+\label{sec:appendix:runtime_benchmark_data:execution_time_cores}
+
+\begin{table}[!htb]
+  \centering
+  \caption{Execution time of multiple runs of TesslaServer V1 with different number of input events}
+  \label{table:tessla_server_v1_events_num_events_data}
+  \begin{tabular}{cllll}
+    Run \# & \multicolumn{1}{c}{500} & \multicolumn{1}{c}{1000} & \multicolumn{1}{c}{5000}  & \multicolumn{1}{c}{10000} \\ \hline
+    1 &  0.5815 s & 1.1913 s & 39.0046 s & timeout\\
+    2 &  0.5958 s & 1.1991 s & 33.5771 s & timeout\\
+    3 &  0.5963 s & 1.2122 s & 26.8252 s & timeout\\
+    5 &  0.580 s  & 1.2569 s & 23.8944 s & timeout\\
+    6 &  0.5948 s & 1.2280 s & 23.8837 s & timeout\\
+    7 &  0.5825 s & 1.2519 s & 23.4110 s & timeout\\
+    8 &  0.6271 s & 1.2636 s & 23.1929 s & timeout\\
+    9 &  0.5705 s & 1.2324 s & 23.3227 s & timeout\\
+    10 & 0.5765 s & 1.1783 s & 21.9043 s & timeout\\
+    11 & 0.5893 s & 1.1928 s & 22.9516 s & timeout\\
+    12 & 0.6101 s & 1.2759 s & 22.8377 s & timeout\\
+    13 & 0.5684 s & 1.1955 s & 26.1974 s & timeout\\
+    14 & 0.5746 s & 1.2047 s & 25.7536 s & timeout\\
+    15 & 0.5588 s & 1.2044 s & 24.6289 s & timeout\\
+    16 & 0.5698 s & 1.1958 s & 22.3709 s & timeout\\
+    17 & 0.5911 s & 1.2271 s & 23.9404 s & timeout\\
+    18 & 0.5955 s & 1.1981 s & 21.4453 s & timeout\\
+    19 & 0.5702 s & 1.1718 s & 23.3482 s & timeout\\
+    20 & 0.5863 s & 1.2571 s & 21.9753 s & timeout
+  \end{tabular}
+\end{table}
+
+\begin{table}[!htb]
+  \centering
+  \caption{Execution time of multiple runs of TesslaServer V1.5 with different number of input events}
+  \label{table:tessla_server_v1_5_events_num_events_data}
+  \begin{tabular}{cllll}
+    Run \# & \multicolumn{1}{c}{500} & \multicolumn{1}{c}{1000} & \multicolumn{1}{c}{5000} & \multicolumn{1}{c}{10000} \\ \hline
+   1 &   0.4512 s & 0.5901 s & 2.1607 s & 2.8476 s \\
+   2 &   0.4349 s & 0.5703 s & 2.0242 s & 2.8715 s \\
+   3 &   0.4424 s & 0.5511 s & 2.1535 s & 2.8250 s \\
+   5 &   0.4373 s & 0.5487 s & 2.1715 s & 2.7025 s \\
+   6 &   0.4239 s & 0.5564 s & 2.2763 s & 2.7671 s \\
+   7 &   0.4670 s & 0.5466 s & 4.2085 s & 2.6719 s \\
+   8 &   0.4492 s & 0.5401 s & 2.6771 s & 2.6956 s \\
+   9 &   0.4649 s & 0.6345 s & 1.9132 s & 2.5634 s \\
+   10 &  0.440 s  & 0.5618 s & 1.5309 s & 2.6090 s \\
+   11 &  0.4641 s & 0.5577 s & 2.5762 s & 2.6738 s \\
+   12 &  0.4306 s & 0.5415 s & 1.6873 s & 2.7178 s \\
+   13 &  0.4255 s & 0.5829 s & 2.0342 s & 2.7294 s \\
+   14 &  0.460 s  & 0.5442 s & 3.0314 s & 2.6789 s \\
+   15 &  0.4401 s & 0.5443 s & 3.2066 s & 2.6045 s \\
+   16 &  0.4516 s & 0.5848 s & 2.5746 s & 2.5837 s \\
+   17 &  0.4927 s & 0.5406 s & 2.4933 s & 2.7866 s \\
+   18 &  0.4635 s & 0.5669 s & 2.6895 s & 2.6719 s \\
+   19 &  0.4506 s & 0.5576 s & 2.2802 s & 2.7056 s \\
+   20 &  0.5080 s & 0.5898 s & 2.4456 s & 2.6697 s
+  \end{tabular}
+\end{table}
+
+\begin{table}[!htb]
+  \centering
+  \caption{Execution time of multiple runs of TesslaServer V2 with different number of input events}
+  \label{table:tessla_server_v2_events_num_events_data}
+  \begin{tabular}{cllll}
+    Run \# & \multicolumn{1}{c}{500} & \multicolumn{1}{c}{1000} & \multicolumn{1}{c}{5000} & \multicolumn{1}{c}{10000} \\ \hline
+  \end{tabular}
+\end{table}
+
+\clearpage
+
+\subsection{Ram Usage with Respect to Number of Input Events}
+\label{sec:appendix:runtime_benchmark_data:ram_usage_events}
+
+\begin{table}[!htb]
+  \centering
+  \caption{RAM usage of multiple runs of TesslaServer V1 with different number of input events}
+  \label{table:tessla_server_v1_events_ram_usage_data}
+  \begin{tabular}{cllll}
+    Run \# & \multicolumn{1}{c}{500} & \multicolumn{1}{c}{1000} & \multicolumn{1}{c}{5000} \\ \hline
+    1 & 98.50 MB  & 182.93 MB & 1.55 GB & timeout \\
+    2 & 95.47 MB  & 226.23 MB & 1.69 GB & timeout\\
+    3 & 84.59 MB  & 223.75 MB & 1.62 GB & timeout\\
+    5 & 102.98 MB & 185.86 MB & 1.78 GB & timeout\\
+    6 & 90.24 MB  & 222.20 MB & 1.77 GB & timeout\\
+    7 & 84.54 MB  & 181.79 MB & 1.75 GB & timeout\\
+    8 & 89.31 MB  & 171.32 MB & 1.60 GB & timeout\\
+    9 & 89.84 MB  & 228.12 MB & 1.75 GB & timeout\\
+    10 & 106.07 MB & 184.48 MB & 1.67 GB & timeout\\
+    11 & 89.41 MB  & 194.26 MB & 1.47 GB & timeout\\
+    12 & 97.62 MB  & 163.42 MB & 1.80 GB & timeout\\
+    13 & 97.54 MB  & 160.26 MB & 1.51 GB & timeout\\
+    14 & 88.77 MB  & 221.16 MB & 1.96 GB & timeout\\
+    15 & 99.99 MB  & 223.81 MB & 1.87 GB & timeout\\
+    16 & 97.40 MB  & 216.00 MB & 1.87 GB & timeout\\
+    17 & 87.62 MB  & 250.93 MB & 1.68 GB & timeout\\
+    18 & 120.70 MB & 206.97 MB & 1.71 GB & timeout\\
+    19 & 91.89 MB  & 246.55 MB & 1.64 GB & timeout\\
+    20 & 88.91 MB  & 252.26 MB & 1.87 GB & timeout
+  \end{tabular}
+\end{table}
+
+\begin{table}[!htb]
+  \centering
+  \caption{RAM usage of multiple runs of TesslaServer V1.5 with different number of input events}
+  \label{table:tessla_server_v1_5_events_ram_usage_data}
+  \begin{tabular}{cllll}
+    Run \# & \multicolumn{1}{c}{500} & \multicolumn{1}{c}{1000} & \multicolumn{1}{c}{5000} & \multicolumn{1}{c}{1000}\\ \hline
+    1 & 52.09 MB & 53.71 MB & 61.49 MB & 58.37 MB \\
+    2 & 48.77 MB & 56.98 MB & 59.74 MB & 60.16 MB \\
+    3 & 52.06 MB & 52.60 MB & 57.21 MB & 75.88 MB \\
+    5 & 52.42 MB & 51.23 MB & 57.45 MB & 61.79 MB \\
+    6 & 54.13 MB & 52.44 MB & 56.55 MB & 74.53 MB \\
+    7 & 50.30 MB & 50.41 MB & 76.10 MB & 62.92 MB \\
+    8 & 47.91 MB & 52.48 MB & 53.78 MB & 63.47 MB \\
+    9 & 50.97 MB & 51.99 MB & 58.85 MB & 60.24 MB \\
+    10 &52.26 MB & 51.00 MB & 57.04 MB & 59.36 MB \\
+    11 &51.25 MB & 54.08 MB & 57.74 MB & 62.32 MB \\
+    12 &47.60 MB & 52.06 MB & 53.92 MB & 65.00 MB \\
+    13 &50.15 MB & 52.54 MB & 57.23 MB & 64.99 MB \\
+    14 &51.03 MB & 52.09 MB & 59.37 MB & 64.33 MB \\
+    15 &52.56 MB & 62.94 MB & 53.98 MB & 65.32 MB \\
+    16 &50.79 MB & 50.54 MB & 58.80 MB & 67.25 MB \\
+    17 &61.64 MB & 49.85 MB & 56.02 MB & 58.18 MB \\
+    18 &50.69 MB & 51.54 MB & 60.00 MB & 59.93 MB \\
+    19 &49.59 MB & 52.21 MB & 61.75 MB & 82.53 MB \\
+    20 &50.04 MB & 51.91 MB & 67.09 MB & 72.43 MB
+  \end{tabular}
+\end{table}
+
+\begin{table}[!htb]
+  \centering
+  \caption{RAM usage of multiple runs of TesslaServer V2 with different number of input events}
+  \label{table:tessla_server_v2_events_ram_usage_data}
+  \begin{tabular}{cllll}
+    Run \# & \multicolumn{1}{c}{500} & \multicolumn{1}{c}{1000} & \multicolumn{1}{c}{5000} & \multicolumn{1}{c}{1000}\\ \hline
+  \end{tabular}
+\end{table}
+
+\clearpage
+
+\subsection{Execution Time in Regard to Number of Nodes}
+\label{sec:appendix:runtime_benchmark_data:ram_usage_events}
+
+\begin{table}[!htb]
+  \centering
+  \caption{Execution time of multiple runs of TesslaServer V1 in regard to different amount of nodes in a specification}
+  \label{table:tessla_server_v1_num_nodes}
+  \begin{tabular}{clllll}
+    Run \# & \multicolumn{1}{c}{8} & \multicolumn{1}{c}{16} & \multicolumn{1}{c}{32} & \multicolumn{1}{c}{64} & \multicolumn{1}{c}{128}\\ \hline
+    1 & 0.997 s & 1.295 s & 2.893 s & 3.780 s & 7.166 s \\
+    2 & 0.875 s & 1.280 s & 2.903 s & 4.139 s & 7.071 s \\
+    3 & 1.269 s & 1.277 s & 2.837 s & 4.055 s & 7.083 s \\
+    5 & 0.888 s & 1.262 s & 3.693 s & 3.811 s & 6.937 s \\
+    6 & 0.917 s & 1.330 s & 4.930 s & 4.150 s & 7.075 s \\
+    7 & 0.881 s & 1.419 s & 3.761 s & 3.826 s & 7.327 s \\
+    8 & 0.959 s & 1.398 s & 3.115 s & 3.835 s & 7.158 s \\
+    9 & 0.973 s & 1.294 s & 2.944 s & 4.093 s & 7.102 s \\
+    10 &0.980 s & 1.257 s & 3.143 s & 4.208 s & 6.981 s \\
+    11 &0.918 s & 1.285 s & 2.788 s & 4.092 s & 7.081 s \\
+    12 &0.939 s & 1.329 s & 2.914 s & 4.033 s & 7.198 s \\
+    13 &0.965 s & 1.225 s & 2.850 s & 3.815 s & 7.135 s \\
+    14 &0.871 s & 1.320 s & 3.003 s & 3.817 s & 6.943 s \\
+    15 &0.898 s & 1.336 s & 2.922 s & 3.905 s & 6.901 s \\
+    16 &0.897 s & 1.357 s & 3.212 s & 3.968 s & 7.153 s \\
+    17 &1.073 s & 1.401 s & 3.057 s & 4.081 s & 7.10 s  \\
+    18 &1.182 s & 1.342 s & 2.759 s & 3.826 s & 7.311 s \\
+    19 &1.019 s & 1.288 s & 2.945 s & 3.991 s & 7.064 s \\
+    20 &0.928 s & 1.314 s & 3.304 s & 5.343 s & 7.161 s
+  \end{tabular}
+\end{table}
+
+\begin{table}[!htb]
+  \centering
+  \caption{Execution time of multiple runs of TesslaServer V1.5 in regard to different amount of nodes in a specification}
+  \label{table:tessla_server_v1_5_num_nodes}
+  \begin{tabular}{clllll}
+    Run \# & \multicolumn{1}{c}{8} & \multicolumn{1}{c}{16} & \multicolumn{1}{c}{32} & \multicolumn{1}{c}{64} & \multicolumn{1}{c}{128}\\ \hline
+    1 & 0.474 s & 0.602 s & 0.811 s & 1.353 s & 2.134 s \\
+    2 & 0.476 s & 0.605 s & 0.813 s & 1.410 s & 2.431 s \\
+    3 & 0.487 s & 0.577 s & 0.884 s & 1.331 s & 2.015 s \\
+    5 & 0.502 s & 0.606 s & 0.933 s & 1.273 s & 2.138 s \\
+    6 & 0.511 s & 0.615 s & 0.930 s & 1.231 s & 2.287 s \\
+    7 & 0.518 s & 0.577 s & 0.813 s & 1.269 s & 2.638 s \\
+    8 & 0.527 s & 0.603 s & 0.898 s & 1.306 s & 2.90 s  \\
+    9 & 0.540 s & 0.596 s & 0.946 s & 1.195 s & 2.874 s \\
+    10 &0.511 s & 0.618 s & 0.834 s & 1.319 s & 3.80 s  \\
+    11 &0.494 s & 0.624 s & 0.796 s & 1.260 s & 2.842 s \\
+    12 &0.561 s & 0.601 s & 0.893 s & 1.497 s & 3.275 s \\
+    13 &0.487 s & 0.619 s & 0.843 s & 1.256 s & 2.898 s \\
+    14 &0.541 s & 0.582 s & 0.868 s & 1.203 s & 2.951 s \\
+    15 &0.482 s & 0.627 s & 0.80 s  & 1.257 s & 3.118 s \\
+    16 &0.487 s & 0.604 s & 0.861 s & 1.347 s & 4.078 s \\
+    17 &0.476 s & 0.591 s & 0.862 s & 1.213 s & 7.687 s \\
+    18 &0.574 s & 0.596 s & 0.846 s & 1.284 s & 5.113 s \\
+    19 &0.555 s & 0.590 s & 0.824 s & 1.277 s & 3.892 s \\
+    20 &0.507 s & 0.619 s & 0.879 s & 1.275 s & 3.991 s
+  \end{tabular}
+\end{table}
+
+\begin{table}[!htb]
+  \centering
+  \caption{Execution time of multiple runs of TesslaServer V2 in regard to different amount of nodes in a specification}
+  \label{table:tessla_server_v2_num_nodes}
+  \begin{tabular}{clllll}
+    Run \# & \multicolumn{1}{c}{8} & \multicolumn{1}{c}{16} & \multicolumn{1}{c}{32} & \multicolumn{1}{c}{64} & \multicolumn{1}{c}{128}\\ \hline
+  \end{tabular}
+\end{table}
+
+\clearpage
+
+\section{Ringbuffer Code}
+\label{sec:appendix:ringbuffer}
+
+\lstinputlisting[language=c,breaklines=true,caption=Code of the ringbuffer example programm,label=listing:ringbuffer]{content/code/ringbuffer.c}
+
+\clearpage
+
+\section{Instrumentation Benchmark Data}
+\label{sec:appendix:instrumentation_benchmark_data}
+
+\begin{table}[]
+  \caption{Execution time of multiple runs of an uninstrumented example C program compiled with different optimization levels}
+  \label{table:non_instrumented_optimizations_benchmark}
+  \centering
+  \begin{tabular}{cllll}
+    Run \# & \multicolumn{1}{c}{O3} & \multicolumn{1}{c}{O2} & \multicolumn{1}{c}{O1} & \multicolumn{1}{c}{O0} \\ \hline
+    1 & 0.1161 s & 0.1191 s & 0.2948 s & 0.6530 s \\
+    2 & 0.1157 s & 0.1156 s & 0.2738 s   & 0.6632 s \\
+    3 & 0.1167 s & 0.1148 s & 0.2762 s & 0.6660 s \\
+    5 & 0.1141 s & 0.1238 s & 0.2678 s & 0.6449 s \\
+    6 & 0.1164 s & 0.1141 s & 0.2763 s & 0.6779 s \\
+    7 & 0.1149 s & 0.1187 s & 0.2759 s & 0.6569 s \\
+    8 & 0.1200 s & 0.1117 s & 0.2793 s & 0.6452 s \\
+    9 & 0.1100 s & 0.1159 s & 0.2894 s & 0.6577 s \\
+    10 &0.1103 s & 0.1151 s & 0.2816 s & 0.6565 s  \\
+    11 &0.1138 s & 0.1219 s & 0.2807 s & 0.6649 s \\
+    12 &0.1163 s & 0.1176 s & 0.2723 s & 0.6588 s \\
+    13 &0.1170 s & 0.1168 s & 0.2781 s & 0.6618 s \\
+    14 &0.1127 s & 0.1200 s & 0.2799 s & 0.6571 s \\
+    15 &0.1124 s & 0.1124 s & 0.2763 s & 0.6544 s \\
+    16 &0.1231 s & 0.1198 s & 0.2752 s & 0.6740 s \\
+    17 &0.1203 s & 0.1191 s & 0.2750 s & 0.6417 s \\
+    18 &0.1163 s & 0.1229 s & 0.2662 s & 0.6602 s \\
+    19 &0.1186 s & 0.1143 s & 0.2685 s & 0.6608 s    \\
+    20 &0.1182 s & 0.1160 s & 0.2935 s & 0.6540 s \\
+    21 & 0.1166 s & 0.1128 s  & 0.2743 s & 0.6557 s \\
+    22 & 0.1196 s  & 0.1137 s & 0.2758 s & 0.6767 s \\
+    23 & 0.1156 s & 0.1164 s & 0.2886 s & 0.6637 s \\
+    25 & 0.1203 s & 0.1166 s & 0.2829 s & 0.6816 s \\
+    26 & 0.1173 s & 0.1203 s & 0.2849 s & 0.6397 s \\
+    27 & 0.1160 s  & 0.1158 s & 0.2814 s & 0.6493 s \\
+    28 & 0.1161 s & 0.1233 s & 0.2841 s & 0.6558 s \\
+    29 & 0.1086 s & 0.1245 s & 0.2797 s & 0.6555 s \\
+    30 &0.1138 s & 0.1158 s & 0.2746 s & 0.6605 s \\
+    31 &0.1159 s & 0.1194 s   & 0.2767 s & 0.6677 s \\
+    32 &0.1231 s  & 0.1197 s & 0.2818 s & 0.6489 s \\
+    33 &0.1154 s & 0.1125 s & 0.2842 s & 0.6527 s  \\
+    34 &0.1147 s  & 0.1216 s & 0.2762 s & 0.6488 s \\
+    35 &0.1205 s & 0.1136 s & 0.2732 s & 0.6657 s \\
+    36 &0.1184 s & 0.1135 s & 0.2743 s & 0.6611 s \\
+    37 &0.1149 s  & 0.1160 s & 0.2773 s & 0.6637 s \\
+    38 &0.1183 s & 0.1157 s & 0.2722 s & 0.6638 s \\
+    39 &0.1138 s & 0.1105 s & 0.2787 s & 0.6738 s  \\
+    40 &0.1113 s & 0.1144 s & 0.2707 s & 0.6705 s
+  \end{tabular}
+\end{table}
+
+\begin{table}
+  \caption{Execution time of multiple runs of an instrumented example C program compiled with different optimization levels}
+  \label{table:instrumented_optimizations_benchmark}
+  \centering
+  \begin{tabular}{cllll}
+    Run \# & \multicolumn{1}{c}{O3} & \multicolumn{1}{c}{O2} & \multicolumn{1}{c}{O1} & \multicolumn{1}{c}{O0} \\ \hline
+    1 & 3.3911 s & 3.2436 s  & 3.4216 s  & 3.8694 s  \\
+    2 & 3.5288 s & 3.6410 s & 3.3192 s  & 3.6850 s  \\
+    3 & 3.3494 s & 3.4974 s & 3.3641 s & 3.6085 s \\
+    5 & 3.5640 s & 3.4832 s & 3.5960 s & 3.7213 s \\
+    6 & 3.3368 s & 3.4711 s & 3.4086 s & 3.6712 s \\
+    7 & 3.5097 s & 3.5463 s & 3.4823 s & 3.6867 s \\
+    8 & 3.3817 s & 3.3919 s & 3.4265 s & 3.8107 s \\
+    9 & 3.6170 s & 3.4889 s & 3.5831 s & 3.6996 s \\
+    10 &3.3764 s  & 3.3402 s  & 3.4814 s & 3.7145 s \\
+    11 &3.4867 s & 3.7752 s & 3.5054 s & 3.7900 s \\
+    12 &3.3393 s & 3.3320 s & 3.6760 s & 3.7082 s \\
+    13 &3.2769 s & 3.3553 s   & 3.7271 s & 3.6436 s  \\
+    14 &3.5930 s & 3.3282 s & 3.4532 s & 3.6124 s \\
+    15 &3.5464 s & 3.5488 s & 3.5590 s  & 3.7060 s \\
+    16 &3.6068 s & 3.5292 s  & 3.4408 s & 3.6440 s \\
+    17 &3.3833 s & 3.3312 s & 3.6440 s   & 3.6952 s \\
+    18 &4.6447 s  & 3.2691 s & 3.6565 s & 3.7749 s \\
+    19 &3.9256 s & 3.3252 s & 3.5309 s  & 3.6850 s \\
+    20 &3.3639 s & 3.3914 s & 3.6782 s & 3.6187 s \\
+    21 &3.6016 s & 3.3473 s & 4.5602 s & 3.6672 s \\
+    22 &3.2825 s & 3.3359 s & 4.2268 s & 3.5982 s  \\
+    23 &3.1969 s & 3.3892 s & 4.3686 s & 3.6702 s \\
+    25 &3.3095 s & 3.3870 s & 3.5713 s & 3.7751 s \\
+    26 &3.4130 s & 3.4193 s & 3.6797 s  & 3.6604 s \\
+    27 &3.5319 s & 3.3532 s & 3.5412 s & 3.6823 s  \\
+    28 &3.3935 s & 3.3253 s  & 3.5808 s & 3.6570 s \\
+    29 &3.3294 s & 3.3051 s & 3.4674 s & 3.6164 s \\
+    30 &3.4536 s  & 3.3509 s & 3.5215 s  & 3.6644 s \\
+    31 &3.4952 s & 3.4388 s & 3.8695 s & 3.7006 s \\
+    32 &3.4600 s & 3.3684 s & 4.1289 s & 3.6317 s \\
+    33 &3.5761 s & 3.4953 s & 4.5513 s  & 3.6137 s \\
+    34 &3.5816 s & 3.4220 s & 4.4331 s & 3.7160 s \\
+    35 &3.6319 s & 4.3748 s & 3.6797 s & 3.6431 s \\
+    36 &3.4037 s & 3.7254 s & 3.5498 s & 3.6337 s  \\
+    37 &3.5317 s & 3.3875 s & 3.9773 s & 4.0382 s \\
+    38 &3.6149 s & 3.2542 s & 3.6003 s & 3.6492 s \\
+    39 &3.3683 s & 3.1844 s & 3.6274 s & 3.6503 s \\
+    40 &3.3448 s & 3.3463 s & 3.6728 s & 3.6539 s
+  \end{tabular}
+\end{table}
+
+\begin{landscape}
+  \begin{longtable}{cllllllll}
+    \caption{Execution time of multiple runs of an instrumented program with different percentages of instrumented function calls}\\
+    Run \# & \multicolumn{1}{c}{10\%} & \multicolumn{1}{c}{5\%} & \multicolumn{1}{c}{2\%} & \multicolumn{1}{c}{1\%} & \multicolumn{1}{c}{0.5\%} & \multicolumn{1}{c}{0.1\%} & \multicolumn{1}{c}{0.01\%} & \multicolumn{1}{c}{0.001\%} \\\hline
+    \endfirsthead
+    \caption[]{Execution time of multiple runs of an instrumented program with different percentages of instrumented function calls}\\
+    Run \# & \multicolumn{1}{c}{10\%} & \multicolumn{1}{c}{5\%} & \multicolumn{1}{c}{2\%} & \multicolumn{1}{c}{1\%} & \multicolumn{1}{c}{0.5\%} & \multicolumn{1}{c}{0.1\%} & \multicolumn{1}{c}{0.01\%} & \multicolumn{1}{c}{0.001\%} \\\hline
+    \endhead
+    1 & 32.2744 s& 16.5746 s& 6.8182 s& 3.4653 s& 1.9216 s& 0.5291 s& 0.3014 s& 0.1262 s\\
+    2 & 32.0180 s& 17.2402 s& 6.7273 s& 4.7988 s& 1.8523 s& 0.5143 s& 0.2784 s& 0.1243 s\\
+    3 & 32.5687 s& 16.5926 s& 6.9581 s& 4.0173 s  & 1.7571 s& 0.4944 s& 0.2864 s& 0.1245 s\\
+    5 & 31.7277 s& 16.4390 s& 6.5665 s& 3.9327 s& 1.7359 s& 0.4897 s& 0.2750 s& 0.1209 s\\
+    6 & 33.2172 s & 16.2865 s& 6.6697 s& 4.3147 s & 1.7712 s& 0.4748 s& 0.2754 s& 0.1266 s\\
+    7 & 32.0802 s& 16.4187 s& 6.6856 s& 3.9003 s& 1.7668 s& 0.4553 s& 0.2718 s& 0.1314 s\\
+    8 & 36.0954 s& 16.7155 s& 6.6875 s& 3.8426 s& 1.8202 s& 0.4432 s& 0.2712 s& 0.1301 s\\
+    9 & 36.9455 s& 16.7840 s& 6.5936 s& 4.2499 s& 1.7469 s& 0.4662 s& 0.2723 s & 0.1200 s\\
+    10 &33.0339 s& 20.1691 s & 7.4481 s  & 3.4560 s& 1.8394 s& 0.4528 s& 0.3151 s& 0.1175 s\\
+    11 &35.2251 s& 19.8842 s& 7.2807 s& 3.8017 s& 1.7728 s& 0.4460 s& 0.3352 s & 0.1189 s\\
+    12 &31.8794 s& 20.2660 s& 7.0673 s & 5.2281 s& 1.6975 s& 0.4340 s& 0.2739 s& 0.1209 s \\
+    13 &32.9260 s & 19.2307 s  & 6.7634 s& 4.3974 s& 1.7026 s & 0.4441 s& 0.2708 s& 0.1195 s\\
+    14 &31.9317 s& 17.8926 s& 6.7118 s& 3.7419 s& 1.7544 s& 0.4361 s& 0.2752 s& 0.1216 s\\
+    15 &32.6378 s& 17.5177 s& 7.7485 s & 3.3878 s& 1.8489 s& 0.5027 s& 0.2767 s& 0.1240 s\\
+    16 &32.1711 s& 16.3863 s& 6.7146 s& 3.3716 s& 2.0388 s& 0.4380 s& 0.2893 s& 0.1266 s\\
+    17 &32.4985 s& 16.4408 s& 6.6772 s& 4.1358 s& 1.8717 s& 0.4349 s& 0.2669 s& 0.1210 s\\
+    18 &32.1387 s& 16.4152 s& 7.1151 s& 3.2681 s  & 1.8253 s& 0.4491 s& 0.2719 s& 0.1217 s\\
+    19 &32.0004 s& 16.1371 s& 6.7711 s& 3.6237 s& 1.7483 s& 0.4274 s& 0.2678 s& 0.1215 s\\
+    20 &32.5547 s& 16.4341 s& 7.2219 s& 3.7627 s& 1.7674 s& 0.4555 s& 0.2658 s& 0.1222 s \\
+    21 &32.1219 s& 16.1507 s& 6.7387 s& 3.4525 s& 1.7188 s& 0.4372 s& 0.2741 s& 0.1280 s \\
+    22 &32.7006 s& 16.2854 s& 6.5879 s & 3.4259 s& 1.7273 s& 0.4447 s& 0.2731 s& 0.1207 s\\
+    23 &32.0705 s& 15.9990 s& 6.6927 s& 3.6898 s& 1.7741 s& 0.4446 s & 0.2728 s& 0.1271 s\\
+    25 &32.5558 s& 16.2882 s& 6.7336 s& 3.2830 s& 1.8821 s& 0.4399 s& 0.2744 s& 0.1245 s\\
+    26 &35.2615 s& 17.6253 s& 6.5753 s& 3.3661 s& 1.8344 s& 0.4657 s& 0.2745 s& 0.1279 s\\
+    27 &46.2991 s & 16.6608 s& 6.6603 s& 3.3115 s& 1.7554 s& 0.4431 s& 0.2678 s& 0.1266 s\\
+    28 &34.3145 s& 16.7270 s& 6.7223 s& 3.5270 s& 1.7145 s& 0.4346 s& 0.2728 s & 0.1251 s\\
+    29 &33.3674 s& 15.9586 s& 6.7363 s & 3.3917 s& 1.7318 s& 0.4426 s& 0.2735 s & 0.1257 s\\
+    30 &35.3249 s& 15.8946 s& 7.1817 s& 3.2812 s& 1.7364 s& 0.4255 s& 0.2741 s& 0.1274 s \\
+    31 &37.5802 s& 17.0438 s& 8.0833 s& 3.9514 s& 1.7507 s& 0.4614 s& 0.2701 s& 0.1250 s\\
+    32 &35.6964 s& 17.9818 s& 6.6254 s& 3.4312 s& 1.8008 s& 0.4516 s& 0.2693 s& 0.1183 s\\
+    33 &32.3928 s& 16.2117 s& 6.8224 s& 3.4366 s& 1.7850 s& 0.4451 s& 0.2717 s& 0.1215 s\\
+    34 &34.6837 s& 16.1150 s& 8.0794 s& 3.4316 s& 1.7732 s& 0.4375 s& 0.2807 s& 0.1304 s\\
+    35 &32.9116 s& 16.6887 s& 7.7993 s& 3.6139 s& 1.7912 s& 0.4468 s& 0.2682 s& 0.1248 s\\
+    36 &32.2931 s& 17.4771 s& 6.6512 s& 3.4691 s& 1.9558 s& 0.4335 s& 0.2717 s& 0.1269 s\\
+    37 &32.5576 s& 16.2437 s& 6.6823 s& 3.3764 s & 1.8431 s& 0.4469 s& 0.2719 s& 0.1273 s\\
+    38 &32.4156 s& 16.1199 s & 6.6837 s& 3.3485 s& 1.8451 s& 0.4372 s& 0.2792 s& 0.1234 s\\
+    39 &32.7322 s& 16.1902 s& 6.6598 s & 3.5290 s& 1.8274 s& 0.4583 s& 0.2744 s & 0.1252 s\\
+    40 &32.7395 s& 16.4886 s& 6.7993 s& 3.3594 s& 1.8212 s& 0.4294 s& 0.2709 s& 0.1233 s
+    \label{table:instrumented_amount_benchmark}
+  \end{longtable}
+\end{landscape}
