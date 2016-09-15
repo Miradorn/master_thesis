@@ -1,0 +1,21 @@
+{
+  "type":"java.util.Collections$UnmodifiableSet",
+  "items":[{
+    "id":1,
+    "nodetype":"TesslaServer.Node.Lifted.Add",
+    "operands":[3,2]
+  },{
+    "id":2,
+    "nodetype":"TesslaServer.Node.Literal",
+    "options":{
+      "value":5
+    }
+  },{
+    "id":3,
+    "nodetype":"TesslaServer.Node.Literal",
+    "options":{
+      "value":3
+    }
+  }]
+}
+

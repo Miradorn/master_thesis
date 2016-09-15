@@ -5,6 +5,8 @@
 
 \section{Conclusion for TesslaServer}
 
+note limitations of Type system of compiler
+
 \section{Conclusion for the Instrumentation Pass}
 
 In the benchmarks of the instrumentation it is obvious that it adds a lot of overhead, especially when compiler optimizations are turned on or the percentage of instrumented function calls is large.
@@ -23,12 +25,13 @@ Obviously it is strongly discouraged to use the instrumented code in any product
 Composition of Transducers/evalEngines
 Port to Scala/akka
 Different evaluation model: Pull not push
-port to genstage
-online monitoring
-possible infinite traces
+  port to genstage: Concept of backpressure -> Nodes generating events out of nothing
+
+
+online monitoring -> possible infinite traces
 
 Architecture is similar to a vm: Tessla specs are code, compiler produces intermediate representation (json), runtime executes Ir.
-Therefore: Maybe define new functions (read nodes) in the spec itself and not in the runtime?
+Therefore: Maybe define new functions (read nodes) in the spec itself and not in the runtime? Also recursion in specifications
 
 \subsection{Error prevention}
 \label{sec:conclusion:further_work:error_prevention}
