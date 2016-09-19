@@ -7,17 +7,17 @@ TODO: TS1 vs TS2
       Implicit greedy schedules with Call vs Fair schedules with cast
       Evaluation Model: JSON parsing -> GenServer -> MessageQueue for inputs -> Evaluation of each Node \dots
 
-Besides the theoretical basics presented in \cref{sec:related} the \gls{tessla} runtime of this thesis is built upon a number of technologies.
+Besides the theoretical basics presented in \Cref{sec:related} the \gls{tessla} runtime of this thesis is built upon a number of technologies.
 To better understand decisions made during the implementation this chapter will give an overview of them and show why they were choosen.
 
 As already mentioned, the implemented runtime itself is independent of the way traces are generated.
-Therefore we will not only look at building blocks for the runtime itself but also examine related projects which can be used to obtain traces, which then can be monitored by the runtime.
-Because the format of the traces can differ heavily, depending on how and why they were collected, they are not only used to test the runtime but also to determine how it can consume them.
+Therefore we will not only look at the building blocks for the runtime itself but also examine related projects which can be used to obtain traces, which then can be monitored by the runtime.
+Because the format of the traces can differ heavily, depending on how and why they were collected, they are not only used to test the runtime but also to determine how the runtime can consume them.
 
 \section{TesslaServer}
 \label{sec:implementation:tesslaserver}
 
-The runtime to evaluate specifications is implemented in the programming language Elixir, which itself is built on top of Erlang, the \gls{beam} \gls{vm} and \gls{otp}.
+The runtime to evaluate specifications against traces is implemented in the programming language Elixir, which itself is built on top of Erlang, the \gls{beam} \gls{vm} and \gls{otp}.
 To understand why this plattform was choosen we will look at the Erlang ecosystem in the next section.
 
 \subsection{Erlang and Elixir}
@@ -35,7 +35,7 @@ The rather new programming language Elixir\footnote{\url{http://elixir-lang.org}
 Elixir code is compiled into bytecode for \gls{beam} and can therefore interoperate with Erlang code.
 The rationale to use Elixir instead of Erlang is twofold:
 On the one hand Erlangs syntax is pretty different from that of most modern general purpose programming languages while Elixirs syntax was developed based on modern language design principles.
-Also Elixir supports metaprogramming, meaning you can write code that generates code at compile time, which is heavily used as described in \cref{sec:implementation:tesslaserver:architecture}.
+Also Elixir supports metaprogramming, meaning you can write code that generates code at compile time, which is heavily used as described in \Cref{sec:implementation:tesslaserver:architecture}.
 
 One of the core strengths of the Erlang platform is it support to use multiple processor cores, even if these cores are deployed over multiple machines in a network.
 The plattform offers tools to develop code that can be distributed over multiple processors.
@@ -43,29 +43,29 @@ This distribution is transparent to the developer.
 The underlying concept of the distribution is the actor model, first introduced in \cite{Hewitt1973}.
 
 An actor is basically a self contained entity, that holds a state and can receive and send messages to other actors.
-Since an actor holds its own state that can't be altered by anything but the actor itself, it doesn't matter on which processor the actor is scheduled to perform its computation.
-When an actor receives a message from another actor the \gls{beam} \gls{vm} will eventually schedule the code responsible for handling the message on a core.
-The code can then access the state, alter it and send a response to the sender of the message.
+Since an actor holds its own state and is the only one that can manipulate it, an actor can be scheduled on any core as long as the runtime guarantees transparent message delivery.
+When an actor receives a message from another actor the \gls{beam} \gls{vm} will eventually schedule the code responsible for handling the message on an available core.
+This code can then access the state, alter it and send a response to the sender of the message.
 In this sense an actor can be seen as a state machine, which alters the state everytime it receives a message.
 Since actors are independent of each other they can be scheduled in parallel on multiple processors.
 Only when two actors synchronously communicate one has to wait for the other.
 
 
 Another reason to choose the Erlang platform was its support for multiple plattforms, including resource restricted ones.
-While not part of this thesis it may be a future goal to perform online monitoring with TesslaServer.
-To enable this the runtime has to be able to run on the hardware architecture the monitored program runs on.
+While this thesis only considers offline monitoring it may be a future goal to perform online monitoring with TesslaServer.
+To enable this the runtime has to be able to run on the same hardware architecture the monitored program runs on sharing resources with it.
 An example of the variety of the supported plattforms of Erlang and Elixir is the Nerves project\footnote{\url{http://nerves-project.org}} which allows developers to build embedded software.
 
 
 \subsection{Architecture}
 \label{sec:implementation:tesslaserver:architecture}
 
-Timing model: reason why events have to carry timestamps in contrast to interweaved monitors
+TODO Timing model: reason why events have to carry timestamps in contrast to interweaved monitors
 Compare V1 and V2
 
-As described in \cref{sec:definitions:eval_engine} \gls{tessla} specifications for am \gls{dag} of nodes, which perform transformations on streams and send their computed stream to children.
-Streams can be seen as a series of events or changes that can be represented as messages between the nodes.
-This form of the specification can be easily implemented as an actor based system.
+As described in \Cref{sec:definitions:eval_engine} \gls{tessla} specifications form a \gls{dag} of nodes, which perform transformations on streams and send their computed streams to children nodes.
+Streams can be seen as a sequence of events or changes that can be represented as messages between the nodes.
+This form of specification can be easily implemented as an actor based system.
 
 \subsection{Synthesis of the Evaluation Engine}
 
@@ -76,29 +76,29 @@ For this step a specification is compiled into a \gls{json} based format that de
 \lstinputlisting[caption={Minimal example of the \gls{json} based specification format. The specification describes a \gls{dag} with three nodes: two literals as the sources and an adder as their child.},label=listing:spec_json]{content/code/minimal.tessla}
 
 The compiler performs multiple checks, e.g. type checks and ensures that no loops are present in the specification, and transformations, e.g. resolve macros and other syntactic elements of the specification language.
-Since the compiler kind of acts as a safety guard TesslaServer assumes that a given specification is error free and performs no safety checks.
-Invalid specifications can therefore lead to all kinds of wrong behaviour.
+Since the compiler acts as a safety guard, TesslaServer assumes that a given specification is error free and performs no redundant safety checks.
+Invalid specifications can therefore lead to all kinds of wrong behaviour if fed to TesslaServer.
 
-The \gls{json} based specification is then translated into actors like the following: For each node described in the \(\mathit{items}\) object an actor is started with the Elixir module specified by the \(\mathit{nodetype}\) key as the message handling code.
+The \gls{json} based specification is then translated into actors as follows: For each node described in the \(\mathit{items}\) object an actor is started with the Elixir module specified by the \(\mathit{nodetype}\) key as the message handling code.
 When a node is started as an actor it will receive the additional information present in the \gls{json} object, e.g. the value for the \(\mathit{operands}\) keys, as an argument to its initialization handler.
 It will use this information to build up the initial state and to register itself with a central process registry provided by erlang under its \(\mathit{id}\).
 
-After all actors are started, TesslaServer will send each one a message asking them to subscribe to their operands.
-When a node subscribes to an operand it will send the operand a message containing its \(\mathit{id}\) with the request to add it as a child.
+After all actors are started, TesslaServer will send each actor a message asking them to subscribe to their operands.
+When a node subscribes to an operand it will send the operand a message containing the nodes \(\mathit{id}\) with the request to add this node as a child.
 The node representing the operand will add the \(\mathit{id}\) the list of children in its internal state.
 Later, during the actual evaluation of the traces, each node will use the list of children to send messages of new generated events using the central process registry.
 
-When all nodes subscribed to their operands the evaluation engine is synthesized and can start to evaluate the specification over traces.
+The evaluation engine is synthesized, when all nodes subscribe to their operands and can start to evaluate the specification over traces.
 To understand how the evaluation works, the next section will explain the implementation of nodes.
 
-\subsubsection{Node Implementation}
+\subsection{Node Implementation}
 Nodes are kind of similar therefore metaprogramming instead of inheritance since functional language
 Note GenServer
 
-\subsubsection{TesslaServer V1: EventStream passing}
-\subsubsection{TesslaServer V2: Event passing}
+\subsection{TesslaServer V1: EventStream passing}
+\subsection{TesslaServer V2: Event passing}
 
-\subsection{Instrumentation Pass}
+\section{Instrumentation Pass}
 \label{sec:implementation:instrumentation}
 
 

@@ -6,12 +6,12 @@
 In this chapter performance characteristics of the implemented runtime and also of the instrumentation pass are presented.
 To do so both systems are tested under a number of different circumstances to get an overview of how they might perform in real world usage.
 As the complete benchmark data is to big in this chapter only summarys are presented.
-The complete datasets can be found in \cref{sec:appendix}.
+The complete datasets can be found in \Cref{sec:appendix}.
 
 \section{Runtime Benchmarks}
 \label{sec:evaluation:runtime_benchmarks}
 
-Over the course of this thesis two different approaches to handling the progress of streams in the runtime are explored, which were also briefly mentioned in \cref{sec:definitions:run}: progress timestamps and progress events.
+Over the course of this thesis two different approaches to handling the progress of streams in the runtime are explored, which were also briefly mentioned in \Cref{sec:definitions:run}: progress timestamps and progress events.
 Progress timestamps were used first, which worked, but lead to big overhead when a great number of computations had to happen, since the whole stream had to be send to all children of the node that performed the computation.
 Therefore, later the runtime was refactored to use progress events, so that only events had to be sent between nodes.
 The following benchmarks will show the performance characteristics of both approaches under different circumstances.
@@ -21,7 +21,7 @@ The following benchmarks will show the performance characteristics of both appro
 
 Since one of the main motivations to choose Erlang as the plattform for the runtime was its support for parallel execution on many processor cores, we explore the performance characteristic in regard to available cores in this section.
 To do so a simple \gls{tessla} specification is given, that includes as many nodes as the maximal number of processors available.
-Such a spec for eigth processors is given in \cref{listing:runtime_parallel_spec_8}.
+Such a spec for eigth processors is given in \Cref{listing:runtime_parallel_spec_8}.
 
 \begin{figure}
   \lstinputlisting[caption=\gls{tessla} specification with eight nodes on the critical path,label=listing:runtime_parallel_spec_8]{content/code/parallel_8.spec}
@@ -31,7 +31,7 @@ The specification is evaluated over appropriate traces with a specified amount o
 The needed time of the evaluation engine from its start until it emits the conclusion, that the stream \(\mathit{done}\) is \(\mathit{true}\), is measured for different amounts of processors.
 All benchmarks were performed on the same machine  with upto 16 cores and 48GB of RAM.
 \Cref{fig:chap_eval:runtime_num_cores} shows the results of the benchmarks.
-The complete data can be found in \cref{table:tessla_server_v1_num_cores_data,table:tessla_server_v1_num_cores_data,table:tessla_server_v1_num_cores_data}.
+The complete data can be found in \Cref{table:tessla_server_v1_num_cores_data,table:tessla_server_v1_num_cores_data,table:tessla_server_v1_num_cores_data}.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{gfx/runtime_num_cores_benchmark}
@@ -49,7 +49,7 @@ This behaviour was one of the main reasons to switch to a new approach.
 To test if reduced \gls{ram} usage would lead to better performance and eliminate crashes, the old architecture was changed in a small way: Each stream was limited to only hold the last 20 events, all older events were thrown away.
 Since the specification used for benchmarking only works on the most recent event of each stream, this would not alter the conclusion of the engine.
 For example a specification computing the average of the last 21 events wouldn't work with this adaption.
-See \cref{sec:evaluation:runtime_benchmarks:num_events} for a benchmark of \gls{ram} usage.
+See \Cref{sec:evaluation:runtime_benchmarks:num_events} for a benchmark of \gls{ram} usage.
 The obvious reduction of \gls{ram} usage of the adapted first approach motivated the decision to refactor the runtime to use the new approach.
 
 TODO: describe how V2 scales with core number.
@@ -58,12 +58,12 @@ TODO: describe how V2 scales with core number.
 \label{sec:evaluation:runtime_benchmarks:num_events}
 
 Another metric looked at, is how the runtime behaves in regard to the number of events that are fed to the engine, and therefore how many events are generated during its execution.
-To obtain these metrics the specification from \cref{listing:runtime_parallel_spec_8} is evaluated with different values for the comparision node are run.
+To obtain these metrics the specification from \Cref{listing:runtime_parallel_spec_8} is evaluated with different values for the comparision node are run.
 The specification is extended to use 16 nodes, which means that each input event will generate 16 internal events.
 All benchmarks in this section were performed on a processor with 4 cores at 2.4GHz speed and 8GB of RAM.
 
 The first benchmark compares the execution time of the implementation approaches when fed with different number of input events.
-\Cref{fig:chap_eval:runtime_num_events} gives an overview of the data, the whole dataset can be found in \cref{table:tessla_server_v1_events_num_events_data,table:tessla_server_v1_5_events_num_events_data,table:tessla_server_v2_events_num_events_data}.
+\Cref{fig:chap_eval:runtime_num_events} gives an overview of the data, the whole dataset can be found in \Cref{table:tessla_server_v1_events_num_events_data,table:tessla_server_v1_5_events_num_events_data,table:tessla_server_v2_events_num_events_data}.
 
 \begin{figure}[!htb]
   \includegraphics[width=\textwidth]{gfx/runtime_num_events_benchmark}
@@ -74,7 +74,7 @@ The first benchmark compares the execution time of the implementation approaches
 The number of events also increase memory usage, espacially in the first implementation approach.
 The second benchmark therefore tests the \gls{ram} usage of the different approaches under different number of input events.
 \Cref{fig:chap_eval:runtime_ram_usage} illustrates the \gls{ram} usage of the different approaches.
-The complete data can be found in \cref{table:tessla_server_v1_events_ram_usage_data,table:tessla_server_v1_5_events_ram_usage_data,table:tessla_server_v2_events_ram_usage_data}.
+The complete data can be found in \Cref{table:tessla_server_v1_events_ram_usage_data,table:tessla_server_v1_5_events_ram_usage_data,table:tessla_server_v2_events_ram_usage_data}.
 
 \begin{figure}[!htb]
   \includegraphics[width=\textwidth]{gfx/runtime_ram_usage_benchmark}
@@ -85,9 +85,9 @@ The complete data can be found in \cref{table:tessla_server_v1_events_ram_usage_
 \subsection{Number of Nodes}
 
 As a last metric the performance of the runtime is evaluated over specifications with different amount of nodes.
-Therefore the specification from \cref{listing:runtime_parallel_spec_8} was modified to include higher number of nodes by appending more nodes computing the absolute.
+Therefore the specification from \Cref{listing:runtime_parallel_spec_8} was modified to include higher number of nodes by appending more nodes computing the absolute.
 All benchmarks in this section were performed on a processor with 4 cores at 2.4GHz speed and 8GB of \gls{ram}.
-\Cref{fig:chap_eval:runtime_num_nodes} visualizes the performance, the complete data can be found in \cref{table:tessla_server_v1_num_nodes,table:tessla_server_v1_5_num_nodes,table:tessla_server_v2_num_nodes}.
+\Cref{fig:chap_eval:runtime_num_nodes} visualizes the performance, the complete data can be found in \Cref{table:tessla_server_v1_num_nodes,table:tessla_server_v1_5_num_nodes,table:tessla_server_v2_num_nodes}.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{gfx/runtime_num_nodes_benchmark}
@@ -110,7 +110,7 @@ For reliable trace collection of software the performance impact of the instrume
 To measure this a trivial C program was exercised with and without instrumentation.
 The program increments each integer from 0 to 100\,000\,000 by one and, if the incremented number is divisible by a given parameter \(c\), adds it to an intermediate result.
 Note that the program  can and will perform some integer overflows.
-The code is shown in \cref{listing:instrument_benchmark_code}.
+The code is shown in \Cref{listing:instrument_benchmark_code}.
 
 \begin{figure}
 \lstinputlisting[language=c, label=listing:instrument_benchmark_code, caption=Example C program for benchmark purposes]{content/code/instrument_benchmark.c}
@@ -131,8 +131,8 @@ Aggressive compiler optimizations can remove function calls or inline values if 
 When instrumentation calls are added no such optimization can happen, since otherwise the behaviour of the program would be altered, namely the logging would be removed when the function calls are removed.
 
 Therefore we compare the instrumented and non-instrumented code for all optimization levels.
-The comparison can be seen in \cref{fig:chap_eval:instrument_benchmark_results}.
-The complete data can be found in \cref{table:non_instrumented_optimizations_benchmark,table:instrumented_optimizations_benchmark}.
+The comparison can be seen in \Cref{fig:chap_eval:instrument_benchmark_results}.
+The complete data can be found in \Cref{table:non_instrumented_optimizations_benchmark,table:instrumented_optimizations_benchmark}.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{gfx/instrumentation_time_benchmark}
@@ -140,7 +140,7 @@ The complete data can be found in \cref{table:non_instrumented_optimizations_ben
 \label{fig:chap_eval:instrument_benchmark_results}
 \end{figure}
 
-The choice to instrument around 1\% of the function calls was made arbitrary after some experimentation showed that a higher amount leads to huge performance impacts as shown in \cref{sec:evaluation:instrumentation_benchmark:instr_amount}.
+The choice to instrument around 1\% of the function calls was made arbitrary after some experimentation showed that a higher amount leads to huge performance impacts as shown in \Cref{sec:evaluation:instrumentation_benchmark:instr_amount}.
 Intuitively it sounds reasonable that in a real life example only a small subset of the function calls are interesting for trace generation, since \gls{tessla} specifications should be used to monitor only critical parts of a system.
 
 \subsection{Performance Impact in Regard to Instrumentation Percentage}
@@ -149,8 +149,8 @@ Intuitively it sounds reasonable that in a real life example only a small subset
 To further investigate the impact of instrumentation we will look at the performance impact with respect to the percentage of function calls that are instrumented.
 Therefore the variable \(c\) of the program is changed, which leads to different amount of calls to the instrumented function.
 For all values the program was compiled with the maximal optimization setting.
-In \cref{fig:chap_eval:instrument_benchmark_amount_results} the results of changing the parameter can be seen.
-The complete dataset can be found in \cref{table:instrumented_amount_benchmark}.
+In \Cref{fig:chap_eval:instrument_benchmark_amount_results} the results of changing the parameter can be seen.
+The complete dataset can be found in \Cref{table:instrumented_amount_benchmark}.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{gfx/instrumentation_amount_benchmark}
@@ -175,19 +175,19 @@ The programs or traces were then modified to deliberately include errors to test
 % \subsection{Ringbuffer Examples}
 
 As the main source for test trace data a ringbuffer, implemented in C, was modified by the instrumentation to log specific events.
-The code of the ringbuffer can be found in \cref{listing:ringbuffer}.
+The code of the ringbuffer can be found in \Cref{listing:ringbuffer}.
 Events that are logged are of two types: calls to the \lstinline{process} function and changes of the \lstinline{write_ptr} variable.
 The generated traces can be used for a variety of specifications, e.g.: performance tests, race conditions or wrong initilizations.
 
-Following specification were tested over the traces:
+The Following specifications were tested over the traces:
 
 \begin{itemize}
-  \item Data is only processed, when it is available, meaning that at each point of the trace the amount of changes of \lstinline{write_ptr} is bigger than the number of calls to \lstinline{process}.
+  \item Data is only processed when it is available, meaning that at each point of the trace the amount of changes of \lstinline{write_ptr} is bigger than the number of calls to \lstinline{process}.
   \item The given buffer size of five is never exceeded, meaning the difference of the amount of changes of both event types is never bigger than five.
-  \item Everytime new data is added, there is a call to process in the next milisecond.
+  \item Everytime new data is added, there is a call to process within the next milisecond.
 \end{itemize}
 
 The specifications were intentionally chosen and written in such a way, that they use a big amount of different nodes.
-The actual \gls{tessla} specifications used to describe the requirements can be found in \cref{sec:appendix:tessla_specs}.
+The actual \gls{tessla} specifications used to describe the requirements can be found in \Cref{sec:appendix:tessla_specs}.
 For each of these specification the traces were deliberately altered to violate them.
 Evaluation of the specifications over the traces with TesslaServer always led to the correct conclusions.

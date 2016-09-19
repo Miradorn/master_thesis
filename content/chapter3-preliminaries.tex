@@ -2,7 +2,7 @@
 \chapter{Preliminaries}
 \label{sec:definitions}
 
-In this chapter we will define concepts that are used in \cref{sec:behaviours} to reason about the implemented runtime.
+In this chapter we will define concepts that are used in \Cref{sec:behaviours} to reason about the implemented runtime.
 
 While the \gls{tessla} specification itself defines a set of semantics, for this thesis we will slightly alter some of it and add some new definitions based on them.
 This is necessary to reason about the specifics how the runtime is built (Note that \gls{tessla} doesn't define an operational semantic, therefore we will define our own) and how it behaves.
@@ -137,7 +137,7 @@ In the following \(\sigma_i\) is used to get the element at position \(i\) and \
   \end{align*}
   \(\Rightarrow t_1 \not\equiv_a t_3\)
 
-  Because of \cref{lemma:async_equivalence_is_equivalence_relationship} \(\Rightarrow t_2 \not\equiv_a t_3\).
+  Because of \Cref{lemma:async_equivalence_is_equivalence_relationship} \(\Rightarrow t_2 \not\equiv_a t_3\).
 
 \end{exmp}
 
@@ -320,7 +320,7 @@ Since the values are associated with timestamps the outputs can be reordered by 
   \(\Rightarrow t_1 \not\equiv_a t_3\)\\
   If \(t_3\) weren't bounded (and therefore not finite) there would be no way to know, if it was equivalent to \(t_1\), because it could always produce a missing event at a later time.
 
-  Because of \cref{lemma:observational_equivalence_equivalence_relationship} \(\Rightarrow t_2 \not\equiv_a t_3\).
+  Because of \Cref{lemma:observational_equivalence_equivalence_relationship} \(\Rightarrow t_2 \not\equiv_a t_3\).
 
 \end{exmp}
 
@@ -385,8 +385,8 @@ Timing functions are evaluated not only on the value of events but also on their
 While non timing functions will consume events at a specific timestamp and emit events with that timestamp, timing functions can emit events with a changed timestamp.
 In this thesis we will only look at past time functions, meaning functions can only delay timestamps, therefore can't depend on future values.
 
-Timing functions complicate the reasoning about schedules and causality and therefore aren't included in \cref{sec:behaviours:without_timing}.
-In \cref{sec:behaviours:timing_functions} the conclusions of earlier sections will be extended to include timing functions.
+Timing functions complicate the reasoning about schedules and causality and therefore aren't included in \Cref{sec:behaviours:without_timing}.
+In \Cref{sec:behaviours:timing_functions} the conclusions of earlier sections will be extended to include timing functions.
 
 \section{Nodes}
 \label{sec:definitions:nodes}
@@ -399,7 +399,7 @@ The function of a node \(n \in N\) is written as \(f_n\).
 
 Each node has a set of inputs, which are either external or internal streams, and one output, which is either an internal or an output stream.
 Nodes which have at least one external stream as an input are called \emph{sources}.
-Nodes have a state, described in \cref{sec:definitions:state}, which contains \gls{fifo} queues, provided by the Erlang plattform, which buffer events from its inputs for later computation.
+Nodes have a state, described in \Cref{sec:definitions:state}, which contains \gls{fifo} queues, provided by the Erlang plattform, which buffer events from its inputs for later computation.
 
 Every new event added to a queue has to have a bigger timestamp than the previous event added to the queue.
 This means a queue has a kind of progress timestamp, which denotes the timestamp of the latest event added to it and which is strictly increasing over time.
@@ -461,7 +461,7 @@ It has to be proven that a chosen schedule produces the correct conclusions for 
 An evaluation engine is run inside an environment.
 The environment has knowledge over the state of the nodes, most important which nodes are enabled.
 Based on that information the environment is responsible of feeding the trace data to the engine: only when no sources are enabled the next trace is added to the queue of an input node.
-This ensures that the consumption of input signals is strictly ordered by timestamp, which is important as we will see in \cref{sec:behaviours}.
+This ensures that the consumption of input signals is strictly ordered by timestamp, which is important as we will see in \Cref{sec:behaviours}.
 
 
 \section{\glsentryname{tessla} Functions}
@@ -491,7 +491,7 @@ Especially only timed functions can produce more than one event at an evaluation
 
 Complete functions will consume one event from every input and produce one event at every timestamp they are evaluated.
 Most complete functions are pretty simple and often have eventstreams as inputs or only have one input.
-The complete functions that are present in the implemented runtime are explained in \cref{table:complete_functions}.
+The complete functions that are present in the implemented runtime are explained in \Cref{table:complete_functions}.
 
 \begin{table}[!htb]
   \begin{tabularx}{\textwidth}{lllX}
@@ -617,7 +617,7 @@ We will denote the set of all global states as \(S\).
 A global state can be queried like \(s(n) = \widetilde{n}\) to yield the state of the node \(n\).
 
 Nodes, and therefore the whole evaluation engine, change their state when they are scheduled.
-The transition between states is described in \cref{sec:definitions:transitions}
+The transition between states is described in \Cref{sec:definitions:transitions}
 
 
 % \begin{itemize}
@@ -658,7 +658,7 @@ One part of a transition is a relation between two sets of events, why sometimes
 E.g.\ the relation \(\tau = (\{e_1,e_2\}, \{e_3\})\) means that two events were consumed by a node and one event was produced based on them.
 
 The empty transition, meaning no input was consumed and no output produced, is labeled with \(\lambda\).
-Note that all transitions, which produces events have to consume at least one event (therefore no events can be created from nowhere) and that it's possible that no event was produced based on the consumed events (see \cref{sec:definitions:tessla_functions}).
+Note that all transitions, which produces events have to consume at least one event (therefore no events can be created from nowhere) and that it's possible that no event was produced based on the consumed events (see \Cref{sec:definitions:tessla_functions}).
 Furthermore with timing functions it's possible to create multiple events in one transition.
 For example think of an \(\mathit{EchoNode}\), which duplicates an input after a specified amount of time.
 
@@ -852,7 +852,7 @@ For the comparision of runs some more definitions are needed.
   First let's assume that no parent of \(n\) are scheduled after step \(i\) and before \(n\) becomes disabled.
   Since the input queues of \(n\) are filled by previous transitions and only finite number of events are produced at every step, all of the queues can only have a finite number of events buffered at step \(i\).
   Since no parents of \(n\) are scheduled, the queues can't get fuller.
-  Because all nodes represent functions, and all functions have to consume at least one input event (\cref{sec:definitions:tessla_functions}), everytime \(n\) is scheduled at least one input queue of \(n\) will have one event less buffered after it performed its computation.
+  Because all nodes represent functions, and all functions have to consume at least one input event (compare \Cref{sec:definitions:tessla_functions}), everytime \(n\) is scheduled at least one input queue of \(n\) will have one event less buffered after it performed its computation.
   Therefore the worst case is when \(n\) only consumes one event per computation.
   The maximum number of time \(n\) can be scheduled is therefore bounded by the sum of the number of events on all input queues at step \(i\).
 

@@ -116,10 +116,10 @@ Specifications are given as a textual representation of state machines, which is
 The specifications are then interweaved into the programm using CIL~\cite{Necula2002}.
 Specifications work on the level of function calls and state properties like \emph{write may never be called before open was called}.
 Because software developers are often working at the same abstraction level (in contrast to e.g.\ assembler or machine instructions), they can define specifications without having to learn new concepts.
-In the \gls{tessla} runtime support for traces at the same abstraction level (function calls, variable reads and writes) is present and used in most of the tests in \cref{sec:evaluation:runtime_examples}.
+In the \gls{tessla} runtime support for traces at the same abstraction level (function calls, variable reads and writes) is present and used in most of the tests in \Cref{sec:evaluation:runtime_examples}.
 
 Because \gls{rmor} specifications are interweaved into the program, their observations can not only be reported but also used to recover the program or even to prevent errors by calling specified functions when a critical condition is encountered.
-The \gls{tessla} runtime doesn't support this out of the box, as it's primary purpose is testing and offline monitoring, but in \cref{sec:conclusion:further_work:error_prevention} we will look at possible extensions to support this.
+The \gls{tessla} runtime doesn't support this out of the box, as it's primary purpose is testing and offline monitoring, but in \Cref{sec:conclusion:further_work:error_prevention} we will look at possible extensions to support this.
 
 % \section{Driver Trace}
 % \label{sec:related:drivertrace}
