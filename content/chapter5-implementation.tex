@@ -3,9 +3,8 @@
 \chapter{Implementation Details}
 \label{sec:implementation}
 
-TODO: TS1 vs TS2
+TODO: T1 vs TS2
       Implicit greedy schedules with Call vs Fair schedules with cast
-      Evaluation Model: JSON parsing -> GenServer -> MessageQueue for inputs -> Evaluation of each Node \dots
 
 Besides the theoretical basics presented in \Cref{sec:related} the \gls{tessla} runtime of this thesis is built upon a number of technologies.
 To better understand decisions made during the implementation this chapter will give an overview of them and show why they were choosen.
@@ -60,12 +59,16 @@ An example of the variety of the supported plattforms of Erlang and Elixir is th
 \subsection{Architecture}
 \label{sec:implementation:tesslaserver:architecture}
 
-TODO Timing model: reason why events have to carry timestamps in contrast to interweaved monitors
-Compare V1 and V2
-
 As described in \Cref{sec:definitions:eval_engine} \gls{tessla} specifications form a \gls{dag} of nodes, which perform transformations on streams and send their computed streams to children nodes.
 Streams can be seen as a sequence of events or changes that can be represented as messages between the nodes.
 This form of specification can be easily implemented as an actor based system.
+
+An important characteristic of \gls{tessla} specifications is, that they can specify properties over realtime.
+On the one hand this enables specifications that aren't feasible with more classical specification approaches, like \gls{ltl} or \gls{lola}, which work on synchronous streams, on the other hand it adds complexity to monitoring approaches, since it adds asynchronicity to all parts of the system.
+One point where this is important is in the way, how systems have to be monitored, or more precisely how their generated events are encoded.
+For synchronous monitoring approaches, the information, that an event happened is sufficient, for asynchronous ones it is important to know at which exact time each event happened.
+For an implementation of an asynchronous monitoring approach this simply means, that the representation of events has to include information about the time of the event.
+Another consequence of the asynchronous nature is discussed in \Cref{sec:implementation:tesslaserver:nodes} with the notion of the \emph{front} of events.
 
 \subsection{Synthesis of the Evaluation Engine}
 
@@ -73,7 +76,7 @@ The first step that TesslaServer has to perform to evaluate a specification is t
 For this step a specification is compiled into a \gls{json} based format that describes the nodes and their relationship.
 \Cref{listing:spec_json} shows a minimal example of the format, which includes three nodes: two literals and a node adding their value.
 
-\lstinputlisting[caption={Minimal example of the \gls{json} based specification format. The specification describes a \gls{dag} with three nodes: two literals as the sources and an adder as their child.},label=listing:spec_json]{content/code/minimal.tessla}
+\lstinputlisting[float,language=json,caption={Minimal example of the \gls{json} based specification format. The specification describes a \gls{dag} with three nodes: two literals as the sources and an adder as their child.},label=listing:spec_json]{content/code/minimal.tessla}
 
 The compiler performs multiple checks, e.g. type checks and ensures that no loops are present in the specification, and transformations, e.g. resolve macros and other syntactic elements of the specification language.
 Since the compiler acts as a safety guard, TesslaServer assumes that a given specification is error free and performs no redundant safety checks.
@@ -92,11 +95,89 @@ The evaluation engine is synthesized, when all nodes subscribe to their operands
 To understand how the evaluation works, the next section will explain the implementation of nodes.
 
 \subsection{Node Implementation}
-Nodes are kind of similar therefore metaprogramming instead of inheritance since functional language
-Note GenServer
+\label{sec:implementation:tesslaserver:nodes}
+
+\emph{Nodes} (or \emph{computations} due to namespace errors with the Erlang standard library) are responsible for the actual evaluation of a specification over traces.
+\Gls{tessla} defines a standard set of nodes (called functions in the original specification) but leaves it open to the runtime to support only part of them or extend it.
+To support extensions of \gls{tessla} and the runtime one of the main focuses was to make it easy to implement new node types.
+
+This is achieved by building upon an abstraction from \gls{otp} called \emph{GenServer} and providing a new abstraction which is tailored towards implementing a node for stream transformation, called \emph{GenComputation}.
+\Cref{fig:chap6:sec_node_impl:node_control_flow} shows the control flow of a single node with two inputs and one child node.
+
+\begin{figure}
+  \center
+  \includegraphics[width=\textwidth,height=0.9\textheight,keepaspectratio]{content/figs/node_architecture}
+  \caption[Control flow of a node]{Schema of the control flow of a node. A node interacts with other nodes using the \emph{GenServer} abstraction, buffers events using the \emph{GenComputation} abstraction and performs its calculation in the \emph{logic} part. Computed events are then send to children using the same abstraction mechanisms.}
+\label{fig:chap6:sec_node_impl:node_control_flow}
+\end{figure}
+
+The \emph{GenServer} abstraction is provided by the Erlang and Elixir plattform and is basically an implementation of the actor pattern mentioned before.
+It provides an \gls{api} to register actors, send messages to other actors and to handle incomming messages as well as maintaining the actor state.
+Furthermore it enables monitoring, crash recovery and hot code upgrades, mechanism that aren't used in TesslaServer as of now.
+
+The next layer is provided by the \emph{GenComputation} abstraction.
+Before examining its responsibilities we will look at it's implementation.
+\emph{GenComputation}, similar to \emph{GenServer}, heavily relies on Elixir metaprogramming, which is achieved with macros.
+Elixir makes heavy use of macros, a mechanism mainly known from the LISP programming language.
+Macros enables the programmer to write code that generates code.
+Since all nodes perform a similar task, performing computations on one or more input streams, it makes sense to generate code for shared responsibilities instead of duplicating it for every node.
+In this special case macros are used to achieve similar goals as inheritance in object oriented programming languages, namely code reuse.
+
+Let's now focus on the responsibilities of \emph{GenComputation}.
+When a node receives a message from another node, the message will be handled by the \emph{GenServer} abstraction.
+\emph{GenServer} itself requires the user to implement a callback which is responsible for actually reacting to the message, e.g. by updating the state or sending new messages.
+Since TesslaServer uses exactly one format for messages \emph{GenComputation} is able to handle them for all actual node implementations.
+The concrete handling of messages differs beween the two versions of TesslaServer, therefore the details are described in \Cref{sec:implementation:tesslaserver:v1,sec:implementation:tesslaserverv2}.
+
+On a high level \emph{GenComputation} buffers messages until it can be sure, that all inputs have progressed since the last time outputs were generated by the node, which means that either new events can be generated or at least the output stream can be progressed.
+A similar concept is presented in~\cite{TODOBEEPBEEP} which was discussed in \Cref{sec:related:beepbeep}: the \emph{front} of the input streams.
+Because BeepBeep isn't using timed specifications the computation of the front is easy: the head of each input when every input has at least one event buffered.
+For \gls{tessla} this is not as easy, since the timestamps of the events in the front can differ.
+As a result \emph{GenComputation} has to perform multiple steps to determine the appropriate actions based on the front.
+The exact steps are described in the respective sections of the two versions of TesslaServer.
 
 \subsection{TesslaServer V1: EventStream passing}
+\label{sec:implementation:tesslaserver:v1}
+
+The first version of TesslaServer was built with two goals in mind: safety and hiding complexity.
+This led to implementation decisions that were on one hand performance critical (see \Cref{sec:evaluation:runtime_benchmarks}) and on the other hand made it hard to implement complex node types.
+
+One of the main ideas of this implementation is to make streams a central data structure that is able to guarantee some safety aspects, e.g. ordering of events.
+Each node has a set of streams: one for each parent node and one output stream.
+Whenever a node computes new events, its output stream is updated and the whole stream is send to all of its children.
+When a node receives a message from a parent node containing an updated stream, it will update its own state by replacing the last saved stream from the parent with the newly received.
+Then it will determine if with this updated stream new events can be computed.
+To do so it looks at the input stream with the minimal progress and compare it with the progress of its own output.
+If theese two times are equal the node can't produce a new front, since at least one input hasn't progressed since the last computation.
+Only if the minimal progress of all inputs is bigger than the progress of the output the node has to determine the appropriate computations.
+
+This happens by generating a sequence of partial fronts for specific timestamps like following:
+
+\begin{enumerate}
+  \item Look at all input streams and find all events that happened after the progress of the output upto the minimal progress.
+  \item Take the timestamps of theese events in chronological order, we will call them the \emph{change timestamps} since they denote that at least on one input stream something changed.
+  \item Iterate over the timestamps in order, built the partial front by getting all events that happened on any input stream at that timestamp.
+  \item Invoke the actual logic of the node with that partial front to perform its transformation.
+\end{enumerate}
+
+It is important to understand, that all steps except the last one are performed by the \emph{GenComputation} abstraction.
+Hence, a node implementation, at least in theory, only has to implement the logic to combine a partial front.
+
+The problems of this approach are twofold:
+First, to implement more complex node types it was necessary to overwrite a lot of the provided abstractions, e.g. to manipulate timestamps.
+But more important were scaling problems: Since every node had a copy of all input streams stored in its state and streams contained all events that were ever produced the \gls{ram} usage did grow exponentially with thenumber of nodes and input events used to evaluate a specification.
+This can be seen in \Cref{sec:evaluation:runtime_benchmarks:num_events}.
+Another problem was that the messages between nodes also grow with the number of events, since the whole stream has to be send everytime.
+
+Therefore the TesslaServer version 2 architecture was implemented.
+
 \subsection{TesslaServer V2: Event passing}
+\label{sec:implementation:tesslaserver:v2}
+Note: more responsibilities for nodes
+Macro for standard nodes
+Signals have to filter duplicate events (change from true to true)
+
+Advantage: Inputs have only to be totally ordered on each stream.
 
 \section{Instrumentation Pass}
 \label{sec:implementation:instrumentation}

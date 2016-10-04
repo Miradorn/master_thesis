@@ -5,9 +5,19 @@
 
 \section{Conclusion for TesslaServer}
 
-note limitations of Type system of compiler
+note limitations of Type system of compiler and Runtime
+
+Optimizations: Bundle up events, throw away unneeded progress events in  bundles
+  For some notes only subset of inputs is important for output progress (think if then else)
+    -> Some things na be optimized by compiler (literal as cond to ite) others only during evaluation.
+
+Implement 'end' notification to flush all values.
+Total ordering of inputs necessary, relax to per channel. Argue that channels could be split by thread id.
 
 \section{Conclusion for the Instrumentation Pass}
+TODO: Timing model, maybe somehow harness Vector clocks -> wwould  compplicate instrumentation! Also would need support in TeSSLa language.
+Extract logging to  different thread ->  run on own core, less overhead.
+Configuration file for instrumetnation -> e.g. include conditions
 
 In the benchmarks of the instrumentation it is obvious that it adds a lot of overhead, especially when compiler optimizations are turned on or the percentage of instrumented function calls is large.
 While the overhead is big, it is stable (see the standard deviation in \Cref{sec:evaluation:instrumentation_benchmark:instr_vs_non_inst}).
