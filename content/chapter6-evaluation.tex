@@ -52,7 +52,11 @@ For example a specification computing the average of the last 21 events wouldn't
 See \Cref{sec:evaluation:runtime_benchmarks:num_events} for a benchmark of \gls{ram} usage.
 The obvious reduction of \gls{ram} usage of the adapted first approach motivated the decision to refactor the runtime to use the new approach.
 
-TODO: describe how V2 scales with core number.
+\Cref{fig:chap_eval:runtime_num_cores} shows how the adapted first approach and second approach are both performing much better than the original one.
+The graph of the adapted first version shows, that it suffers from a too high number of cores.
+It is suspected that this comes from the fact that the messages between the processes are still quite big.
+The new version does not only has the best performance with a single core, it also scales with more cores and doesn't suffer under a high number of cores.
+While not tested we expect the new approach to scale very well with even more cores, especially for more complex specifications and more input events.
 
 \subsection{Number of Events}
 \label{sec:evaluation:runtime_benchmarks:num_events}
@@ -65,22 +69,30 @@ All benchmarks in this section were performed on a processor with 4 cores at 2.4
 The first benchmark compares the execution time of the implementation approaches when fed with different number of input events.
 \Cref{fig:chap_eval:runtime_num_events} gives an overview of the data, the whole dataset can be found in \Cref{table:tessla_server_v1_events_num_events_data,table:tessla_server_v1_5_events_num_events_data,table:tessla_server_v2_events_num_events_data}.
 
-\begin{figure}[!htb]
+\begin{figure}
   \includegraphics[width=\textwidth]{gfx/runtime_num_events_benchmark}
   \caption[Average execution time of the different implementations when fed with different amounts of input events.]{Average execution time of the different implementations when fed with different amounts of input events. V1 refers to the old approach, V1.5 to the adapted old approach and V2 to the new approach. V1 has no data for 10\,000 events since the enormous \gls{ram} usage constantly lead to timeouts.}
 \label{fig:chap_eval:runtime_num_events}
 \end{figure}
+
+The numbers clearly show that the first version has big scaling problems when the number of input events grows.
+The adapted approach shows, that the reduction of size of the messages is an important factor to improve the scalability.
+Version 2 does perform even better than the adapted approach and also scales very well with big numbers of events.
 
 The number of events also increase memory usage, espacially in the first implementation approach.
 The second benchmark therefore tests the \gls{ram} usage of the different approaches under different number of input events.
 \Cref{fig:chap_eval:runtime_ram_usage} illustrates the \gls{ram} usage of the different approaches.
 The complete data can be found in \Cref{table:tessla_server_v1_events_ram_usage_data,table:tessla_server_v1_5_events_ram_usage_data,table:tessla_server_v2_events_ram_usage_data}.
 
-\begin{figure}[!htb]
+\begin{figure}
   \includegraphics[width=\textwidth]{gfx/runtime_ram_usage_benchmark}
   \caption[\gls{ram} usage of the different versions of the runtime]{\gls{ram} usage of the different versions of the runtime in regard to input events. V1 refers to the old approach, V1.5 to the adapted old approach and V2 to the new approach. V1 has no data for 10\,000 events since the enormous \gls{ram} usage constantly lead to timeouts.}
 \label{fig:chap_eval:runtime_ram_usage}
 \end{figure}
+
+Again it can be seen how the old version doesn't scale well and uses an exponential amount of memory with a growing number of events.
+The adapted and the new version both require a very small memory overhead and are nearly constant in their memory consumption.
+The new version uses a bit more memory, we suspect this comes from the fact that more messages have to be sent between the processes and each message carries a bit of overhead.
 
 \subsection{Number of Nodes}
 
@@ -96,8 +108,10 @@ All benchmarks in this section were performed on a processor with 4 cores at 2.4
 \end{figure}
 
 While there is no real world data of the size of typical \gls{tessla} specifications, 128 nodes seems to be a rational upper bound.
-As the data shows the runtime scales nicely with big specification, the data even suggests a somewhat logarithmic increase of the execution time in regard to node count.
+As the data shows that all version of the runtime scale nicely with complex specification, the data even suggests a somewhat logarithmic increase of the execution time in regard to node count.
+It cna also be seen that each version of the runtime has better performance than the previous one.
 
+\clearpage
 
 \section{Instrumentation Benchmarks}
 \label{sec:evaluation:instrumentation_benchmarks}
@@ -112,13 +126,14 @@ The program increments each integer from 0 to 100\,000\,000 by one and, if the i
 Note that the program  can and will perform some integer overflows.
 The code is shown in \Cref{listing:instrument_benchmark_code}.
 
-\begin{figure}
-\lstinputlisting[language=c, label=listing:instrument_benchmark_code, caption=Example C program for benchmark purposes]{content/code/instrument_benchmark.c}
-\end{figure}
-
 The code is then instrumented to log each call of the \lstinline{add} method.
 For each benchmark the compiled program was run 50 times.
 All benchmarks in this section were performed on an Intel Core i5 with four cores at a clock speed of 2.4GHz and 8GB of Ram.
+
+\begin{figure}[!hb]
+\lstinputlisting[language=c, label=listing:instrument_benchmark_code, caption=Example C program for benchmark purposes]{content/code/instrument_benchmark.c}
+\end{figure}
+
 
 \subsection{Performance Comparison with non Instrumented Code and Compiler Optimizations}
 \label{sec:evaluation:instrumentation_benchmark:instr_vs_non_inst}
