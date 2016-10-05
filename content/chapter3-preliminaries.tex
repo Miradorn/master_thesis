@@ -399,7 +399,7 @@ The function of a node \(n \in N\) is written as \(f_n\).
 
 Each node has a set of inputs, which are either external or internal streams, and one output, which is either an internal or an output stream.
 Nodes which have at least one external stream as an input are called \emph{sources}.
-Nodes have a state, described in \Cref{sec:definitions:state}, which contains \gls{fifo} queues, provided by the Erlang plattform, which buffer events from its inputs for later computation.
+Nodes have a state, described in \Cref{sec:definitions:state}, which contains \gls{fifo} queues, provided by the Erlang platform, which buffer events from its inputs for later computation.
 
 Every new event added to a queue has to have a bigger timestamp than the previous event added to the queue.
 This means a queue has a kind of progress timestamp, which denotes the timestamp of the latest event added to it and which is strictly increasing over time.

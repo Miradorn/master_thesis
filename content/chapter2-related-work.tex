@@ -6,7 +6,7 @@
 As Runtime Monitoring and Verification is a widely researched field, multiple approaches to attain it's goals were developed.
 
 As stated in~\cite{Havelund2008} most approaches are geared towards software written in Java, while many critical systems are written in C and there are countless other systems that could benefit from monitoring and verification written in all kinds of programming languages.
-With \gls{tessla} as a specification language over streams, which has no assumptions on the environment of the system that produces the streams,  as the base for our monitoring approach, we recognized the possibility to abstract the monitoring plattform from the monitored program.
+With \gls{tessla} as a specification language over streams, which has no assumptions on the environment of the system that produces the streams,  as the base for our monitoring approach, we recognized the possibility to abstract the monitoring platform from the monitored program.
 This means that the developed runtime for \gls{tessla} is not restricted to monitor programs written in a specific language but can monitor anything that can produce streams of data.
 
 To show that the runtime is valuable in the context of existing approaches, we will show ways to generate traces from systems that were used to evaluate other monitoring techniques.
@@ -113,7 +113,7 @@ traces, which alters the semantics of the program.
 It does so by transforming C code into an \emph{armored} version, which includes monitors to check conformance to a specification.
 
 Specifications are given as a textual representation of state machines, which is strongly influenced by \gls{rcat}~\citep{Smith2008}.
-The specifications are then interweaved into the programm using CIL~\cite{Necula2002}.
+The specifications are then interweaved into the program using CIL~\cite{Necula2002}.
 Specifications work on the level of function calls and state properties like \emph{write may never be called before open was called}.
 Because software developers are often working at the same abstraction level (in contrast to e.g.\ assembler or machine instructions), they can define specifications without having to learn new concepts.
 In the \gls{tessla} runtime support for traces at the same abstraction level (function calls, variable reads and writes) is present and used in most of the tests in \Cref{sec:evaluation:runtime_examples}.
@@ -131,7 +131,7 @@ Note the concept of the front.
 % \section{RiTHM}
 
 \section{Trace Data}
-\label{sec:system:traces}
+\label{sec:related:traces}
 
 Problem: Many traces don't carry timestamp (see DeCapo, CRV 15)
 
@@ -144,3 +144,6 @@ Problem: Many traces don't carry timestamp (see DeCapo, CRV 15)
 \subsection{CIL}
 \subsection{Google XRay}
 \subsection{Sampling}
+\subsection{LLVM}
+\label{sec:related:traces:llvm}
+

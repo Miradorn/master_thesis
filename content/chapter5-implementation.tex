@@ -3,9 +3,6 @@
 \chapter{Implementation Details}
 \label{sec:implementation}
 
-TODO: T1 vs TS2
-      Implicit greedy schedules with Call vs Fair schedules with cast
-
 Besides the theoretical basics presented in \Cref{sec:related} the \gls{tessla} runtime of this thesis is built upon a number of technologies.
 To better understand decisions made during the implementation this chapter will give an overview of them and show why they were choosen.
 
@@ -17,7 +14,8 @@ Because the format of the traces can differ heavily, depending on how and why th
 \label{sec:implementation:tesslaserver}
 
 The runtime to evaluate specifications against traces is implemented in the programming language Elixir, which itself is built on top of Erlang, the \gls{beam} \gls{vm} and \gls{otp}.
-To understand why this plattform was choosen we will look at the Erlang ecosystem in the next section.
+To understand why this platform was choosen we will look at the Erlang ecosystem in the next section.
+Note that in the following sections terminology from \Cref{sec:related,sec:definitions} as well as from Erlang and Elixir is heavily used.
 
 \subsection{Erlang and Elixir}
 \label{sec:implementation:tesslaserver:erlang_elixir}
@@ -37,7 +35,7 @@ On the one hand Erlangs syntax is pretty different from that of most modern gene
 Also Elixir supports metaprogramming, meaning you can write code that generates code at compile time, which is heavily used as described in \Cref{sec:implementation:tesslaserver:architecture}.
 
 One of the core strengths of the Erlang platform is it support to use multiple processor cores, even if these cores are deployed over multiple machines in a network.
-The plattform offers tools to develop code that can be distributed over multiple processors.
+The platform offers tools to develop code that can be distributed over multiple processors.
 This distribution is transparent to the developer.
 The underlying concept of the distribution is the actor model, first introduced in \cite{Hewitt1973}.
 
@@ -53,17 +51,26 @@ Only when two actors synchronously communicate one has to wait for the other.
 Another reason to choose the Erlang platform was its support for multiple plattforms, including resource restricted ones.
 While this thesis only considers offline monitoring it may be a future goal to perform online monitoring with TesslaServer.
 To enable this the runtime has to be able to run on the same hardware architecture the monitored program runs on sharing resources with it.
-An example of the variety of the supported plattforms of Erlang and Elixir is the Nerves project\footnote{\url{http://nerves-project.org}} which allows developers to build embedded software.
-
+An example of the variety of the supported platforms of Erlang and Elixir is the Nerves project\footnote{\url{http://nerves-project.org}} which allows developers to build embedded software.
 
 \subsection{Architecture}
 \label{sec:implementation:tesslaserver:architecture}
 
 As described in \Cref{sec:definitions:eval_engine} \gls{tessla} specifications form a \gls{dag} of nodes, which perform transformations on streams and send their computed streams to children nodes.
 Streams can be seen as a sequence of events or changes that can be represented as messages between the nodes.
-This form of specification can be easily implemented as an actor based system.
+This form of specification can be easily implemented as an actor based system, where each vertex in the \gls{dag} is implemented as an actor and the communication between adjacent vertices is realised with message passing.
+Interestingly this architecture enables the simulation of greedy schedules described in \Cref{def:greedy_schedule} while the Erlang runtime itself only guarantees a fair scheduling.
+To understand how this work the details of message passing and handling in Erlang is important.
+Basically there are two ways two Erlang processes can communicate with each other through messages: synchronous and asynchronous.
+To send a message synchronous the \emph{call} \gls{api} is used.
+A \emph{call} will send a message to another process and block until a response is received.
+The \emph{cast} \gls{api} is the asynchronous counterpart, which will send a message and immediately passes back control to the process that used it.
 
-An important characteristic of \gls{tessla} specifications is, that they can specify properties over realtime.
+It can be easily seen, that the usage of the synchronous \gls{api} will lead to a valid greedy schedule, since the sources in the \gls{dag} will have to wait for their children to finish and the children will transitively have to wait for their children.
+This means that each new message gets distributed through the whole graph as fast as possible.
+While this behaviour is an interesting observation the actual implementation uses the asynchronous \gls{api} to take better advantage of parallel evaluation.
+
+An important characteristic of \gls{tessla} specifications is, that they can specify properties targeting realtime characteristics.
 On the one hand this enables specifications that aren't feasible with more classical specification approaches, like \gls{ltl} or \gls{lola}, which work on synchronous streams, on the other hand it adds complexity to monitoring approaches, since it adds asynchronicity to all parts of the system.
 One point where this is important is in the way, how systems have to be monitored, or more precisely how their generated events are encoded.
 For synchronous monitoring approaches, the information, that an event happened is sufficient, for asynchronous ones it is important to know at which exact time each event happened.
@@ -111,7 +118,7 @@ This is achieved by building upon an abstraction from \gls{otp} called \emph{Gen
 \label{fig:chap6:sec_node_impl:node_control_flow}
 \end{figure}
 
-The \emph{GenServer} abstraction is provided by the Erlang and Elixir plattform and is basically an implementation of the actor pattern mentioned before.
+The \emph{GenServer} abstraction is provided by the Erlang and Elixir platform and is basically an implementation of the actor pattern mentioned before.
 It provides an \gls{api} to register actors, send messages to other actors and to handle incomming messages as well as maintaining the actor state.
 Furthermore it enables monitoring, crash recovery and hot code upgrades, mechanism that aren't used in TesslaServer as of now.
 
@@ -125,18 +132,19 @@ In this special case macros are used to achieve similar goals as inheritance in 
 
 Let's now focus on the responsibilities of \emph{GenComputation}.
 When a node receives a message from another node, the message will be handled by the \emph{GenServer} abstraction.
-\emph{GenServer} itself requires the user to implement a callback which is responsible for actually reacting to the message, e.g. by updating the state or sending new messages.
-Since TesslaServer uses exactly one format for messages \emph{GenComputation} is able to handle them for all actual node implementations.
-The concrete handling of messages differs beween the two versions of TesslaServer, therefore the details are described in \Cref{sec:implementation:tesslaserver:v1,sec:implementation:tesslaserverv2}.
+\emph{GenServer} itself requires the user to implement a callback method which is responsible for actually handling a received message, e.g. by updating the state or sending new messages.
+Since TesslaServer uses exactly one format for messages \emph{GenComputation} is able to handle them for all actual node implementations in a general way and only invoke actual node logic when needed.
+The concrete handling of messages differs beween the two versions of TesslaServer, therefore the details are described in \Cref{sec:implementation:tesslaserver:v1,sec:implementation:tesslaserver:v2}.
 
 On a high level \emph{GenComputation} buffers messages until it can be sure, that all inputs have progressed since the last time outputs were generated by the node, which means that either new events can be generated or at least the output stream can be progressed.
 A similar concept is presented in~\cite{TODOBEEPBEEP} which was discussed in \Cref{sec:related:beepbeep}: the \emph{front} of the input streams.
 Because BeepBeep isn't using timed specifications the computation of the front is easy: the head of each input when every input has at least one event buffered.
 For \gls{tessla} this is not as easy, since the timestamps of the events in the front can differ.
-As a result \emph{GenComputation} has to perform multiple steps to determine the appropriate actions based on the front.
+As a result \emph{GenComputation} has to perform multiple steps to determine the appropriate actions to take based on the events of the front.
 The exact steps are described in the respective sections of the two versions of TesslaServer.
+When \emph{GenComputation} has determined that at least one new transformation can happen it invokes the actual node logic by calling a callback method that each node has to implement.
 
-\subsection{TesslaServer V1: EventStream passing}
+\subsection{TesslaServer V1: Stream passing}
 \label{sec:implementation:tesslaserver:v1}
 
 The first version of TesslaServer was built with two goals in mind: safety and hiding complexity.
@@ -162,7 +170,7 @@ This happens by generating a sequence of partial fronts for specific timestamps 
 \end{enumerate}
 
 It is important to understand, that all steps except Step \ref{sec:implementation:tesslaserver:v1:item_logic_call} are performed by the \emph{GenComputation} abstraction.
-Hence, a node implementation, at least in theory, only has to implement the logic to combine a partial front.
+Hence, a node implementation, at least in theory, only has to implement the logic to combine a partial front to a new output.
 
 The problems of this approach are twofold:
 First, to implement more complex node types it was necessary to overwrite a lot of the provided abstractions, e.g. to manipulate timestamps.
@@ -175,10 +183,10 @@ Therefore the TesslaServer version 2 architecture was implemented.
 \subsection{TesslaServer V2: Event passing}
 \label{sec:implementation:tesslaserver:v2}
 
-The second version used the insights of the first version to change focus.
+The second version used the insights of the first version to provide better abstractions.
 Scalability and making complex node types possible to implement were the main goals of the architecture.
 
-To achieve theese goals some changes were made.
+To achieve theese goals some changes has to be made:
 Streams are no longer an explicit data structure in the system but mere an attribute of events to denote on which stream they happened.
 At the cost of some safety guarantees, which explicit streams provided, a simpler and clearer control flow of nodes and a very small \gls{api} of the new version of \emph{GenComputation} was achieved.
 
@@ -217,6 +225,52 @@ This can easily be achieved by including an unique identifier per thread in the 
 \section{Instrumentation Pass}
 \label{sec:implementation:instrumentation}
 
+While the implementation of the actual runtime was the main goal of this thesis another project was also developed, mainly to provide test traces for the runtime.
+Since this project uses some interesting technologies and can be extended to support a wide variety of trace data generation, the used technologies will be described in this chapter.
 
-\subsection{GCC instrument functions}
-\subsection{LLVM/clang AST matchers}
+The need for a tool to generate traces arised, when no suitable test data for the runtime could be found.
+As reasoned in \Cref{sec:related:traces} all trace data that was available wasn't suitable for \gls{tessla} for a number of different reasons.
+Therefore a tool was implemented to generate traces tailored towards the needs of \gls{tessla}.
+This did open up the opportunity to think about how the ideas from the runtime can be translated into a trace collection tool.
+One of the central ideas of the runtime is, that it doesn't make assumptions about the platform of the monitored program.
+While the instrumentation of code with the goal to emit trace data obviously relies on the language the code is written in, the \gls{llvm} project provides abstractions that can be used to implement an instrumentation mechanism that doesn't rely on the language the instrumented code was written in.
+
+To understand how this works recall \Cref{sec:related:traces:llvm} and the way \gls{llvm} works: a frontend compiles code from a source language into an \gls{ir}, perform compiler passes on the \gls{ir} and then finally compiles it to native machine code.
+If the instrumentation pass works on the level of the \gls{ir} it would work for all languages that have a frontend for \gls{llvm}.
+
+With the provided C++ \gls{api} from \gls{llvm} to implement compiler passes that can analyse and transform \gls{ir} code it is easy to implement such an instrumentation.
+The implementation uses the \emph{ModulePass}\footnote{\url{http://llvm.org/docs/doxygen/html/classllvm_1_1ModulePass.html}} base class to analyse whole modules.
+Modules represent constructs like classes from C and C++ in \gls{ir}.
+The pass iterates over the \emph{Functions}\footnote{\url{http://llvm.org/docs/doxygen/html/classllvm_1_1Function.html}} the module consists of and checks if the current function is one that should be instrumented.
+If so it builds a \emph{CallInst}\footnote{\url{http://llvm.org/docs/doxygen/html/classllvm_1_1CallInst.html}}, which is the \gls{ir} equivalent of calling a function.
+The \emph{CallInst} will call a specified log method provided by a logging library.
+The instruction is then inserted as the first instruction of the \emph{Function} that is instrumented.
+
+At runtime the instrumented program will then log an event everytime the instrumented function is called.
+Events generated by the instrumented program will have the format shown in \Cref{listing:instrumentation_trace_data}.
+
+\begin{lstlisting}[numbers=none,float,caption={[Trace data format of the instrumentation pass]Trace data generated by the instrumentation pass. Each line represents an event and each event consists of four pieces seperated by spaces: a stream name, an optional value and the timestamp in unix format followed by the amount of microseconds since that timestamp.},label=listing:instrumentation_trace_data]
+variable_values:write_ptr 843071489 1463991050 176761
+variable_values:write_ptr 843071490 1463991050 176832
+function_calls:process nil 1463991050 176901
+\end{lstlisting}
+
+While the compiler pass works and was used to generate authentic test data it is limited and has some challenges remaining.
+As we will see in \Cref{sec:evaluation:instrumentation_benchmarks} it can add a lot of overhead and interfere with compiler optimizations.
+As a first measure to reduce the overhead the logging mechanism is implemented on top of a library called \emph{zlog}\footnote{\url{https://github.com/HardySimpson/zlog}} to buffer generated events.
+Without this buffer the overhead would be much higher since constant writes of the generated events to an output device would have to happen.
+
+A second measure is that the pass will only instrument functions that are specified by the user when invoking the pass.
+This makes it possible to generate multiple different instrumented versions of the same code, of which each will only generate traces that are interesting for a certain specification.
+E.g. one could have two instrumented versions of the same code, one which generates events used by a specification to monitor buffer size limits and the other which generates events used by a specification describing performance constraints.
+
+As of now the instrumentation will also produce erroneous traces when the instrumented program is multithreaded and will generate events on more than one stream.
+Due to race conditions the logged events can then be in the wrong order with respect to their timestamps.
+For offline monitoring this can be solved by simply reordering the events, for online monitoring this obviously isn't possible.
+For the second version of TesslaServer the problem only occurs, when different threads can generate events with the same stream, since it doesn't require the inputs to be totally ordered over all input streams.
+This can be solved by adding a thread unique identifier to the stream name and adapting the specifications to take into account that events might happen on different threads out of order.
+
+As a final limitation the instrumentation pass right now only supports function calls to be instrumented.
+To do so it would have been enough to implement a \emph{FunctionPass}\footnote{\url{http://llvm.org/docs/doxygen/html/classllvm_1_1FunctionPass.html}}.
+That a \emph{ModulePass} was chosen is justified by the fact that the pass could be easily expanded to generate other events as well, for example function returns, variable definitions, variable overwrites and assignments of null values.
+
