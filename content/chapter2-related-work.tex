@@ -16,6 +16,12 @@ The following chapter will summarize the approaches that are available in the fi
 
 \section{\glsentryname{rv} Techniques for C Programs}
 \label{sec:related:c_programs}
+
+Most \gls{rv} approaches are developed for Java and the \gls{jvm} and therefore ignores a big amount of software that is written.
+Especially C and C++ is used in a wide variety of safety critical systems, e.g. aircrafts and energy plants.
+While \gls{tessla} as a language and the implemented runtime is independent of the platform of the monitored program, the domain of C programs and especially embedded software has a special focus in this thesis.
+Therefore in this section we will look at some existing approaches to monitor C programs and in Section~\ref{sec:related:traces} we will discuss ways to generate trace data from such programs.
+
 \subsection{Copilot}
 \label{sec:related:c_programs:copilot}
 
@@ -80,30 +86,43 @@ To do this distributed monitors, which have to communicate with one another, are
 The other challenge of parallelism and distribution is how it can be included in monitoring algorithms.
 Since modern systems often contain many processor core it wouldn't be efficient to ignore this fact when building monitors, especially when performance of the monitor is important.
 
-The work in~\cite{Attard2016} uses the Erlang plattform to implement a highly distributed monitoring algorithm.
+The work in~\cite{Attard2016} uses the Erlang plattform to implement a highly distributed monitoring algorithm for a branching time logic called \gls{mhml}.
 It achieves this by synthesizing formulas into \emph{submonitors} which can then be run in parallel and their verdicts are combined to form a global verdict.
 For example the formula \(\Phi \vee \Psi\) can be synthesized as two \emph{submonitors}, one for \(\Psi\) and one for \(\Phi\).
 
-Whle the \gls{tessla} specification language doesn't include mechanisms to explicitly reason about distributed properties, the \gls{tessla} runtime doesn't care about the environment of the monitored program, so it doesn't distinguish between traces from distributed and non distributed programs.
+While the \gls{tessla} specification language doesn't include mechanisms to explicitly reason about distributed properties, the \gls{tessla} runtime doesn't care about the environment of the monitored program, so it doesn't distinguish between traces from distributed and non distributed programs.
 As we will see in \Cref{sec:implementation:tesslaserver} this means that with a trick \gls{tessla} can be used to monitor at least some characteristics of a distributed system.
 But more important is that the runtime takes parallelism and distribution as one of its core concepts as we will see in the next chapters.
 
 
 \section{Stream Based Specification Techniques}
 \label{sec:related:stream_based}
+
+Specifications in the field of \gls{rv} are defined over finite words, meaning a sequence of properties.
+Some works in the field take another perspective on the problem and define the sequence of properties as streams of data.
+As \gls{tessla} takes this approach we will look at other work that influenced this view and how it can be used to incorporate techniques from other fields into \gls{rv}.
+
 \subsection{\glsentryname{lola}}
 \label{sec:related:stream_based:lola}
 
 The concepts of \gls{lola}~\cite{DAngelo2005} are very similar to the ones of \gls{tessla}.
 Both approaches built upon streams of events.
-The biggest difference between them is, that while streams in \gls{lola} are based on a discrete model of time \gls{tessla} uses a continuous timing model.
+The biggest difference between them is that streams in \gls{lola} are based on a discrete model of time and \gls{tessla} uses a continuous timing model highlighted in \Cref{sec:related:tessla}.
 
 The specification language of \gls{lola} is very small (expressions are built upon three operators) but the expressiveness surpasses \glspl{tl} and many other formalisms \citep{DAngelo2005}.
 Expressions in \gls{lola} are built by manipulating existing streams to form new ones.
 Therefore streams depend on other streams, so they can be arranged in a weighted dependency graph, where the weight describes the amount of steps a generated stream is delayed compared to the parent.
 In contrast to \gls{tessla} streams in \gls{lola} can depend on themself and therefore the dependency graph can contain cycles.
-
 Based on this graph a notion of efficiently monitorable properties is given and an algorithm to monitor them is presented.
+
+\Cref{listing:lola_spec} shows a small specification written in \gls{lola}.
+This example shows the usage of integer streams, which allows \gls{lola} the usage of counters and therefore enables it to express context-free properties.
+
+\begin{lstlisting}[escapeinside=``,numbers=none,float,label=listing:lola_spec, caption={[A specification written in \gls{lola}]A \gls{lola} specification describing the property that the number of \emph{a}\'s in a stream shall never be less then the number of \emph{b}\'s}]
+s = s[-1, 0] + ite((a `\(\wedge\ \neg \)`b), 1, 0) + ite((b `\(\wedge\ \neg \)`a), −1, 0)
+trigger(s `\(\leq\)` 0)
+\end{lstlisting}
+
 
 \gls{tessla} takes concepts of \gls{lola} and applies them to a continuous model of time and introduces a language and a rich set of functions that can be applied to streams.
 The dependency graph is a core concept of \gls{tessla} and is used to check if specifications are valid (e.g.\ cycle free) and is also the core concept to evaluate specifications over traces in this thesis.
@@ -167,19 +186,56 @@ This specification shows, how \gls{salt} specifications are more intuitively und
 \section{Trace Data}
 \label{sec:related:traces}
 
-Problem: Many traces don't carry timestamp (see DeCapo, CRV 15)
-% \label{sec:related:drivertrace}
-% DTrace PID
+As in \gls{rv} we talk about monitoring of properties over traces, another important aspect is how traces can be extracted from a running program.
+Many \gls{rv} tools solve this problem by using a technique called \emph{interweaving}: The code of the monitored program is changed in a way that the monitor becomes part of it, therefore the monitor becomes part of the program and has explicit acces to the state of the running system.
+Examples for this are AspectJ~\cite{Kiczales2001} and DiSL~\cite{Marek2012} for Java and \gls{rmor}~\cite{Havelund2008} and \gls{rithm}~\cite{Navabpour2013} for C.
+This approach is not feasible for the goals of the \gls{tessla} runtime, because it should enable users to monitor multiple kinds of systems.
 
-\url{http://lttng.org}
-\url{http://diamon.org/ctf/}
-\url{https://github.com/efficios/barectf}
-\subsection{Debie}
-\subsection{TraceBench}
-\subsection{Aspect oriented programming}
+Therefore we are looking for ways to manipulate programs in a general way to emit trace data.
+
+As a first step other projects were searched to find trace data that can be used to evaluate the implemented runtime.
+While there are many benchmarks available to test monitoring tools again we weren't able to find any that satisfied all of the characteristics that are needed for an evaluation of \gls{tessla}.
+The next sections will list some of the benchmarks and evaluation tools that were surveyed and finally at a tool that enabled the generation of suitable trace data.
+
+\subsection{General Benchmarks for \glsentryname{rv} Tools}
+
+The field of \gls{rv} lacks a common specification language and can be expanded to a wide variety of different properties to verify.
+Therefore it is no surprise that there is no common benchmark that is applicable to all tools.
+Nonetheless some benchmarks are occasionally used to compare the expressiveness of a new \gls{rv} tool.
+
+The DaCapo benchmark~\citep{Blackburn2006} was introduced as a general purpose benchmark for the Java language.
+It turned out that it can be used to benchmark monitor implementations and trace collection tools~\citep{Wu2016,Chen2007,Marek2012}.
+Since Java wasn't the target architecture of our runtime it wasn't used for the evaluation in this thesis.
+
+The works in~\cite{Dwyer1999} can be seen as a benchmark for the expressiveness of a specification language.
+It categorizes commonly monitored porperties into so called patterns like \emph{precedence}, \emph{absence} and \emph{response}.
+While it would be valuable to test \gls{tessla} and the implemented runtimes against theese patterns this would be a two step process:
+First each pattern would have to be checked, if and how it could be expressed as a \gls{tessla} specification.
+As a second step, if the pattern can be expressed, test trace data would have to be generated and only then the runtime could be evaluated using that pattern.
+Since this thesis doesn't work on the \gls{tessla} language definition but only on the runtime we decided against this process.
+
+Another interesting project for evaluation of offline monitoring tools is TraceBench~\citep{Zhou2014}.
+TraceBench is a big set of traces collected from a distributed system running \gls{hdfs}.
+During the collection errors of different categories were deliberately introduced, like network timeouts or data corruption.
+The generated traces are organized in a hierarchy: if an event is produced as the effect of another event, e.g. a function call that leads to another function call, the second event is a child of the first.
+Furthermore the traces contain the beginning and end of each event as a timestamp, making the traces suitable for \gls{tessla}.
+Unfortunately it seems that the generated trace data has a problem: Since events are produced in a distributed system the timestamps are faulty, for example some events started before their parent event.
+Furthermore \gls{tessla} doesn't have a mechanism to express nested events as of now, meaning the traces would need to be manipulated before they could be used.
+
+As a final benchmark \gls{crv}~\citep{Reger2016} was evaluated.
+\Gls{crv} is a set of benchmarks especially developed for the usage in monitoring algorithms.
+It consists of three tracks: Java, C and offline.
+While the C and offline track would have been very interesting the benchmarks don't contain any realtime properties.
+Since the realtime fragment is an important part of \gls{tessla} we decided that the benchmark wasn't appropriate either.
+
+\subsection{Tools to Generate Traces}
+
+Since no suitable benchmark could be found the next step was to search for a tool that can be used to generate appropriate traces from programs during execution.
+% DTrace PID
 \subsection{CIL}
 \subsection{Google XRay}
-\subsection{Sampling}
+\subsection{Compilers}
+GCC
 \subsection{LLVM}
 \label{sec:related:traces:llvm}
 

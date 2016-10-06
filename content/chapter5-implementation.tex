@@ -201,7 +201,7 @@ With the new architecture nodes have a buffer for each parent node in their stat
 In this buffer all events received from that parent are saved, that weren't part of a front upto that point in time.
 The process of handling new messages and computing the partial fronts implemented in the new version of \emph{GenComputation} is the following:
 
-\begin{itemize}
+\begin{enumerate}
   \item Add the newly received event to the end of the buffer that stores events of that parent node.
   \item Test if on each buffer at least one event is stored.
   \item End if at least one buffer has no events.
@@ -210,7 +210,7 @@ The process of handling new messages and computing the partial fronts implemente
   \item\label{sec:implementation:tesslaserver:v2:item_logic_call} Invoke the actual logic of the node for the partial front to perform its transformation.
   \item This will generate at least a new progress event or one or more normal events, send them to all children of the node.
   \item Go to Step 2.
-\end{itemize}
+\end{enumerate}
 
 Note again how only at Step \ref{sec:implementation:tesslaserver:v2:item_logic_call} the actual node logic is invoked, meaning only that part has to be implemented for each new node type.
 Nonetheless this procedure adds more responsibilities to the programmer of new node types:
