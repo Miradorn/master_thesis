@@ -214,7 +214,7 @@ First each pattern would have to be checked, if and how it could be expressed as
 As a second step, if the pattern can be expressed, test trace data would have to be generated and only then the runtime could be evaluated using that pattern.
 Since this thesis doesn't work on the \gls{tessla} language definition but only on the runtime we decided against this process.
 
-Another interesting project for evaluation of offline monitoring tools is TraceBench~\citep{Zhou2014}.
+Another interesting project for evaluation of offline monitoring tools is TraceBench presented in~\cite{Zhou2014}.
 TraceBench is a big set of traces collected from a distributed system running \gls{hdfs}.
 During the collection errors of different categories were deliberately introduced, like network timeouts or data corruption.
 The generated traces are organized in a hierarchy: if an event is produced as the effect of another event, e.g. a function call that leads to another function call, the second event is a child of the first.

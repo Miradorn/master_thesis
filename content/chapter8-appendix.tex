@@ -98,7 +98,7 @@ This section includes all data from the benchmarks of TesslaServer.
 \clearpage
 
 \subsection{Execution Time in Regard to Number of Input Events}
-\label{sec:appendix:runtime_benchmark_data:execution_time_cores}
+\label{sec:appendix:runtime_benchmark_data:execution_time_events}
 
 \begin{table}[!htb]
   \centering
@@ -276,7 +276,7 @@ This section includes all data from the benchmarks of TesslaServer.
 \clearpage
 
 \subsection{Execution Time in Regard to Number of Nodes}
-\label{sec:appendix:runtime_benchmark_data:ram_usage_events}
+\label{sec:appendix:runtime_benchmark_data:execution_time_nodes}
 
 \begin{table}[!htb]
   \centering
@@ -526,4 +526,4 @@ This section includes all data from the benchmarks of TesslaServer.
 \lstinputlisting[breaklines=true,caption={\gls{tessla} specification that checks if the size of a buffer is always between zero and five. It counts the number of events happened on two input streams. The first stream denotes changes of the variable \(\mathit{write\_ptr}\), the second calls of the function \(\mathit{process}\). An error is encountered when more data is processed than is present or if more than five items are written onto the buffer.},label=listing:spec_buffer_size]{content/code/between_zero_and_five.spec}
 \clearpage
 
-\lstinputlisting[breaklines=true,caption={\gls{tessla} specification describing a performance constraint. The specification describes that after each change of the \(\mathit{write\_ptr}\) variable there has to be a call to the \(\mathit{process}\) function after at most 1 millisecond. Since TesslaServer only implements the past time functions of \gls{tessla} the specification is a bit more complex than it would be when using funvtions that can depend on future values.},label=listing:spec_buffer_size]{content/code/process_below_1_ms.spec}
+\lstinputlisting[breaklines=true,caption={\gls{tessla} specification describing a performance constraint. The specification describes that after each change of the \(\mathit{write\_ptr}\) variable there has to be a call to the \(\mathit{process}\) function after at most 1 millisecond. Since TesslaServer only implements the past time functions of \gls{tessla} the specification is a bit more complex than it would be when using funvtions that can depend on future values.},label=listing:spec_buffer_performance]{content/code/process_below_1_ms.spec}
