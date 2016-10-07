@@ -123,14 +123,28 @@ s = s[-1, 0] + ite((a `\(\wedge\ \neg \)`b), 1, 0) + ite((b `\(\wedge\ \neg \)`a
 trigger(s `\(\leq\)` 0)
 \end{lstlisting}
 
+\Gls{lola} was recently extended in~\cite{Faymonville2016} with two new features:  template stream expressions, which allow input data to be carried along the stream, and dynamic stream generation, where new monitors can be invoked during the monitoring process for the monitoring of new subtasks on their own time scale.
+The extension adds the concept of \emph{slicing} with template streams, which enables the generation of  parameterized streams.
+A parameterized stream, or template stream, is a mechanism to generate a dynamic amount of real streams from one base stream by \emph{slicing} it in respect to data it carries.
+For example a template stream could be used to monitor logins of individual users, where one \emph{slice} is generated for each user.
+Adding parameterization to \gls{tessla} was discussed but isn't implemented as of now.
 
 \gls{tessla} takes concepts of \gls{lola} and applies them to a continuous model of time and introduces a language and a rich set of functions that can be applied to streams.
 The dependency graph is a core concept of \gls{tessla} and is used to check if specifications are valid (e.g.\ cycle free) and is also the core concept to evaluate specifications over traces in this thesis.
 
 \subsection{BeepBeep 3}
 \label{sec:related:stream_based:beepbeep}
-TODO: Sync event stream processing.
-Note the concept of the front.
+
+The project BeepBeep aims to introduce concepts from the field of \gls{cep} to \gls{rv}.
+The third version of it is presented in~\cite{Hall2011} where different concepts from \gls{cep} are applied to problems of \gls{rv}.
+BeepBeep implements a system for evaluating specifications over synchronous event streams.
+It exposes two ways to express specifications: an \gls{api} in Java and the language \gls{esql}.
+
+The evaluation model of BeepBeep is very similiar to the one implemented for \gls{tessla} in this thesis: events enter the system through sources, flow through multiple processors which perform transofmrations and can lead to the generation of an output.
+The central unit of computation are the processors: processors transofrm multiple input streams into multiple output streams.
+A processor can only perform a transformation when there is at least one event buffered at each input stream.
+The combination of the first event on each buffer is called the \emph{front}.
+We will reuse this terminology in \Cref{sec:implementation:tesslaserver} when we talk about the way computations in \gls{tessla} work.
 
 \section{\glsentryname{tessla}}
 \label{sec:related:tessla}
