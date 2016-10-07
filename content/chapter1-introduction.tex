@@ -8,47 +8,47 @@
 \section{Motivation and Problem Statement}
 \label{sec:intro:motivation}
 
-Software Verification is an important tool to harden critical systems against faults and exploits.
+Software verification is an important tool to harden critical systems against faults and exploits.
 Due to the raising importance of computer based systems, verification has become a big field of research in computer science.
 
-While pure verification approaches try to proof the correct behaviour of a system under all possible executions,
-\gls{rv} limits itself to single, finite runs of a system, trying to proof it conforms to a given specification
-under specific conditions, like input sequences or scheduling.
-These specifications can be given in various ways, e.g.\ as a \gls{tl} formula or in specification languages that are specifically developed for \gls{rv}.
+While pure verification approaches try to proof the correct behaviour of a system under all possible executions, \gls{rv} limits itself to single, finite runs of a system.
+The goal is to proof that a run conforms to a given specification under specific conditions, like input sequences or scheduling.
+Specifications can be given in various ways, e.g.\ as a \gls{tl} formula or in a specification language that is specifically developed for \gls{rv}.
 Examples for this are \gls{rmor} \citep{Havelund2008}, \gls{lola} \citep{DAngelo2005} and others \citep{Zheng2015, Pike2010, Mostafa2015}, which we will look at more closely in \Cref{sec:related}.
 
-The language \gls{tessla} aims to make it easy to specify behaviour of streams.
-To gain this it introduces a number of language features and syntax sugar to expressively describe the conditions a stream should fulfill.
-The evaluation of TeSSLa specifications is done in two steps: first the specification is compiled by a compiler written at the \gls{isp} of the University of Lübeck.
-The output is a canonical representation of the operations on the streams in the specification.
-In the second step the compiled specification is connected with a system that produces some kind of traces, which are treated as the input streams of the specification.
+The project \Gls{tessla}\citep{Decker2016} presents ways to specify and evaluate properties over streams of events including timing information.
+To achieve this it introduces a language to expressively describe the conditions one or more streams should fulfill by applying transformations on them.
+The evaluation of \gls{tessla} a specification is done in two steps: first the specification is compiled by a compiler written at the \gls{isp} of the University of Lübeck.
+The output is a canonical representation of the transformations on the streams in the specification.
+In the second step the compiled specification is connected with a system that produces traces that are treated as the input streams of the specification.
 
-The second step can be done in different ways: online or offline, interweaving the monitors into the monitored program (e.g.~\cite{Havelund2008}) or having a standalone system.
-These different approaches lead to different manipulations of the original program that should be monitored.
-When the monitors are interweaved into the program, they can produce new errors or even suppress others.
-When the monitors are run in a different process or even on different hardware, the overhead and influence to the system can be much smaller,
-but there will be a bigger delay between the occurence of events in the program and their evaluation in the monitor.
-Furthermore interweaved monitors can optionally react towards errors by changing the program execution, therefore eliminating cascading errors,
-while external executions of monitors can't directly modify the program but can still produce warnings to prevent such errors.
-While online monitoring can be used to actively react to error conditions, either automatically or by notification of a third party,
-offline monitoring can be thought of as an extension to software testing (\cite{DAngelo2005}).
+The second step can be done in different ways: online or offline, interweaving the monitors into the monitored program (like for example done in~\cite{Havelund2008}) or by executing them standalone.
+These different approaches lead to different ways the monitored program has to be altered, e.g. manipulating its original code to log status informations or to invoke the monitoring code.
 
-At the beginning of this thesis there was one implementation of a runtime for \gls{tessla} specifications that is based on FPGAs that have to be manually reconfigured for each new specification.
+Interweaved monitors can alter the original system and produce new errors or even suppress others.
+Standalone monitors on the other hand will have a much smaller impact on the monitored system.
+But as a consequence there will be a bigger delay between the occurence of events in the program and their evaluation in the monitor.
+Furthermore interweaved monitors can optionally react to detected errors.
+They could change the control flow of the original system or alert a third party and eliminate cascading errors.
+Standalone monitors can't directly modify the program but can still produce warnings and alerts that can then be reacted to.
+
+While online monitoring can be used to actively react to error conditions, either automatically or by notification of a third party, offline monitoring can be thought of as an extension to software testing~\cite{DAngelo2005}.
+
+At the beginning of this thesis there was one implementation of a runtime for \gls{tessla} specifications that is based on \glspl{fpga} that have to be manually reconfigured for each new specification.
 While this is a very performant approach for actual monitoring it isn't feasible for testing and prototyping.
-Therefore it is wanted to implement a runtime for TeSSLa specifications that can be run independent of specific hardware.
+This leads to the wish to implement a software based \gls{tessla} runtime which can be executed independent of hardware restrictions.
 
 Furthermore most \gls{rv} approaches are specific to one programming language or environment and combine ways of generating the data, which is used for monitoring, and the monitoring itself.
 \gls{tessla} specifications themself are independent of any implementation details of the monitored system, working only on streams of data, which can be gathered in any way.
 This can be used to implement a runtime that is also independent of the monitored system an how traces of it are collected.
 
-During the thesis it is prooven, that the actual approach of this runtime, a functional, actor based, asynchronous system,
-will generate the same observations on input traces as a synchronous evaluation of the specification.
-While \gls{tessla} specifications can work on all kinds of streams, especially on traces on all levels of a program, e.g.\
-on instruction counters or on spawning processes, in this thesis we will mainly focus on the level of function calls and variable reads/writes.
-Other applications of the system can easily extend it to use traces of drastically different fields, e.g.\ health data, temperatures, battery levels, web services and more.
+During the thesis it is prooven that the actual approach of the runtime, a functional, actor based, asynchronous system, will generate the same observations on input traces as a synchronous evaluation of the specification.
+While \gls{tessla} specifications can work on all kinds of streams, especially on traces on all levels of a program, e.g.\ on instruction counters or on spawning processes, in this thesis we will mainly focus on the level of function calls and variable reads/writes.
+Other applications of the system could easily extend it to use traces representing drastically different fields, e.g.\ health data, temperatures, battery levels, web services and more.
 
-To test the software based runtime, different specifications will be tested on multiple traces, some of which are generated by actually running a program,
-which was instrumented by hand to generate traces, others which are generated or modified by hand to deliberately introduce bugs which should be detected by the system.
+To test the software based runtime different specifications will be tested on multiple traces.
+Some of the traces are generated by actually running a program which was instrumented by hand or automatically to generate traces.
+Others where are generated or modified by hand to deliberately introduce bugs which should be detected by the system.
 
 \section{Results}
 \label{sec:intro:results}
