@@ -57,19 +57,33 @@ With this mechanism all children of sources will then receive the information th
 The information that all inputs have finished will transitively flow thourgh the whole system and at one point all nodes will have performed their final computation and the system will have generated all possible outputs.
 
 \section{Instrumentation Pass}
-TODO: Timing model, maybe somehow harness Vector clocks -> wwould  compplicate instrumentation! Also would need support in TeSSLa language.
-Extract logging to  different thread ->  run on own core, less overhead.
-Configuration file for instrumetnation -> e.g. include conditions
 
 In the benchmarks of the instrumentation it is obvious that it adds a lot of overhead, especially when compiler optimizations are turned on or the percentage of instrumented function calls is large.
 While the overhead is big, it is stable (see the standard deviation in \Cref{sec:evaluation:instrumentation_benchmark:instr_vs_non_inst}).
 
 For now the instrumentation should be seen as a proof of concept and test tool.
-The generated traces should be mostly used for analysing test settings, where compiler optimizations are turned off.
+The generated traces should be mostly used to analyse test settings where compiler optimizations are turned off.
 When used for timing specifications, the instrumented code can be benchmarked against a non instrumented version of the code and the results can be used to transform the actual timing requirements to corresponding ones for the instrumented code.
 This will at least give an approximation of the actual results.
 Also it is recommended to write small and specific \gls{tessla} specifications, so that the instrumentations only have to be applied to a small subset of functions.
 Obviously it is strongly discouraged to use the instrumented code in any production setting.
+
+Two enhancements could be easliy integrated into the instrumentation pass:
+Enabling the logging of more event types, like variable reads or memory allocation, while also including data in the events and introducing a better configuration format to specify what events should be logged.
+
+As explained in \Cref{sec:implementation:instrumentation} the compiler pass is instrumented as a \emph{ModulePass}, enabling the logging of all kinds of events.
+While the logging of function calls was sufficient for testing and evaluation purposes this restriction together with the total lack of logging data is an obvious problem for more serious use cases.
+The trace format already includes a field for data values and the instrumentation pass has the ability to extract data, e.g. function arguments or return values, from the source code it is transforming.
+
+Also the expansion to more event types shouldn't be too complicated when harnessing the \emph{InstVisitor}\footnote{\url{http://llvm.org/docs/doxygen/html/classllvm_1_1InstVisitor.html}} mechanism.
+An \emph{InstVisitor} can be used to abstract the actual iteration over the building blocks of the \gls{ir} of a program, so that the user only has to specify the transformation that should be happening when a specific instruction type is seen.
+For example the instrumentation of return statements could use the \emph{visitReturnInst} \gls{api} to handle all return statements and change them to log an event.
+
+In the context of adding more event types to the instrumentation pass the configuration format becomes a problem.
+For now a user specifys each function that should be instrumented when calling the pass with an option to the compiler pass like \lstinline{-instrument FUNCTIONNAME}.
+This approach obviously doesn't scale when multiple event types are implemented.
+Therefore a common configuration format should be specified and the instrumentation pass should read it from a given file.
+This approach would also enable the sharing of configuration files between different developers and the versioning of them using version control systems.
 
 \section{Further Work}
 \label{sec:conclusion:further_work}
@@ -78,6 +92,7 @@ Composition of Transducers/evalEngines
 Port to Scala/akka
 Different evaluation model: Pull not push
   port to genstage: Concept of backpressure -> Nodes generating events out of nothing
+Slicing/parameter
 
 
 online monitoring -> possible infinite traces
@@ -86,6 +101,10 @@ maybe define new functions (read nodes) in the spec itself and not in the runtim
 Optimizations: Bundle up events, throw away unneeded progress events in  bundles
   For some notes only subset of inputs is important for output progress (think if then else)
     -> Some things na be optimized by compiler (literal as cond to ite) others only during evaluation.
+
+More fine grained instrumentation pass config
+TODO: Timing model, maybe somehow harness Vector clocks -> wwould  compplicate instrumentation! Also would need support in TeSSLa language.
+Configuration file for instrumetnation -> e.g. include conditions
 
 \subsection{Error prevention}
 \label{sec:conclusion:further_work:error_prevention}
