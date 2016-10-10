@@ -279,3 +279,22 @@ As an example think of logging an event whenever a variable is assigned more tha
 \subsection{LLVM}
 \label{sec:related:traces:llvm}
 
+\Gls{llvm}~\cite{Lattner2004} is a compiler framework to allow program analysis and transformation.
+The compilation process of \gls{llvm} is seperated into three parts: a front-end, a middle-end and a back-end.
+A front-end is responsible for translating a source language, e.g. C or C++ into \gls{llvm} \gls{ir}, a strongly typed \gls{risc} instruction set which is independent from the target platform.
+The middle-end is performing source-to-source transformations on the \gls{ir}, e.g. to perform analizations or optimizations.
+Such transformations are called \emph{compiler passes} and are independent of the source language.
+The back-end is then used to transform the \gls{ir} into native machine code for the target platform.
+
+The \emph{compiler pass} on top of \gls{ir} provides a good abstraction as a base for an instrumentation to generate traces.
+Since a pass works on \gls{ir} and not on the source language itself the instrumentation can be used for each language that has an \gls{llvm} front-end.
+At the time of writing there is a big amount of such frontends for many languages, including C, C++, Objective-C, Swift, Haskell, Ruby and many more\footnote{\url{http://llvm.org/ProjectsWithLLVM/}}.
+
+Furthermore a compiler pass can work on all parts of a program: whole modules (think classes in C), function definitions, variable reads and writes, memory allocation and others.
+The building block of \gls{ir} programs in \gls{llvm} are so called \emph{instructions}\footnote{\url{http://llvm.org/docs/doxygen/html/classllvm_1_1Instruction.html}}.
+Each statement from a source language is represented as such an instruction.
+A \emph{compiler pass} is able to examine instructions, change or reorder them and generate new ones and insert them.
+
+Due to the great flexibility a \emph{compiler pass} offers this approach was chosen for the instrumentation pass.
+The implementation details can be seen in \Cref{sec:implementation:instrumentation}.
+
