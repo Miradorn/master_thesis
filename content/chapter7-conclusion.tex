@@ -88,25 +88,85 @@ This approach would also enable the sharing of configuration files between diffe
 \section{Further Work}
 \label{sec:conclusion:further_work}
 
-Composition of Transducers/evalEngines
-Port to Scala/akka
-Different evaluation model: Pull not push
-  port to genstage: Concept of backpressure -> Nodes generating events out of nothing
-Slicing/parameter
+In addition to the adjustments that are stated in the two previous sections there are also some ideas to extend the works from this thesis in ways that require more theoretic work and larger changes of the architecture.
+This section will give an overview of theese ideas and will present sketches of approaches to implement them.
+
+\subsection{Implementation for the \glsentryname{jvm}}
+\label{sec:conclusion:further_work:jvm}
+
+While the Erlang platform is tested in production for many years and provides great performance for our implementation, the desire to provide an implementation on top of the \gls{jvm} was expressed.
+The main reason for this is that the \gls{tessla} compiler itself is implemented in Scala and therefore on top of the \gls{jvm}.
+An implementation using the same platform would enable the distribution of a single executable that can be used to compile and evaluate \gls{tessla} specifications all in one.
+Also a runtime on the \gls{jvm} could better with monitored programs that are written in a \gls{jvm} language and therefore eliminating the need for an instrumentation pass.
+
+The Akka project\footnote{\url{http://akka.io}} provides a Scala implementation of the actor model.
+Since the runtime relies heavily on this model, Akka might enable to port it to scala in a very straightforward way.
+As a side node there is also an implementation of Akka on top of the .NET platform\footnote{\url{http://getakka.net}} which might be used to port the runtime to yet another platform.
+
+\subsection{Composition of Evaluation Engines}
+\label{sec:conclusion:further_work:composition}
+
+Another idea that is motivated from the \gls{cep} field is the composition of multiple evaluation engines.
+This is somewhat contrary to the \gls{rv} approach, since \gls{rv} is aimed to answer the question, if a run of a system satisfies a given property.
+Therefore a specification in \gls{tessla} that is used for \gls{rv} purposes would have exactly one output: a boolean stream denoting if the property is satisfied after a given time.
+
+The composition of evaluation engines would only makes sense, if the output of specifications would be streams that are interesting as the input to a new evaluation engine.
+As it turns out, there are no restriction applied to output streams, neither by the \gls{tessla} specification language nor the runtime.
+
+This means that it should be possible right now to combine multiple evaluation engines with only small adjustments to the output format of the runtime.
+
+% Different evaluation model: Pull not push
+% port to genstage: Concept of backpressure -> Nodes generating events out of nothing
 
 
-online monitoring -> possible infinite traces
+\subsection{Parameterized Streams}
+\label{sec:conclusion:further_work:parametrization}
 
-maybe define new functions (read nodes) in the spec itself and not in the runtime? Also recursion in specifications
+A quite common model in \gls{rv} are parameterized streams, where one parameterized stream represents a dynamic number of actual streams.
+A very common example to highlight why parameterization is required is the specification that a user can't have more than three failed login attempts in a row.
+When the number of users is not known it is not possible to write such a specification without parameterization.
+A parameterized version of the specification would generate a signal for each user holding the value of failed log in attempts in a row.
+
+The common approach to handle parameterized specifications, called \emph{slicing}, is discussed in~\cite{Chen2009a}.
+The basic idea of \emph{slicing} is to partition a stream of events, where each event holds a data value, into multiple streams with respect to that data.
+In context of the example specification restricting failed log in attempts the following would happen:
+An input stream \lstinline{login_attempt(int, bool)} denoting that a user with the id that is the first value of the stream tried to login, where the second value denotes if the login was succesful, would be partitioned, or \emph{sliced}, by the first argument, generating a variable number of streams \lstinline{login_attempt_id(bool)}.
+Each of this streams could then be evaluated by the \gls{tessla} runtime.
+
+While streams in \gls{tessla} are already carrying data only a restricted form of generating new streams based on this data is possible.
+This limited slicing can be performed for example using the \emph{ifThen} function, which can be used to get only that events of a stream that cary a specified value.
+But since the real expressiveness of parameterization is based on the dynamic nature of the input data that approach is not sufficient.
+Therefore, to allow parameterized streams, the \gls{tessla} specification language would have to be extended.
+How exactly this extension would look like remains to be specified.
+
+The changes required to allow slicing in the runtime shouldn't be very complex.
+Basically a \emph{slice} node would have to be implemented, that has one input stream and a variable number of output streams.
+Whenever the node receives an event which carries a value that wasn't seen before the node would have to start new child nodes that are responsible to handle the new stream.
+Since nodes are already generated at runtime, when the evaluation engine is synthesized, it should be no problem to start new ones during the evaluation process.
+
+
+% online monitoring -> possible infinite traces, important that on each stream new event finally happen.
+
+\subsection{Easier Definition of New Node Types}
+\label{sec:conclusion:further_work:node_definition}
+
+Note the BeepBeep approach
+maybe define new functions (read nodes) in the spec itself and not in the runtime? Or generate new computations by combining base ones
+
+\subsection{Runtime Optimizations}
+\label{sec:conclusion:further_work:runtime_optimizations}
+
 Optimizations: Bundle up events, throw away unneeded progress events in  bundles
   For some notes only subset of inputs is important for output progress (think if then else)
-    -> Some things na be optimized by compiler (literal as cond to ite) others only during evaluation.
+    -> Some things may be optimized by compiler (literal as cond to ite) others only during evaluation.
 
-More fine grained instrumentation pass config
-TODO: Timing model, maybe somehow harness Vector clocks -> wwould  compplicate instrumentation! Also would need support in TeSSLa language.
-Configuration file for instrumetnation -> e.g. include conditions
 
 \subsection{Error prevention}
 \label{sec:conclusion:further_work:error_prevention}
 Ways of sending observations back to the program to recover from or prevent errors
 
+
+\subsection{Instrumentation Pass}
+More fine grained instrumentation pass config: restrictions etc
+TODO: Timing model, maybe somehow harness Vector clocks -> would  compplicate instrumentation! Also would need support in TeSSLa language.
+Configuration file for instrumetnation -> e.g. include conditions
