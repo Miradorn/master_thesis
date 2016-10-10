@@ -246,9 +246,22 @@ Since the realtime fragment is an important part of \gls{tessla} we decided that
 
 \subsection{Tools to Generate Traces}
 
-Since no suitable benchmark could be found the next step was to search for a tool that can be used to generate appropriate traces from programs during execution.
+Since no suitable benchmark could be found the next step was to search for a tool that can be used to generate apropriate traces from programs during execution.
+Theese tools can be categorized into static and dynamic instrumentation tools: static tools transform the source code of a program during compilation to include logging statements, dynamic ones only work at runtime and aren't involved in the compilation process.
+
 % DTrace PID
 \subsection{CIL}
+
+\Gls{cil}\cite{Necula2002} is a tool to write source-to-source transformations for C programs, therefore it is a static instrumentation tool.
+\Gls{cil} implements ``a highly-structured clean subset of C'' in the OCaml language.
+When used \gls{cil} will transform a C program into the intermediate representation in OCaml.
+It will then go on and apply transformations that are supplied by the programmer to the intermediate representation.
+When all transformations are applied the program is written back as a normal C program.
+
+Since \gls{cil} is able to represent the complete C90 standard and also extensions that are commonly used like the ones from GNU C it could be used to write an instrumentation pass for the use case of trace generation.
+The main reason that \gls{cil} wasn't used is that it only supports C and we were looking for a tool that could be used on a variety of programming languages.
+
+
 \subsection{Google XRay}
 \subsection{Compilers}
 GCC
