@@ -3,18 +3,60 @@
 \chapter{Conclusion}
 \label{sec:conclusion}
 
-\section{Conclusion for TesslaServer}
+In this chapter we will revisit the work done in the whole thesis and see which parts remain to be done.
+In the final section an overview of future work is given, highlighting challenges that can be approached based on the work that is already done.
 
-note limitations of Type system of compiler and Runtime
+\section{TesslaServer}
 
-Optimizations: Bundle up events, throw away unneeded progress events in  bundles
-  For some notes only subset of inputs is important for output progress (think if then else)
-    -> Some things na be optimized by compiler (literal as cond to ite) others only during evaluation.
+As the evaluation in \Cref{sec:evaluation:runtime_benchmarks,sec:evaluation:runtime_examples} shows the implemented runtime is able to evaluate a variety of specifications in a performant way.
+The new architecture for the runtime improved the performance in many ways, especially enabling the evaluation of complex specifications with many input events.
+Nonetheless it has to be noted that the runtime at the moment is mainly a proof of concept and isn't tested under real life circumstances or with actual systems.
 
-Implement 'end' notification to flush all values.
-Total ordering of inputs necessary, relax to per channel. Argue that channels could be split by thread id.
+At the moment there are two drawbacks of the runtime that are based on limitations of the current version of the \gls{tessla} compiler.
+The limitations are missing type information and missing output information.
 
-\section{Conclusion for the Instrumentation Pass}
+Let's first understand the lack of type information and the impact of the runtime.
+The \gls{tessla} compiler is able to infer a lot of type information, therefore making it possible to omit type information from \gls{tessla} specifications.
+Many functions in \gls{tessla} are generic over the type they consume or produce.
+Recall that each function in \gls{tessla} is generic, since they work either on signals or eventstreams which carry a type themself, e.g. a function can have the output type \lstinline{Events<Int>} or \lstinline{Signal<Boolean>}.
+Furthermore a function can be generic not only over the type of the values of its streams but also what kind of stream (signal or eventstream) it consumes or produces.
+Also the same function can be defined over different aritys, for example an \emph{add} function could be defined for 2, 3 or any number of arguments (note that \gls{tessla} doesn't support methods with a varying number of arguments, in some languages known as \emph{varargs}, as of now).
+
+This leads to a situation where for example the \emph{delay} function, which delays stream by an amount, has actually three generic types: \lstinline{Events<A>,time -> Events<A>}, \lstinline{Signal<A>,time,A -> Events<a>} and \lstinline{Events<A>, Int -> Events<A>}.
+The first and second functions are delaying a stream by a certain time, the second one having a default value as the third argument, and the las function delaying the events on an eventstream by a given amount of steps, meaning the first event will be delayed to the timestamp of the second event.
+
+The compiler is now able to match the signatures of a used function to the correct one and will check if the whole specification is correct with respect to the type system.
+The problem is in the output of the compiler which doesn't contain type informations anyomore, meaning that the representation of the first and third \emph{delay} functions are exactly the same and the runtime would have to figure out which type of the function it should actually use.
+For the moment two workarounds are present in the runtime and compiler until the type informations are included in the output.
+
+The first workaround is for functions which work with signals and eventstreams and have the same arity.
+To make them work without type information they are split into multiple functions, one for each argument that can take either a signal or an eventstream.
+For example the two \emph{delay} functions with the same arity are split into a \emph{delayEventsByTime} and a \emph{delayEventsByCount} function.
+This moves some responsibility to the user writing a spec since he has to use the right function and can't rely on the compiler to figure out the correct one.
+Furthermore this leads to an increased implementation effort for the runtime, since more node types have to implemented.
+The second workaround is much simpler: functions which work on streams with generic type of values (e.g. \lstinline{Signal<A>}) will use \emph{Int} as the default type and doesn't support any other types.
+
+The desired solution to the problem is, that the compiler will somehow include the type signature of functions in the output.
+The signature could than be used at runtime to dynamically convert the values of events to the matching types.
+
+The lack of output information is easier to understand and solve.
+In \gls{tessla} specifications one denotes that a stream is an output stream with the \lstinline{out} keyword.
+At the moment the compiler isn't handling this keyword at all and therefore it is missing in the output.
+The workaround for now is, that output nodes have to be specified when the runtime is started, therefore a typical invocation of TesslaServer looks like \lstinline[language=bash]{./tessla_server example.spec -o 4:error} where the \emph{o} flag denotes an output, 4 is the id of the node that generates the output stream and \emph{error} is a name that can be chosen by the user.
+
+A last missing functionality we want to highlight is based on the asynchronous nature of the runtime.
+Since nodes are independent of each other and share no knowledge, except the one that is explicitly shared by messages, there is no global state that can be used to track if all nodes have finished their computation.
+Furthermore there is no shared progres between independent nodes in the new architecture, or in other words each source will be progressed to a different timestamp.
+
+This leads to a problem when the trace actually ends: Think of a specification with two independent sources and a trace which contains events on the stream of the first source upto timestamp \(t_2\) but for the stream of the second stream only to the timestamp \(t_1\) with \(t_1 < t_2\).
+When the trace ends the second source will have only progressed to \(t_1\) while the trace implicitly contains the information that there is no event happening on its input stream at any time later than \(t_1\).
+This information could lead to new generated events of a child node, e.g. a \emph{timeout} node which could then lead to new output events.
+
+A simple workaround would be to implement a \emph{flush} mechanism, which will send each source node a message that there will be no more input events and therefore they can progress to the maximal timestamp.
+With this mechanism all children of sources will then receive the information that their inputs have progressed without generating new events, enabling them to also progress to the maximal time.
+The information that all inputs have finished will transitively flow thourgh the whole system and at one point all nodes will have performed their final computation and the system will have generated all possible outputs.
+
+\section{Instrumentation Pass}
 TODO: Timing model, maybe somehow harness Vector clocks -> wwould  compplicate instrumentation! Also would need support in TeSSLa language.
 Extract logging to  different thread ->  run on own core, less overhead.
 Configuration file for instrumetnation -> e.g. include conditions
@@ -40,8 +82,10 @@ Different evaluation model: Pull not push
 
 online monitoring -> possible infinite traces
 
-Architecture is similar to a vm: Tessla specs are code, compiler produces intermediate representation (json), runtime executes Ir.
-Therefore: Maybe define new functions (read nodes) in the spec itself and not in the runtime? Also recursion in specifications
+maybe define new functions (read nodes) in the spec itself and not in the runtime? Also recursion in specifications
+Optimizations: Bundle up events, throw away unneeded progress events in  bundles
+  For some notes only subset of inputs is important for output progress (think if then else)
+    -> Some things na be optimized by compiler (literal as cond to ite) others only during evaluation.
 
 \subsection{Error prevention}
 \label{sec:conclusion:further_work:error_prevention}
