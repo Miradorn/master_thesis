@@ -261,10 +261,21 @@ When all transformations are applied the program is written back as a normal C p
 Since \gls{cil} is able to represent the complete C90 standard and also extensions that are commonly used like the ones from GNU C it could be used to write an instrumentation pass for the use case of trace generation.
 The main reason that \gls{cil} wasn't used is that it only supports C and we were looking for a tool that could be used on a variety of programming languages.
 
-
 \subsection{Google XRay}
-\subsection{Compilers}
-GCC
+
+Google XRay~\cite{Berris2016} is a function call tracing system for C and C++.
+It is mainly a static instrumentation tool but has some aspects of a dynamic one: While it requires the orginal source code to be instrumented, the tracing functionality can be turned off at runtime which minimizes overhead.
+XRay works by inserting a series of no-ops after function entry points and before return points.
+At runtime a library that is part of XRay can then patch theese no-ops to a log function call if tracing is enabled.
+This rather complex mechanism is chosen to enable a minimal overhead which was a main requirement for the development of XRay.
+
+XRay is at the moment implemented as a set of patches onto \gls{gcc} but is planned to be migrated to \gls{llvm}.
+In typical usage scenarios XRay led to an overhead of around 20\% to 40\%.
+
+While XRay looks like a promising all-in-one solution to trace collection it only supports the instrumentation of function entrys and exits.
+For our instrumentation we wanted to have the possibility to also trace other events and maybe event allow the attach conditions when an event is actually logged.
+As an example think of logging an event whenever a variable is assigned more than once in a single function call.
+
 \subsection{LLVM}
 \label{sec:related:traces:llvm}
 
