@@ -92,7 +92,8 @@ In the following \(\sigma_i\) is used to get the element at position \(i\) and \
 \begin{lemma}[name=Asynchronous equivalence is an equivalence Relation]\label{lemma:async_equivalence_is_equivalence_relationship}
   Asynchronous equivalence is symmetric, reflexive and transitive.
 \end{lemma}
-\begin{proof}$ $\newline
+
+\begin{proof}
     Symmetry is trivial, since the second part of the definition is requiring it.\\
     Reflexivity is also trivial, for \((\sigma_{[0,k]}, \vec{o})\) select \(k' = k\).\\
     For transitivity:
@@ -229,7 +230,7 @@ Since the values are associated with timestamps the outputs can be reordered by 
 \begin{lemma}[name=Observational Equivalence is an Equivalence Relationship for Bounded Transducers]\label{lemma:observational_equivalence_equivalence_relationship}
   \(\equiv_o\) is symmetric, reflexive and transitive for bounded timed transducers.
 \end{lemma}
-\begin{proof}$ $\newline
+\begin{proof}
   Let \(t_1, t_2, t_3\) be bounded timed transducers.
   Symmetry follows directly from the definition.\\
   Reflexivity: For \((\sigma_{[0,k]}, \vec{o})\) select \(k' = k''\) as the k, for which the transducer is bounded for that input.\\
@@ -237,22 +238,22 @@ Since the values are associated with timestamps the outputs can be reordered by 
   \begin{itemize}
     \item Let \(t_1 \equiv_o t_2\), \(t_2 \equiv_o t_3\).
     \item First case:
-      \begin{align*}
+      \begin{alignat*}{2}
         &\text{Since } t_1 \equiv_o t_2:\ \forall (\sigma_{[0,k_1]}, \vec{o_1}) \in t_1: \\
         &\hspace{2em} \exists k_1', k_2 > k_1\ \text{with } (\sigma_{[0,k_1']}, \vec{o_1}\circ\vec{o_1'}) \in t_1\ \text{and } (\sigma_{[0,k_2]}, \vec{o_2}) \in t_2 \\
         &\hspace{4em} \text{with } \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_1} \circ \vec{o_1'} )) \\
-        &\hspace{8em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_2})) & (\star)\\
+        &\hspace{8em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_2})) && (\star)\\
         &\hspace{2em} \text{and since } t_2 \equiv_o t_3: \exists k_2', k_3 > k_2\ \text{with } (\sigma_{[0,k_2']}, \vec{o_2}\circ\vec{o_2'}) \in t_2 \\
         &\hspace{4em} \text{and } (\sigma_{[0,k_3]}, \vec{o_3}) \in t_3 \\
         &\hspace{6em} \text{with } \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_2}),\vec{o_2} \circ \vec{o_2'} )) \\
-        &\hspace{10em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_2}),\vec{o_3})) & (\star\star)\\
-        &\hspace{2em} \mathit{maxTime}(\vec{o_1})\ \text{has to be smaller then}\mathit{maxTime}(\vec{o_2}) \\
-        &\hspace{4em} \text{else } (\star)\ \text{couldn't hold, therefore, combined with boundedness and }(\star\star): \\
+        &\hspace{10em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_2}),\vec{o_3})) && (\star\star)\\
+        &\hspace{2em} \mathit{maxTime}(\vec{o_1})\ \text{has to be smaller than }\mathit{maxTime}(\vec{o_2}), \\
+        &\hspace{2em} \text{else } (\star)\ \text{couldn't hold, therefore, combined with boundedness and }(\star\star): \\
         &\hspace{4em} \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_2} )) \\
         &\hspace{8em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_3})) \\
         &\text{which concludes }\mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_1} \circ \vec{o_1'} ))\\
         &\hspace{4em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_3}))
-      \end{align*}
+      \end{alignat*}
     \item The second case works the same, just switch \(t_1\) and \(t_3\).
   \end{itemize}
 \end{proof}

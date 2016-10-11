@@ -130,6 +130,7 @@ Greedy evaluation engines offer a good start to reason about behaviours and will
     \node (o1) at (0,-2) {\(o\)} edge [pre] (c);
     \node (o2) at (4,-2) {\(u\)} edge [pre] (e);
   \end{tikzpicture}
+  \hspace{20mm}
   \begin{tikzpicture}
     [pre/.style={<-,shorten <=1pt,>=stealth,semithick}]
     \node [shape=circle,draw=black] (a) [label=right:5] at (2, 4) {a};
@@ -145,7 +146,7 @@ Greedy evaluation engines offer a good start to reason about behaviours and will
     \node (o1) at (0,-2) {\(o\)} edge [pre] (c);
     \node (o2) at (4,-2) {\(u\)} edge [pre] (e);
   \end{tikzpicture}
-  \caption{Visualization of a simple evaluation engine with a greedy schedule.}
+  \caption[Visualization of a simple evaluation engine with a greedy schedule.]{Visualization of a simple evaluation engine with a greedy schedule. The left side shows the initial state of the evaluation engine with one input event that can be consumed. The right side shows the state after the input event was consumed and now two internal events are send to the children of the input node.}
   \label{fig:chap5:sec_greedy:visual_dag}
 \end{figure}
 
@@ -307,7 +308,7 @@ If such a closer run always exist, we will show that the run with closeness \((l
         (H.265) edge [path2, dashed] node {} (X.95)
         (H.275) edge [path3, dashed] node {} (X.85);
       \end{tikzpicture}
-      \caption{Visualization of three runs of an evaluation engine as explained in \Cref{proof:equiv_greedy_engines}. }
+      \caption[Visualization of three runs of an evaluation engine]{Visualization of three runs of an evaluation engine. The left run differs from the two right runs after state \(s_{d-1}\) while the two right runs only differ by the order of the transitions \(\tau_1\) and \(\tau'_2\).}
       \label{fig:chap5:sec_greedy:maximize_closeness}
     \end{figure}
 
@@ -402,5 +403,6 @@ If such a closer run always exist, we will show that the run with closeness \((l
 
   \section{Timing functions}
   \label{sec:behaviours:timing_functions}
+  TODO
 
-  \section{Parallel computation}
+  % \section{Parallel computation}

@@ -58,7 +58,7 @@ An example of the variety of the supported platforms of Erlang and Elixir is the
 As described in \Cref{sec:definitions:eval_engine} \gls{tessla} specifications form a \gls{dag} of nodes, which perform transformations on streams and send their computed streams to children nodes.
 Streams can be seen as a sequence of events or changes that can be represented as messages between the nodes.
 This form of specification can be easily implemented as an actor based system, where each vertex in the \gls{dag} is implemented as an actor and the communication between adjacent vertices is realised with message passing between the corresponding actors.
-Interestingly, this architecture enables the enforcement of greedy schedules, which are described in \Cref{def:greedy_schedule}, while the Erlang runtime itself only guarantees a fair scheduling.
+Interestingly, as we will see in the following, this architecture enables the enforcement of greedy schedules, which are described in \Cref{def:greedy_schedule}, while the Erlang runtime itself only guarantees a fair scheduling.
 To understand how a greedy schedule can be enforced we have to look at the internals of message passing and handling in Erlang and Elixir.
 
 Basically there are two ways two Erlang processes can communicate with each other through messages: synchronous and asynchronous.
