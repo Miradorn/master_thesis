@@ -192,7 +192,7 @@ The programs or traces were then modified to deliberately include errors to test
 As the main source for test trace data a ringbuffer, implemented in C, was modified by the instrumentation to log specific events.
 The code of the ringbuffer can be found in \Cref{listing:ringbuffer}.
 Events that are logged are of two types: calls to the \lstinline{process} function and changes of the \lstinline{write_ptr} variable.
-The generated traces can be used for a variety of specifications, e.g.: performance tests, race conditions or wrong initilizations.
+The generated traces can be used for a variety of specifications, inlcuding performance tests, race conditions or wrong initilizations.
 
 The Following specifications were tested over the traces:
 

@@ -18,7 +18,7 @@ The following chapter will summarize the approaches that are available in the fi
 \label{sec:related:c_programs}
 
 Most \gls{rv} approaches are developed for Java and the \gls{jvm} and therefore is not usable for a big percentage of software that is written.
-Especially C and C++ are used in a wide variety of safety critical systems, e.g. aircrafts and energy plants.
+Especially C and C++ are used in a wide variety of safety critical systems, including aircrafts and energy plants.
 While \gls{tessla} as a language and the implemented runtime is independent of the platform of the monitored program, the domain of C programs and especially embedded software has a special focus in this thesis.
 Therefore in this section we will look at some existing approaches to monitor C programs and in Section~\ref{sec:related:traces} we will discuss ways to generate trace data from such programs.
 
@@ -63,7 +63,7 @@ Specifications are given as a textual representation of state machines which is 
 The specifications are then interweaved into the program using \gls{cil}~\cite{Necula2002}.
 
 Specifications work on the level of function calls and state properties like \emph{write may never be called before open was called}.
-Because software developers are often working at the same abstraction level (in contrast to e.g.\ assembler or machine instructions), they can define specifications without having to learn new concepts.
+Because software developers are often working at the same abstraction level (in contrast to assembler or machine instructions), they can define specifications without having to learn new concepts.
 In the \gls{tessla} runtime support for traces at the same abstraction level (function calls, variable reads and writes) is present and used in most of the tests in \Cref{sec:evaluation:runtime_examples}.
 
 Because \gls{rmor} specifications are interweaved into the program, their observations can not only be reported but also used to recover the program or even to prevent errors by calling specified functions when a critical condition is encountered.
@@ -94,7 +94,7 @@ It achieves this by synthesizing formulas into \emph{submonitors} which can then
 For example the formula \(\Phi \vee \Psi\) can be synthesized as two \emph{submonitors}, one for \(\Psi\) and one for \(\Phi\).
 
 The \gls{tessla} runtime follows a similiar approach where each part of the specification is implemented as an independent actor.
-Theese actors can then be scheduled by the environment in a parallel fashion.
+These actors can then be scheduled by the environment in a parallel fashion.
 In \Cref{sec:implementation:tesslaserver} we will look at this architecture more closely.
 
 \section{Stream Based Specification Techniques}
@@ -131,7 +131,7 @@ For example a template stream could be used to monitor logins of individual user
 Adding parameterization to \gls{tessla} was discussed but isn't implemented as of now.
 
 \gls{tessla} takes concepts of \gls{lola} and applies them to a continuous model of time and introduces a language and a rich set of functions that can be applied to streams.
-The dependency graph is a core concept of \gls{tessla} and is used to check if specifications are valid (e.g.\ cycle free) and is also the core concept to evaluate specifications over traces in this thesis.
+The dependency graph is a core concept of \gls{tessla} and is used to check if specifications are valid and is also the core concept to evaluate specifications over traces in this thesis.
 
 \subsection{BeepBeep 3}
 \label{sec:related:stream_based:beepbeep}
@@ -155,7 +155,7 @@ The implemented runtime and the theoretic work of this thesis is built upon the 
 For that project a syntax and a formal semantic of a specification language was introduced.
 
 Specifications in \gls{tessla} are based on streams of data.
-Streams are the representation of data over time, e.g.\ a variable value in a program or the temperature of a processor.
+Streams are the representation of data over time, for example a variable value in a program or the temperature of a processor.
 To model streams \gls{tessla} defines a timing model.
 That model is based on timestamps that are isomorphic to real numbers \(\mathbb{R}\).
 \Cref{fig:chap2:sec_tessla:streams} shows how streams behave over time.
@@ -183,7 +183,7 @@ This is an important step to enable people without a strong theoretical backgrou
 While \gls{rv} has a lot of mechanisms to express specifications they often lack the ability to be intuitively understood.
 
 While there exist many specification languages like \gls{ltl}~\citep{Pnueli77}, \gls{rltl}~\citep{Leucker2007}, \gls{ctl}~\citep{Clarke82} and many others they are geared heavily toward scientific work and theoretic reasoning.
-When introducing new concepts like realtime this trend keeps up and formalism like \gls{tltl} from~\cite{Raskin1997}, \gls{stl} from~\cite{Maler2004} and \gls{mtl} from~\cite{Koymans1990} provide theoretical foundations to reason about realtime properties but formulas using theese logics are even harder to understand than their non realtime counterparts.
+When introducing new concepts like realtime this trend keeps up and formalism like \gls{tltl} from~\cite{Raskin1997}, \gls{stl} from~\cite{Maler2004} and \gls{mtl} from~\cite{Koymans1990} provide theoretical foundations to reason about realtime properties but formulas using these logics are even harder to understand than their non realtime counterparts.
 
 One approach to make \gls{rv} more usage friendly is \gls{salt} presented in~\cite{Bauer2006} which acts as frontend language to the more formal specification languages and can be transpiled into them.
 \Gls{salt} unifies many different mechanism, like specification patterns, nested scopes, exceptions, regular expressions and realtime.
@@ -225,7 +225,7 @@ Since Java wasn't the target architecture of our runtime it wasn't used for the 
 
 The works in~\cite{Dwyer1999} can be seen as a benchmark for the expressiveness of a specification language.
 It categorizes commonly monitored porperties into so called patterns like \emph{precedence}, \emph{absence} and \emph{response}.
-While it would be valuable to test \gls{tessla} and the implemented runtimes against theese patterns this would be a two step process:
+While it would be valuable to test \gls{tessla} and the implemented runtimes against these patterns this would be a two step process:
 First each pattern would have to be checked, if and how it could be expressed as a \gls{tessla} specification.
 As a second step, if the pattern can be expressed, test trace data would have to be generated and only then the runtime could be evaluated using that pattern.
 Since this thesis doesn't work on the \gls{tessla} language definition but only on the runtime we decided against this process.
@@ -233,7 +233,7 @@ Since this thesis doesn't work on the \gls{tessla} language definition but only 
 Another interesting project for evaluation of offline monitoring tools is TraceBench presented in~\cite{Zhou2014}.
 TraceBench is a big set of traces collected from a distributed system running \gls{hdfs}.
 During the collection errors of different categories were deliberately introduced, like network timeouts or data corruption.
-The generated traces are organized in a hierarchy: if an event is produced as the effect of another event, e.g. a function call that leads to another function call, the second event is a child of the first.
+The generated traces are organized in a hierarchy: if an event is produced as the effect of another event, for example a function call that leads to another function call, the second event is a child of the first.
 Furthermore the traces contain the beginning and end of each event as a timestamp, making the traces suitable for \gls{tessla}.
 Unfortunately it seems that the generated trace data has a problem: Since events are produced in a distributed system the timestamps are faulty, for example some events started before their parent event.
 Furthermore \gls{tessla} doesn't have a mechanism to express nested events as of now, meaning the traces would need to be manipulated before they could be used.
@@ -247,7 +247,7 @@ Since the realtime fragment is an important part of \gls{tessla} we decided that
 \subsection{Tools to Generate Traces}
 
 Since no suitable benchmark could be found the next step was to search for a tool that can be used to generate apropriate traces from programs during execution.
-Theese tools can be categorized into static and dynamic instrumentation tools: static tools transform the source code of a program during compilation to include logging statements, dynamic ones only work at runtime and aren't involved in the compilation process.
+These tools can be categorized into static and dynamic instrumentation tools: static tools transform the source code of a program during compilation to include logging statements, dynamic ones only work at runtime and aren't involved in the compilation process.
 
 % DTrace PID
 \subsection{CIL}
@@ -266,7 +266,7 @@ The main reason that \gls{cil} wasn't used is that it only supports C and we wer
 Google XRay~\cite{Berris2016} is a function call tracing system for C and C++.
 It is mainly a static instrumentation tool but has some aspects of a dynamic one: While it requires the orginal source code to be instrumented, the tracing functionality can be turned off at runtime which minimizes overhead.
 XRay works by inserting a series of no-ops after function entry points and before return points.
-At runtime a library that is part of XRay can then patch theese no-ops to a log function call if tracing is enabled.
+At runtime a library that is part of XRay can then patch these no-ops to a log function call if tracing is enabled.
 This rather complex mechanism is chosen to enable a minimal overhead which was a main requirement for the development of XRay.
 
 XRay is at the moment implemented as a set of patches onto \gls{gcc} but is planned to be migrated to \gls{llvm}.
@@ -284,8 +284,8 @@ TODO
 
 \Gls{llvm}~\cite{Lattner2004} is a compiler framework to allow program analysis and transformation.
 The compilation process of \gls{llvm} is seperated into three parts: a front-end, a middle-end and a back-end.
-A front-end is responsible for translating a source language, e.g. C or C++ into \gls{llvm} \gls{ir}, a strongly typed \gls{risc} instruction set which is independent from the target platform.
-The middle-end is performing source-to-source transformations on the \gls{ir}, e.g. to perform analizations or optimizations.
+A front-end is responsible for translating a source language, for example C or C++, into \gls{llvm} \gls{ir}, a strongly typed \gls{risc} instruction set which is independent from the target platform.
+The middle-end is performing source-to-source transformations on the \gls{ir} that can perform analizations or optimizations.
 Such transformations are called \emph{compiler passes} and are independent of the source language.
 The back-end is then used to transform the \gls{ir} into native machine code for the target platform.
 

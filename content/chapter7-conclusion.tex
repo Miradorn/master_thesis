@@ -18,7 +18,7 @@ The limitations are missing type information and missing output information.
 Let's first understand the lack of type information and the impact of the runtime.
 The \gls{tessla} compiler is able to infer a lot of type information, therefore making it possible to omit type information from \gls{tessla} specifications.
 Many functions in \gls{tessla} are generic over the type they consume or produce.
-Recall that each function in \gls{tessla} is generic, since they work either on signals or eventstreams which carry a type themself, e.g. a function can have the output type \lstinline{Events<Int>} or \lstinline{Signal<Boolean>}.
+Recall that each function in \gls{tessla} is generic, since they work either on signals or eventstreams which carry a type themself, so a function could have the output type \lstinline{Events<Int>} or \lstinline{Signal<Boolean>}.
 Furthermore a function can be generic not only over the type of the values of its streams but also what kind of stream (signal or eventstream) it consumes or produces.
 Also the same function can be defined over different aritys, for example an \emph{add} function could be defined for 2, 3 or any number of arguments (note that \gls{tessla} doesn't support methods with a varying number of arguments, in some languages known as \emph{varargs}, as of now).
 
@@ -50,7 +50,7 @@ Furthermore there is no shared progres between independent nodes in the new arch
 
 This leads to a problem when the trace actually ends: Think of a specification with two independent sources and a trace which contains events on the stream of the first source upto timestamp \(t_2\) but for the stream of the second stream only to the timestamp \(t_1\) with \(t_1 < t_2\).
 When the trace ends the second source will have only progressed to \(t_1\) while the trace implicitly contains the information that there is no event happening on its input stream at any time later than \(t_1\).
-This information could lead to new generated events of a child node, e.g. a \emph{timeout} node which could then lead to new output events.
+This information could lead to new generated events of a child node, for example a \emph{timeout} node which could then lead to new output events.
 
 A simple workaround would be to implement a \emph{flush} mechanism, which will send each source node a message that there will be no more input events and therefore they can progress to the maximal timestamp.
 With this mechanism all children of sources will then receive the information that their inputs have progressed without generating new events, enabling them to also progress to the maximal time.
@@ -73,7 +73,7 @@ Enabling the logging of more event types, like variable reads or memory allocati
 
 As explained in \Cref{sec:implementation:instrumentation} the compiler pass is instrumented as a \emph{ModulePass}, enabling the logging of all kinds of events.
 While the logging of function calls was sufficient for testing and evaluation purposes this restriction together with the total lack of logging data is an obvious problem for more serious use cases.
-The trace format already includes a field for data values and the instrumentation pass has the ability to extract data, e.g. function arguments or return values, from the source code it is transforming.
+The trace format already includes a field for data values and the instrumentation pass has the ability to extract data, for example function arguments or return values, from the source code it is transforming.
 
 Also the expansion to more event types shouldn't be too complicated when harnessing the \emph{InstVisitor}\footnote{\url{http://llvm.org/docs/doxygen/html/classllvm_1_1InstVisitor.html}} mechanism.
 An \emph{InstVisitor} can be used to abstract the actual iteration over the building blocks of the \gls{ir} of a program, so that the user only has to specify the transformation that should be happening when a specific instruction type is seen.
@@ -89,7 +89,7 @@ This approach would also enable the sharing of configuration files between diffe
 \label{sec:conclusion:further_work}
 
 In addition to the adjustments that are stated in the two previous sections there are also some ideas to extend the works from this thesis in ways that require more theoretic work and larger changes of the architecture.
-This section will give an overview of theese ideas and will present sketches of approaches to implement them.
+This section will give an overview of these ideas and will present sketches of approaches to implement them.
 
 \subsection{Implementation for the \glsentryname{jvm}}
 \label{sec:conclusion:further_work:jvm}

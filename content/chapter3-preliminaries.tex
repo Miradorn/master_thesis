@@ -334,7 +334,7 @@ Events are the atomic unit of information that all computations are based on.
 There are three types of events: external, output and internal events.
 
 The set of all events is denoted as \(E\).
-Each event carries a value, which can be \emph{nothing} or a value of a type (types are formally defined in the \gls{tessla} specification, but aren't important for this thesis), a timestamp and the stream it's perceived on (e.g.\ a function call of a specific function or the name of an output stream).
+Each event carries a value, which can be \emph{nothing} or a value of a type (types are formally defined in the \gls{tessla} specification, but aren't important for this thesis), a timestamp and the stream it's perceived on (for example a function call of a specific function or the name of an output stream).
 
 The value of an event can be queried with the function \(\upsilon\), its timestamp with \(\mathit{time}\) and its stream with \(\mathit{stream}\).
 
@@ -380,7 +380,7 @@ The produced stream can either be assigned to a named identifier (think: a varia
 Functions can be divided into three categories: pure, unpure and timing.
 Pure functions, also called stateless, are evaluated only on the values their inputs have at the timestamp they are evaluated, therefore they don't have to remember a state and will only return events.
 Unpure, or stateful, functions are evaluated over the values if its inputs at that timestamp and a state and will return not only new events but also an updated state.
-E.g.\ a function \emph{eventCount} has to \emph{remember} how many events already happened on it's input stream and increment that counter on every new event.
+As an example a function \emph{eventCount} has to \emph{remember} how many events already happened on it's input stream and increment that counter on every new event.
 Timing functions are evaluated not only on the value of events but also on their timestamp and can also manipulate it:
 While non timing functions will consume events at a specific timestamp and emit events with that timestamp, timing functions can emit events with a changed timestamp.
 In this thesis we will only look at past time functions, meaning functions can only delay timestamps, therefore can't depend on future values.
@@ -392,7 +392,7 @@ In \Cref{sec:behaviours:timing_functions} the conclusions of earlier sections wi
 \label{sec:definitions:nodes}
 
 Nodes are the atomic unit of computation for the evaluation of a \gls{tessla} specification.
-A node implements a single function, e.g.:\ there is an \emph{AddNode} which takes two input signals and produces a new signal.
+A node implements a single function: there is an \emph{AddNode} which takes two input signals and produces a new signal.
 Therefore a node is the concrete implementation of a function in a runtime for \gls{tessla} specifications.
 The set of all nodes is called \(N\).
 The function of a node \(n \in N\) is written as \(f_n\).
@@ -405,34 +405,6 @@ Every new event added to a queue has to have a bigger timestamp than the previou
 This means a queue has a kind of progress timestamp, which denotes the timestamp of the latest event added to it and which is strictly increasing over time.
 Queues support the standard operators for lists like \(\mathit{hd}, \mathit{tl}, ++\) to respectively get the head, the tail or to append to the end.
 
-% Based on the input queues and its function, when a node perform its compputation on a set of input events, it:
-
-% \begin{enumerate}
-%   \item Check if one or more new output events can be produced (see Section~\ref{sec:concepts:defs:nodes:processable})
-%     \begin{itemize}
-%       \item If so, compute all timestamps, where new events might be computed
-%       \item Compute the events at the possible timestamps
-%       \item Remove the used Events for the computation from the input queue
-%     \end{itemize}
-%   \item Add the produced events to the input of all children and update the associated progress to the new one
-% \end{enumerate}
-
-% \subsubsection{Determination of processable Events}
-% \label{sec:concepts:defs:nodes:processable}
-
-% Based on the asynchronous nature of nodes, events from different streams can be received out of order.
-% Therefore a node cannot compute its output upto a timestamp unless it has the information from all inputs that they did progress to at least that timestamp.
-
-% E.g.\ if a node \(c\) is a child of node \(a\) and \(b\), it can receive events from node \(a\) at timestamps \(t_1, t_2, t_3, t_4\) before receiving an event with timestamp \(t_1\) from node \(b\).
-% When node \(c\) receives the first four events from node \(a\), they will stay buffered on the input queue that represents the stream from node a and the progress for that input will be \(t_4\), while the input queue representing the stream from node b will have no events buffered and a progress of \(0\).
-% When it receives the first event from node \(b\) it can compute all events upto \(t_1\).
-% To do so it will compute \emph{change timestamps}: The union of all timestamps where an event occured on any input between the timestamp of the last generated output and the minimal progress of all inputs.
-% In this case that is only \(t_1\).
-% Therefore the node will remove the events with timestamp \(t_1\) from both queues and will compute a new event based on them, with a timestamp that is equal to or smaller than \(t_1\), where smaller can only happen if it is a timing node.
-% Then it will distribute the computed event together with the new progress \(t_1\) to its children.
-
-% To see why the computation of change timestamps is necessary lets assume that node \(c\) will receive a new event from node \(b\) with timestamp \(t_4\):
-% All inputs have progressed to \(t_4\), but on the stream from node \(a\) there are changes between \(t_1\) (where the last output was generated) and \(t_4\), therefore the \emph{change timestamps} are \(t_2, t_3, t_4\) and the node will have to compute its output based on the values of the streams at that timestamps.
 
 \section{\glsentryname{tessla} Evaluation Engine}
 \label{sec:definitions:eval_engine}
@@ -515,7 +487,9 @@ The complete functions that are present in the implemented runtime are explained
 \label{table:complete_functions}
 \end{table}
 
-The first four functions are sources which take an external event and format them for internal use, e.g.\ \(\mathit{variable\_values}\) takes a string containing the name and the value of a variable, casts the value to an appropriate type and produces a signal holding that produced value.
+The first four functions are sources which take an external event and format them for internal use.
+\(\mathit{variable\_values}\) takes a string containing the name and the value of a variable, casts the value to an appropriate type and produces a signal holding that produced value.
+The other sources work in a similiar way.
 
 \subsection{Output Complete Functions}
 \label{sec:definitions:tessla_functions:output_complete}
@@ -607,7 +581,7 @@ TODO
 All \gls{tessla} evaluation engines have to hold a state, which encodes information necessary to continue the evaluation, and a history, which encodes what happened on all streams in the evaluation engine.
 The state of a whole evaluation engine is made up of the states of its nodes.
 
-Each node has a state, which contains arbitray information, e.g.\ a counter for a \(\mathit{CountNode}\), its input queues holding the non-processed events and, if they have signals as inputs, the last changes of them.
+Each node has a state, which contains arbitray information, for example a counter for a \(\mathit{CountNode}\), its input queues holding the non-processed events and, if they have signals as inputs, the last changes of them.
 
 To distinguish between the two types of states, the state of the whole engine is called the \emph{global state} and the state of a single node the \emph{node state}.
 The set of all valid node states is called \(\widetilde{N}\).
@@ -655,7 +629,7 @@ The set of all transitions is written as \(T\).
 The function \(\mathit{node} : T \rightarrow N\) returns the node of which the transitions models the computation.
 
 One part of a transition is a relation between two sets of events, why sometimes we write \(\tau = (\{e_1, e_2\}, \{e_3\})\) to visualize a transition, but remember that there is more to a transition than that.
-E.g.\ the relation \(\tau = (\{e_1,e_2\}, \{e_3\})\) means that two events were consumed by a node and one event was produced based on them.
+The relation \(\tau = (\{e_1,e_2\}, \{e_3\})\) means that two events were consumed by a node and one event was produced based on them.
 
 The empty transition, meaning no input was consumed and no output produced, is labeled with \(\lambda\).
 Note that all transitions, which produces events have to consume at least one event (therefore no events can be created from nowhere) and that it's possible that no event was produced based on the consumed events (see \Cref{sec:definitions:tessla_functions}).
@@ -739,7 +713,7 @@ Now it is possible to restrict runs to a subset where each run models a rational
 
 As stated, the definition for enabledness works for all output complete functions, while output incomplete functions have a problem.
 It is possible that an output incomplete functions will never produce a new output:
-E.g.\ think of a \(\mathit{FilterNode}\) where the second input is always \(\mathit{false}\).
+Think of a \(\mathit{FilterNode}\) where the second input is always \(\mathit{false}\).
 Even if new input events are added to the first input and the second input is known to be \(\mathit{false}\) upto any timestamp, the children of the node will never receive new events for that input queue.
 Therefore no children can ever again compute, because they don't have an event buffered on all inputs.
 
