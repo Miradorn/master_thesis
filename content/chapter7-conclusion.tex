@@ -175,17 +175,41 @@ How exactly it could be integrated into \gls{tessla} remains to be discussed.
 \subsection{Runtime Optimizations}
 \label{sec:conclusion:further_work:runtime_optimizations}
 
-Optimizations: Bundle up events, throw away unneeded progress events in  bundles
-  For some notes only subset of inputs is important for output progress (think if then else)
-    -> Some things may be optimized by compiler (literal as cond to ite) others only during evaluation.
+\Cref{sec:evaluation:runtime_benchmarks} shows that the implemented runtime is able to perform evaluation of \gls{tessla} specifications in an efficient and scalable way.
+Nonetheless some optimizations can be done.
 
+As explained in \Cref{sec:implementation:tesslaserver:v2} the new architecture generates more events and messages than the old approach.
+While this leads to a more intuitive evaluation model and better abstraction it carries some overhead.
+A possible optimization is to bundle multiple events into one when possible.
+For example a node could generate only one message containing all produced events whenever it is scheduled.
+At the moment it generates a message for each partial front.
+With this approach it could also remove unneeded progress events.
+
+Another optimization that is more complex is specific to some node types.
+Think of an \emph{ifThenElse} node that has three input signals and one output signal.
+The output signal will carry the value of the second input when the first input has a \emph{true} value and the value of the third input else.
+When the node has events buffered for the first and second input upto a timestamp \(t_1\) and none for the third input the node will perform no computation until it receives an event for the third input because of the way that the \emph{GenComputation} abstraction works.
+But the node could actually perform a computation if the buffered event for the first input has a \emph{true} value and generate events upto the timestamp \(t_1\).
+
+More generally stated the problem is that the progress of the output of a node is always equal or smaller to the minimal progress of all of the nodes inputs.
+While this has to be true for most node types it is not for all of them as we just saw.
+The added complexity to handle such cases seemed to be unreasonable in the current context.
 
 \subsection{Error prevention}
 \label{sec:conclusion:further_work:error_prevention}
-Ways of sending observations back to the program to recover from or prevent errors
 
+\Gls{rv} has not only the goal to detect errors but also to react when one is detected.
+Interweaved monitors can influence program behaviour when errors are detected, for example it could prevent cascading errors or notify a third party that can then take appropriate actions in respect to the error.
+As the \gls{tessla} runtime is implemented as a standalone monitor that shares nothing with the monitored program such a behaviour is harder to achieve.
 
-\subsection{Instrumentation Pass}
-More fine grained instrumentation pass config: restrictions etc
-TODO: Timing model, maybe somehow harness Vector clocks -> would  compplicate instrumentation! Also would need support in TeSSLa language.
-Configuration file for instrumetnation -> e.g. include conditions
+While the reimplementation of the runtime on another platform as described in \Cref{sec:conclusion:further_work:jvm} is a possible solution to that problem we also want to show another approach.
+To enable communication between the monitored program and TesslaServer the monitored code has to be changed.
+We actually did already solve this problem with the instrumentation pass.
+The instrumentation pass changes a program to generate traces, which can be seen as a way to communicate with the monitor.
+
+The instrumentation pass could be reworked so that it not only changes a program to emit traces but also to include a way to receive messages from an external program and somehow react on them.
+
+% \subsection{Instrumentation Pass}
+% More fine grained instrumentation pass config: restrictions etc
+% Timing model, maybe somehow harness Vector clocks -> would  compplicate instrumentation! Also would need support in TeSSLa language.
+% Configuration file for instrumetnation -> e.g. include conditions
