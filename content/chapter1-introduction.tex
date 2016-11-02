@@ -4,6 +4,7 @@
 \label{sec:intro}
 
 % \cleanchapterquote{You can’t do better design with a computer, but you can speed up your work enormously.}{Wim Crouwel}{(Graphic designer and typographer)}
+In this Chapter we will look at the challengs that motivate the works of this thesis and how the results solve these challenges.
 
 \section{Motivation and Problem Statement}
 \label{sec:intro:motivation}
@@ -55,10 +56,25 @@ Others where are generated or modified by hand to deliberately introduce bugs wh
 
 The main contributions of this thesis consist of three parts.
 The first is a theoretical approach to asynchronously evaluate timed specifications over streams.
-The second is an implementation that can synthesize systems to evaluate such specificationss based on the theoretical approach.
+The second is an implementation that can synthesize systems to evaluate such specifications based on the theoretical approach.
 And the third is a proof of concept implementation of a system that can instrument code which is compiled with \gls{llvm}, mainly targeted at C and C++.
-TODO: more
 
+The theoretical evaluation approach aims to solve the challenges of \gls{rv} in a way that facilitates the current state of computation like parallelism and distribution.
+While this is sensible to enable the efficient usage of resources in an implementation, it introduces new challenges which needs to be tackled.
+Therefore a theoretic basis is introduced which enables the reasoning about correctnes in the context of the asynchronous evaluation approach.
+
+The implementation of the system to synthesize evaluation engines for specifications is an attempt to translate the theoretical evaluation approach directly into software.
+To do so the Erlang platform was chosen, which provides abstractions that can be used to implement an asynchronous and distributed system in a straightforward way.
+The implementation can evaluate a multitude of specifications written in \gls{tessla}, scales well with the size of the specification, the number of events in a trace and the number of cores of the hardware it is executed with.
+The whole system implemented in a modular way, enabling a user to switch some parts, for example the part of the system that parses a \gls{tessla} specification could be exchanged with one that parses a specification in another language and the rest of the system would not be affected.
+Finally the implementation makes it easy to implement new functions, making the system open to extensions of \gls{tessla}.
+
+To generate test data for the implementation the third part was developed.
+For testing purposes a proof of concept implementation was sufficient.
+This proof of concept was succesfully used to instrument multiple programs written in C and one in Swift.
+Instrumented programs emit trace data about calls of specified functions without any manual work required.
+At this point the instrumentation is only able to instrument function calls and isn't optimized in any way, leading to a big performance impact if it is used excessively.
+Nonetheless it shows great potential of the underlying system that it uses to perform the instrumentation and is therefore an interesting and important part of this thesis.
 
 \section{Thesis Structure}
 \label{sec:intro:structure}
