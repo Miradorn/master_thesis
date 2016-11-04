@@ -249,9 +249,9 @@ To understand how this is possible recall \Cref{sec:related:traces:llvm} and the
 A frontend compiles code from a source language into an \gls{ir}, performs compiler passes on the \gls{ir} and then finally compiles into native machine code.
 If the instrumentation pass works at the level of the \gls{ir} it would work for all languages that have a frontend for \gls{llvm}.
 
-It is easy to implement such an instrumentation with the provided C++ \gls{api} from \gls{llvm} to implement compiler passes that can analyse and transform \gls{ir} code.
+It is easy to implement such an instrumentation with the provided \CC \gls{api} from \gls{llvm} to implement compiler passes that can analyse and transform \gls{ir} code.
 The implementation uses the \emph{ModulePass}\footnote{\url{http://llvm.org/docs/doxygen/html/classllvm_1_1ModulePass.html}} base class to analyse whole modules.
-Modules represent constructs like classes from C and C++ in \gls{ir}.
+Modules represent constructs like classes from C and \CC in \gls{ir}.
 A module consists of \emph{Functions}\footnote{\url{http://llvm.org/docs/doxygen/html/classllvm_1_1Function.html}}.
 On invocation implemented \emph{ModulePass} iterates over the \emph{functions} and checks if the current function is one that should be instrumented.
 If so it builds a \emph{CallInst}\footnote{\url{http://llvm.org/docs/doxygen/html/classllvm_1_1CallInst.html}}, which is the \gls{ir} equivalent of calling a function.
