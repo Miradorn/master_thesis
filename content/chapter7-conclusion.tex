@@ -3,213 +3,214 @@
 \chapter{Conclusion}
 \label{sec:conclusion}
 
-In this chapter we will revisit the work done in the whole thesis and see which parts remain to be done.
-In the final section an overview of future work is given, highlighting challenges that can be approached based on the work that is already done.
+In this chapter we will summarize the rest of the thesis and describe areas of future work.
+In the final section of this chapter we highlight some challenges that can be attached based on the work that is already done.
 
 \section{TesslaServer}
 
 As the evaluation in \Cref{sec:evaluation:runtime_benchmarks,sec:evaluation:runtime_examples} shows the implemented runtime is able to evaluate a variety of specifications in a performant way.
 The new architecture for the runtime improved the performance in many ways, especially enabling the evaluation of complex specifications with many input events.
-Nonetheless it has to be noted that the runtime at the moment is mainly a proof of concept and isn't tested under real life circumstances or with actual systems.
+Nonetheless, the current version of the runtime is a proof of concept developed for this thesis and has not been tested under real life circumstances or with actual systems.
 
-At the moment there are two drawbacks of the runtime that are based on limitations of the current version of the \gls{tessla} compiler.
-The limitations are missing type information and missing output information.
+At the moment there are two drawbacks of the runtime, that are based on limitations of the current version of the \gls{tessla} compiler.
+This limitations are missing type information and missing output information.
 
-Let's first understand the lack of type information and the impact of the runtime.
+Let us first describe the lack of type information and its impact on the runtime.
 The \gls{tessla} compiler is able to infer a lot of type information, therefore making it possible to omit type information from \gls{tessla} specifications.
-Many functions in \gls{tessla} are generic over the type they consume or produce.
-Recall that each function in \gls{tessla} is generic, since they work either on signals or eventstreams which carry a type themself, so a function could have the output type \lstinline{Events<Int>} or \lstinline{Signal<Boolean>}.
-Furthermore a function can be generic not only over the type of the values of its streams but also what kind of stream (signal or eventstream) it consumes or produces.
-Also the same function can be defined over different aritys, for example an \emph{add} function could be defined for 2, 3 or any number of arguments (note that \gls{tessla} doesn't support methods with a varying number of arguments, in some languages known as \emph{varargs}, as of now).
+Many functions in \gls{tessla} are generic functions over the type they consume or produce.
+Recall that each function in \gls{tessla} is generic, since functions work either on signals or eventstreams which carry an underlying type themself, so a function could have for example the output type \lstinline{Events<Int>} or \lstinline{Signal<Boolean>}.
+Furthermore a function can be generic not only over the type of the values of its streams but also on what kind of stream (signal or eventstream) it consumes or produces.
+Additionally the same function can be defined with different aritys, for example an \emph{add} function could be defined for 2, 3 or any number of arguments (note that \gls{tessla} does not support yet methods with a varying number of arguments, in some languages known as \emph{varargs}).
 
-This leads to a situation where for example the \emph{delay} function, which delays stream by an amount, has actually three generic types: \lstinline{Events<A>,time -> Events<A>}, \lstinline{Signal<A>,time,A -> Events<a>} and \lstinline{Events<A>, Int -> Events<A>}.
-The first and second functions are delaying a stream by a certain time, the second one having a default value as the third argument, and the las function delaying the events on an eventstream by a given amount of steps, meaning the first event will be delayed to the timestamp of the second event.
+This genericity leads to a situation where for example the \emph{delay} function, which delays stream by an amount, has actually three generic types:
 
-The compiler is now able to match the signatures of a used function to the correct one and will check if the whole specification is correct with respect to the type system.
-The problem is in the output of the compiler which doesn't contain type informations anyomore, meaning that the representation of the first and third \emph{delay} functions are exactly the same and the runtime would have to figure out which type of the function it should actually use.
-For the moment two workarounds are present in the runtime and compiler until the type informations are included in the output.
+\begin{samepage}
+  \begin{itemize}
+    \item \lstinline{Events<A>, time -> Events<A>}
+    \item \lstinline{Signal<A>, time, A -> Events<a>}
+    \item \lstinline{Events<A>, Int -> Events<A>}.
+  \end{itemize}
+\end{samepage}
 
-The first workaround is for functions which work with signals and eventstreams and have the same arity.
-To make them work without type information they are split into multiple functions, one for each argument that can take either a signal or an eventstream.
+The first and second functions are delaying a stream by a certain time, the second one includes a default value as the third argument, and the last function dalays the events on an eventstream by a given amount of steps, meaning the first event will be delayed to the timestamp of the second event.
+
+The compiler is now able to match the signatures of a function to the correct instance and will check if the whole specification is correct with respect to the type system.
+The problem is in the output of the compiler which does not contain type informations anymore, meaning that the representation of the first and third \emph{delay} functions are exactly the same and the runtime would have to figure out which concrete type of the function to use.
+We propose two workarounds for the runtime and the compiler until the type informations are included in the output.
+
+The first workaround is for functions that work with signals and eventstreams and which have the same arity.
+To make these functions work without type information the functions are split into multiple functions, one for each argument, that can take either a signal or an eventstream.
 For example the two \emph{delay} functions with the same arity are split into a \emph{delayEventsByTime} and a \emph{delayEventsByCount} function.
-This moves some responsibility to the user writing a spec since he has to use the right function and can't rely on the compiler to figure out the correct one.
-Furthermore this leads to an increased implementation effort for the runtime, since more node types have to implemented.
-The second workaround is much simpler: functions which work on streams with generic type of values (e.g. \lstinline{Signal<A>}) will use \emph{Int} as the default type and doesn't support any other types.
+This moves some responsibility to the user writing a spec since the user has to use the right function and cannot rely on the compiler to figure out the correct version.
+This workaround leads to an increased implementation effort for the runtime, since more node types have to implemented.
+The second workaround is much simpler: functions which work on streams with generic type of values (e.g. \lstinline{Signal<A>}) will use \emph{Int} as the default type and will not support any other types.
 
-The desired solution to the problem is, that the compiler will somehow include the type signature of functions in the output.
-The signature could than be used at runtime to dynamically convert the values of events to the matching types.
+The best solution to the problem is, that the compiler includes the type signature of functions in its output.
+The signature could than be used at runtime to dynamically convert the values of events to the corresponding matching types.
 
-The lack of output information is easier to understand and solve.
-In \gls{tessla} specifications one denotes that a stream is an output stream with the \lstinline{out} keyword.
-At the moment the compiler isn't handling this keyword at all and therefore it is missing in the output.
-The workaround for now is, that output nodes have to be specified when the runtime is started, therefore a typical invocation of TesslaServer looks like \lstinline[language=bash]{./tessla_server example.spec -o 4:error} where the \emph{o} flag denotes an output, 4 is the id of the node that generates the output stream and \emph{error} is a name that can be chosen by the user.
+The problem of the lack of output information is easier to understand and solve.
+\gls{tessla} specifications denote that a stream is an output stream using the \lstinline{out} keyword.
+At the moment the compiler is not handling this keyword at all and therefore the information, which streams are outputs, is missing in the output.
+The workaround for now is to specify that output nodes when the runtime is started.
+A typical invocation of TesslaServer looks like
+\lstinline[breaklines=true,breakatwhitespace=true,language=bash]{./tessla_server example.spec -o 4:error}
+where the \emph{-o} flag denotes an output, 4 is the id of the node that generates the output stream and \emph{error} is a name that can be chosen by the user.
 
 A last missing functionality we want to highlight is based on the asynchronous nature of the runtime.
-Since nodes are independent of each other and share no knowledge, except the one that is explicitly shared by messages, there is no global state that can be used to track if all nodes have finished their computation.
+Since nodes are independent of each other and share no knowledge, except the one that is explicitly exchanged by messages, there is no global state that can be used to track if all nodes have finished their computation.
 Furthermore there is no shared progres between independent nodes in the new architecture, or in other words each source will be progressed to a different timestamp.
 
-This leads to a problem when the trace actually ends: Think of a specification with two independent sources and a trace which contains events on the stream of the first source upto timestamp \(t_2\) but for the stream of the second stream only to the timestamp \(t_1\) with \(t_1 < t_2\).
-When the trace ends the second source will have only progressed to \(t_1\) while the trace implicitly contains the information that there is no event happening on its input stream at any time later than \(t_1\).
+This leads to a problem of detecting when the trace actually ends: Consider a specification with two independent sources and a trace which contains events on the stream of the first source upto timestamp \(t_2\) but on the stream of the second source only to the timestamp \(t_1\), with \(t_1 < t_2\).
+When the trace ends the second source will have only progressed to \(t_1\) while the trace implicitly contains the information that there is no event happening on its input stream at any time later than \(t_1\) (and upto \(t_2\)).
 This information could lead to new generated events of a child node, for example a \emph{timeout} node which could then lead to new output events.
 
 A simple workaround would be to implement a \emph{flush} mechanism, which will send each source node a message that there will be no more input events and therefore they can progress to the maximal timestamp.
-With this mechanism all children of sources will then receive the information that their inputs have progressed without generating new events, enabling them to also progress to the maximal time.
-The information that all inputs have finished will transitively flow thourgh the whole system and at one point all nodes will have performed their final computation and the system will have generated all possible outputs.
+With this mechanism all children of sources will then receive the information that their inputs have progressed without generating new events, enabling these nodes to progress to the maximal time.
+The information that all inputs have finished will transitively flow through the whole system and evantually all nodes will have performed their final computation and the system will have generated all possible outputs.
 
 \section{Instrumentation Pass}
 
-In the benchmarks of the instrumentation it is obvious that it adds a lot of overhead, especially when compiler optimizations are turned on or the percentage of instrumented function calls is large.
-While the overhead is big, it is stable (see the standard deviation in \Cref{sec:evaluation:instrumentation_benchmark:instr_vs_non_inst}).
+The benchmarks reaveal that the instrumentation adds significant overhead, especially when compiler optimizations are turned on or the percentage of instrumented function calls is large.
+While the overhead is large, it is stable (see the standard deviation in \Cref{sec:evaluation:instrumentation_benchmark:instr_vs_non_inst}).
 
-For now the instrumentation should be seen as a proof of concept and test tool.
+The current instrumentation should be seen as a proof of concept.
 The generated traces should be mostly used to analyse test settings where compiler optimizations are turned off.
-When used for timing specifications, the instrumented code can be benchmarked against a non instrumented version of the code and the results can be used to transform the actual timing requirements to corresponding ones for the instrumented code.
-This will at least give an approximation of the actual results.
-Also it is recommended to write small and specific \gls{tessla} specifications, so that the instrumentations only have to be applied to a small subset of functions.
+When used for timing specifications, the instrumented code can be benchmarked against a non instrumented version of the code and the results can be used to transform the actual timing requirements to the corresponding ones for the instrumented code.
+This will an approximation of the actual results.
+Also it is recommended to write small and specific \gls{tessla} specifications, so that the instrumentation only has to be applied to a small subset of functions.
 Obviously it is strongly discouraged to use the instrumented code in any production setting.
 
 Two enhancements could be easliy integrated into the instrumentation pass:
-Enabling the logging of more event types, like variable reads or memory allocation, while also including data in the events and introducing a better configuration format to specify what events should be logged.
+\begin{enumerate}
+  \item Enabling the logging of more event types, like variable reads or memory allocation, while also including data in the events.
+  \item Introducing a better configuration format to specify what events should be logged.
+\end{enumerate}
 
 As explained in \Cref{sec:implementation:instrumentation} the compiler pass is instrumented as a \emph{ModulePass}, enabling the logging of all kinds of events.
-While the logging of function calls was sufficient for testing and evaluation purposes this restriction together with the total lack of logging data is an obvious problem for more serious use cases.
+While the logging of function calls was sufficient for testing and evaluation purposes this restriction together with the total lack of logging data is an obvious obstacle for more serious use cases.
 The trace format already includes a field for data values and the instrumentation pass has the ability to extract data, for example function arguments or return values, from the source code it is transforming.
 
-Also the expansion to more event types shouldn't be too complicated when harnessing the \emph{InstVisitor}\footnote{\url{http://llvm.org/docs/doxygen/html/classllvm_1_1InstVisitor.html}} mechanism.
+Also the expansion to more event types is possible harnessing the \emph{InstVisitor}\footnote{\url{http://llvm.org/docs/doxygen/html/classllvm_1_1InstVisitor.html}} mechanism.
 An \emph{InstVisitor} can be used to abstract the actual iteration over the building blocks of the \gls{ir} of a program, so that the user only has to specify the transformation that should be happening when a specific instruction type is seen.
-For example the instrumentation of return statements could use the \emph{visitReturnInst} \gls{api} to handle all return statements and change them to log an event.
+For example the instrumentation of return statements could use the \emph{visitReturnInst} \gls{api} to handle all return statements and perform a log event.
 
 In the context of adding more event types to the instrumentation pass the configuration format becomes a problem.
-For now a user specifys each function that should be instrumented when calling the pass with an option to the compiler pass like \lstinline{-instrument FUNCTIONNAME}.
-This approach obviously doesn't scale when multiple event types are implemented.
-Therefore a common configuration format should be specified and the instrumentation pass should read it from a given file.
+For now a user specifies each function that should be instrumented when calling the pass with an option to the compiler pass like \lstinline{-instrument FUNCTIONNAME}.
+This approach obviously does not scale when multiple event types are implemented.
+Therefore we advocate for the design of a common configuration format that is processed by the instrumentation pass.
 This approach would also enable the sharing of configuration files between different developers and the versioning of them using version control systems.
 
 \section{Further Work}
 \label{sec:conclusion:further_work}
 
-In addition to the adjustments that are stated in the two previous sections there are also some ideas to extend the works from this thesis in ways that require more theoretic work and larger changes of the architecture.
+In addition to the adjustments mentioned in the two previous sections there are also some ideas to extend the works reported in this thesis in ways that require more theoretic work and larger changes of the architecture.
 This section will give an overview of these ideas and will present sketches of approaches to implement them.
 
 \subsection{Implementation for the \glsentryname{jvm}}
 \label{sec:conclusion:further_work:jvm}
 
-While the Erlang platform is tested in production for many years and provides great performance for our implementation, the desire to provide an implementation on top of the \gls{jvm} was expressed.
-The main reason for this is that the \gls{tessla} compiler itself is implemented in Scala and therefore on top of the \gls{jvm}.
-An implementation using the same platform would enable the distribution of a single executable that can be used to compile and evaluate \gls{tessla} specifications all in one.
-Also a runtime on the \gls{jvm} could better with monitored programs that are written in a \gls{jvm} language and therefore eliminating the need for an instrumentation pass.
+While the Erlang platform has been tested in production for many years and provides a great performance for our implementation, there is a certain interest to provide an implementation on top of the \gls{jvm}.
+The main reason for this is that the \gls{tessla} compiler itself is implemented in Scala and therefore already uses the \gls{jvm}.
+An implementation using the same platform would enable the distribution of a single executable that can be used to compile and evaluate \gls{tessla} specifications alltogether.
+Also a runtime on the \gls{jvm} could interact with monitored programs that are written in a \gls{jvm} language and therefore eliminate the need for an instrumentation pass.
 
 The Akka project\footnote{\url{http://akka.io}} provides a Scala implementation of the actor model.
-Since the runtime relies heavily on this model, Akka might enable to port it to scala in a very straightforward way.
-As a side node there is also an implementation of Akka on top of the .NET platform\footnote{\url{http://getakka.net}} which might be used to port the runtime to yet another platform.
+Since the runtime relies heavily on the actor model, Akka might enable to port the runtime to scala in a very straightforward way.
+As a side node there is also an implementation of Akka on top of the .NET platform\footnote{\url{http://getakka.net}} which might be used to additionally port the runtime to yet another platform.
 
 \subsection{Composition of Evaluation Engines}
 \label{sec:conclusion:further_work:composition}
 
-Another idea that is motivated from the \gls{cep} field is the composition of multiple evaluation engines.
-This is somewhat contrary to the \gls{rv} approach, since \gls{rv} is aimed to answer the question, if a run of a system satisfies a given property.
-Therefore a specification in \gls{tessla} that is used for \gls{rv} purposes would have exactly one output: a boolean stream denoting if the property is satisfied after a given time.
+Another idea, motivated by the \gls{cep} field, is the composition of multiple evaluation engines.
+This is somewhat contrary to the \gls{rv} approach, since \gls{rv} is aimed to answer the question of wether a run of a system satisfies a given property.
+Therefore a specification in \gls{tessla} that is used for \gls{rv} purposes would have exactly one output: a boolean stream denoting if the property is satisfied at a given time.
 
-The composition of evaluation engines would only makes sense, if the output of specifications would be streams that are interesting as the input to a new evaluation engine.
+The composition of evaluation engines would only makes sense if the output of specifications would be streams that are interesting as the input to a new evaluation engine.
 As it turns out, there are no restriction applied to output streams, neither by the \gls{tessla} specification language nor the runtime.
 
-This means that it should be possible right now to combine multiple evaluation engines with only small adjustments to the output format of the runtime.
-
-% Different evaluation model: Pull not push
-% port to genstage: Concept of backpressure -> Nodes generating events out of nothing
-
+This means that it should be possible to combine multiple evaluation engines with only small adjustments to the output format of the runtime.
 
 \subsection{Parameterized Streams}
 \label{sec:conclusion:further_work:parametrization}
 
 A quite common model in \gls{rv} are parameterized streams, where one parameterized stream represents a dynamic number of actual streams.
-A very common example to highlight why parameterization is required is the specification that a user can't have more than three failed login attempts in a row.
+A very common example to highlight why parameterization is required is the specification that a user cannot have more than three failed login attempts in a row.
 When the number of users is not known it is not possible to write such a specification without parameterization.
 A parameterized version of the specification would generate a signal for each user holding the value of failed log in attempts in a row.
 
 The common approach to handle parameterized specifications, called \emph{slicing}, is discussed in~\cite{Chen2009a}.
 The basic idea of \emph{slicing} is to partition a stream of events, where each event holds a data value, into multiple streams with respect to that data.
-In context of the example specification restricting failed log in attempts the following would happen:
-An input stream \lstinline{login_attempt(int, bool)} denoting that a user with the id that is the first value of the stream tried to login, where the second value denotes if the login was succesful, would be partitioned, or \emph{sliced}, by the first argument, generating a variable number of streams \lstinline{login_attempt_id(bool)}.
-Each of this streams could then be evaluated by the \gls{tessla} runtime.
+In the context of the example specification restricting failed consecutive login attempts the following would happen:
+An input stream \lstinline{login_attempt(int, bool)} denotes that a user with a given id (the first value of the stream) tries to login, where the second value denotes if the login was succesful.
+This input stream would be partitioned, or \emph{sliced}, by the first argument, generating a variable number of streams \lstinline{login_attempt_id(bool)}.
+Each of these streams could then be evaluated by the \gls{tessla} runtime.
 
-While streams in \gls{tessla} are already carrying data only a restricted form of generating new streams based on this data is possible.
+While streams in \gls{tessla} are already carrying data, only a restricted form of generating new streams based on this data is possible.
 This limited slicing can be performed for example using the \emph{ifThen} function, which can be used to get only that events of a stream that cary a specified value.
 But since the real expressiveness of parameterization is based on the dynamic nature of the input data that approach is not sufficient.
 Therefore, to allow parameterized streams, the \gls{tessla} specification language would have to be extended.
-How exactly this extension would look like remains to be specified.
 
-The changes required to allow slicing in the runtime shouldn't be very complex.
-Basically a \emph{slice} node would have to be implemented, that has one input stream and a variable number of output streams.
-Whenever the node receives an event which carries a value that wasn't seen before the node would have to start new child nodes that are responsible to handle the new stream.
-Since nodes are already generated at runtime, when the evaluation engine is synthesized, it should be no problem to start new ones during the evaluation process.
-
-
-% online monitoring -> possible infinite traces, important that on each stream new event finally happen.
+The changes required to allow slicing in the runtime are not very complex.
+Basically, a \emph{slice} node would have to be implemented with one input stream and a variable number of output streams.
+Whenever the node receives an event which carries a value that has not been seen before the node would have to start new children nodes that are responsible to handle the new stream.
+Since nodes are already generated at runtime, when the evaluation engine is synthesized, it should be no problem to start new nodes during the evaluation process.
 
 \subsection{Easier Definition of New Node Types}
 \label{sec:conclusion:further_work:node_definition}
 
 A problem that is still present in the current architecture is how complex it is to implement new node types.
-First of all the \gls{tessla} compiler needs to be changed to include the signature of the new function and to support the mapping of the function to its \gls{json} representation.
-Then a corresponding node has to be implemented for the runtime.
+First of all the \gls{tessla} compiler would have to be changed to include the signature of the new function and to support the mapping of the function to its \gls{json} representation.
+Then, a corresponding node has to be implemented for the runtime.
 While the \emph{GenLifted} abstraction provides a starting point for a generic generation of new node types it still requires manual work to implement new node types.
 
-To improve this \gls{tessla} could be extended with a mechanism to somehow specify new functions without the requirement to explicitly implement them in the compiler and the runtime.
-A somehow related technique that is already present in \gls{tessla} are macros which can be used in a specification to compose existing functions into a new one.
-While this enables the user to write more expressive specifications by leveraging reuse of common subexpressions in a specification it doesn't support the generation of new functions.
+To improve this situation \gls{tessla} could be extended with a mechanism to specify new functions without the requirement to explicitly implement these functions in the compiler and the runtime.
+A somewhat related technique that is already present in \gls{tessla} are macros which can be used in a specification to compose existing functions into new ones.
+While this feature enables the user to write more expressive specifications by leveraging common subexpressions, this feature does not support the generation of new functions.
 
 One approach that looks promising is presented in~\cite{Hall2011} in the contetxt of the BeepBeep tool.
 In BeepBeep computations can be generated by combining two base parts, \emph{processors} and \emph{functions}.
-A processor is responsible to apply a transformation on one or more streams while functions specify how the exact transformation looks like.
-As an example lets look at two processors that could be implemented and how they could be combined with one function to perform different transformations.
+A processor is responsible to apply a transformation on one or more streams while functions specify how the exact transformations look like.
+As an example consider the following two processors and their combination with one function to perform different transformations.
 
 Let the example processors be called \emph{Combiner} and \emph{Aggregator}.
-The \emph{Combiner} processor is responsible for combining two input streams by applying a function for each front and the \emph{Aggregator} computes an aggregation over one stream by applying a function to each new event combined with the last computed value.
+The \emph{Combiner} processor is responsible for combining two input streams by applying a function for each front and the \emph{Aggregator}, which computes an aggregation over one stream by applying a function to each new event combined with the last computed value.
 Each function that takes two input values and generates one output can be combined with these processors.
 The \(+\) function when combined with a \emph{Combiner} would add the values of two streams at each position while it would compute the sum of the values of all events on one stream when combined with an \emph{Aggregator}.
 
-As part of \gls{tessla} this approach could lead to a much smaller implementation effort for the runtime.
-How exactly it could be integrated into \gls{tessla} remains to be discussed.
+This approach could lead to a much smaller implementation effort for the runtime, but how exactly it could be integrated into \gls{tessla} remains to be discussed.
 
 \subsection{Runtime Optimizations}
 \label{sec:conclusion:further_work:runtime_optimizations}
 
 \Cref{sec:evaluation:runtime_benchmarks} shows that the implemented runtime is able to perform evaluation of \gls{tessla} specifications in an efficient and scalable way.
-Nonetheless some optimizations can be done.
+Nonetheless some additional optimizations can be performed.
 
 As explained in \Cref{sec:implementation:tesslaserver:v2} the new architecture generates more events and messages than the old approach.
 While this leads to a more intuitive evaluation model and better abstraction it carries some overhead.
-A possible optimization is to bundle multiple events into one when possible.
-For example a node could generate only one message containing all produced events whenever it is scheduled.
-At the moment it generates a message for each partial front.
-With this approach it could also remove unneeded progress events.
+A possible optimization is to bundle multiple events into a single message when possible.
+For example, a node could generate only one message containing all produced events whenever it is scheduled.
+Currently a node generates a message for each partial front.
+This approach allows also to remove unnecessary progress events.
 
-Another optimization that is more complex is specific to some node types.
+The following optimization is more complex and is specific to some node types.
 Think of an \emph{ifThenElse} node that has three input signals and one output signal.
-The output signal will carry the value of the second input when the first input has a \emph{true} value and the value of the third input else.
+The output signal will carry the value of the second input when the first input has a \emph{true} value and the value of the third input otherwise.
 When the node has events buffered for the first and second input upto a timestamp \(t_1\) and none for the third input the node will perform no computation until it receives an event for the third input because of the way that the \emph{GenComputation} abstraction works.
 But the node could actually perform a computation if the buffered event for the first input has a \emph{true} value and generate events upto the timestamp \(t_1\).
 
 More generally stated the problem is that the progress of the output of a node is always equal or smaller to the minimal progress of all of the nodes inputs.
-While this has to be true for most node types it is not for all of them as we just saw.
-The added complexity to handle such cases seemed to be unreasonable in the current context.
+While this is indeed necessary for most node types, theren are important exceptions as we just illustrated.
+The added complexity necessary to handle such cases did not justify its implementation in the current context.
 
 \subsection{Error prevention}
 \label{sec:conclusion:further_work:error_prevention}
 
-\Gls{rv} has not only the goal to detect errors but also to react when one is detected.
-Interweaved monitors can influence program behaviour when errors are detected, for example it could prevent cascading errors or notify a third party that can then take appropriate actions in respect to the error.
+\Gls{rv} can be used not only to detect errors but also to react when an error is detected.
+Interweaved monitors can influence program behaviour when errors are detected, for example it could prevent cascading errors or notify a third party that can then take appropriate actions in response to the error.
 As the \gls{tessla} runtime is implemented as a standalone monitor that shares nothing with the monitored program such a behaviour is harder to achieve.
 
 While the reimplementation of the runtime on another platform as described in \Cref{sec:conclusion:further_work:jvm} is a possible solution to that problem we also want to show another approach.
-To enable communication between the monitored program and TesslaServer the monitored code has to be changed.
-We actually did already solve this problem with the instrumentation pass.
-The instrumentation pass changes a program to generate traces, which can be seen as a way to communicate with the monitor.
+To enable communication between the monitored program and TesslaServer the monitored code has to be changed, but we solved this problem with the instrumentation pass.
+The instrumentation pass changes a program to generate traces, which can be interpreted as a way to communicate with the monitor.
 
-The instrumentation pass could be reworked so that it not only changes a program to emit traces but also to include a way to receive messages from an external program and somehow react on them.
-
-% \subsection{Instrumentation Pass}
-% More fine grained instrumentation pass config: restrictions etc
-% Timing model, maybe somehow harness Vector clocks -> would  compplicate instrumentation! Also would need support in TeSSLa language.
-% Configuration file for instrumetnation -> e.g. include conditions
+The instrumentation pass could be reworked so that it not only changes a program to emit traces but also to include a way to receive feedback messages from an external program and react to these messages.
