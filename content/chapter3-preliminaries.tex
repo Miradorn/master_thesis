@@ -535,7 +535,7 @@ Input complete function consume one events from every input but can produce zero
 
 \subsection{Incomplete Functions}
 \label{sec:definitions:tessla_functions:incomplete}
-Incomplete functions always consume at least one input from any input and will produce zero or one events.
+Incomplete functions always consume at least one input from any input and will produce zero or one event.
 \Cref{table:incomplete_functions} lists all supported incomplete functions.
 If no explanation is given, why the function is incomplete it is the following:
 The function is not input complete, because it only consumes events or changes that have the timestamp at which it is evaluated, if one input only has events with bigger timestamps no event or change is removed from them and the remembered last change of them is used as a base for computation if it is a signal.
@@ -572,9 +572,26 @@ For example, if the values of the inputs of an \(\mathit{add}\) are switched at 
 \subsection{Timing Functions}
 \label{sec:definitions:tessla_functions:timing}
 
-Timing functions are a bit special, therefore they are mentioned here in their own section.
-Basically they are also incomplete functions, but they have to buffer multiple events until they are emitted and they can produce more than one event when evaluated.
-TODO
+Timing functions introduce a new challenge for TesslaServer.
+Timing functions are able to manipulate the timestamp of events.
+Without timing functions all events produced in an evaluation engine would have a timestamp that is equal to the timestamp of some input event.
+Furthermore, all functions that are not timing functions can at most produce one new event per input event, else two of the events would have to have the same timestamp which is forbidden in our definition of streams.
+
+Timing functions can produce events at every timestamp and produce multiple events per input event.
+\Cref{table:timing_functions} lists all implemented timing functions.
+
+\begin{longtable}{lp{3cm}lp{6cm}}
+  Name                 & Domain                    & Range   & Explanation \\
+  \toprule \\
+  \endhead{}
+  \(\mathit{timestamps}\)               & Events & Events  & Emits the timestamp of each input event as the value of an output event. Can also be categorized as a complete function since it only reads the timestamp. \\
+  \(\mathit{delayEventByCount}\)        & Events & Events  & Delays each event of an eventstream by a specified number of events. For example it can be used to change the timestamp of each event to the timestamp of the next event received.\\
+  \(\mathit{delayEventByTime}\)         & Events & Events  & Delays each event of an eventstream by a specified time. \\
+  \(\mathit{delaySignalByTime}\)        & Events & Events  & Delays each change of a signal by a specified time. \\
+  \(\mathit{inPast}\)                   & Events & Signal  & Emits a boolean signal which holds the value \emph{true} whenever an event happened on the input before in a time specified.\\
+  \caption{List of timing functions}
+\label{table:timing_functions}
+\end{longtable}
 
 \section{State and History}
 \label{sec:definitions:state}
