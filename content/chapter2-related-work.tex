@@ -252,7 +252,6 @@ Since the realtime fragment is an important part of \gls{tessla} we decided that
 Since no suitable benchmark could be found the next step was to search for a tool that can be used to generate apropriate traces from programs during execution.
 These tools can be categorized into static and dynamic instrumentation tools: static tools transform the source code of a program during compilation to include logging statements, dynamic ones only work at runtime and are not involved in the compilation process.
 
-% DTrace PID
 \subsection{CIL}
 
 \Gls{cil} \cite{Necula2002} is a tool to write source-to-source transformations for C programs, therefore it is a static instrumentation tool.
@@ -281,7 +280,42 @@ For our instrumentation we wanted to explore the possibility to also trace other
 As an example consider logging an event whenever a variable is assigned more than once in a single function call.
 
 \subsection{DTrace}
-TODO
+
+\Cite{Cantrill2004} presents DTrace, a ``facility for dynamic instrumentation of production systems''.
+DTrace relies on support from the Kernel of the operating system and does require specific compilation settings for some instrumentations.
+DTrace includes a language to specify instrumentations called D.
+
+To use DTrace one has to specify \emph{probes} in the D language.
+A \emph{probe} consists of probe descriptions, a predicate and action statements.
+The probe descriptions specifies the kind of instrumentation it provides and the modules and functions the probe should be applied to.
+The predicate can be used to skip the invocation of the probe if certain conditions are not met.
+Action statements contain code that is executed hwen the probe is called.
+
+\Cref{listing:dtrace_spec} shows a DTrace specification with two probes.
+The first probe is invoked everytime the instrumetned program calls the \lstinline{read} function provided by the operating system and assigns the current timestamp to a variable.
+The second probe is invoked everytime the \lstinline{read} function returns and logs the time used by the \lstinline{read} function before returning.
+The predicate of the second probe checks if the variable \lstinline{t} has been assigned.
+
+\begin{lstlisting}[showstringspaces=false,language=C,float,label=listing:dtrace_spec, caption={A DTrace specification in the D language specifying two probes}]
+syscall::read:entry {
+  self->t = timestamp;
+}
+
+syscall::read:return
+/self->t/ {
+  printf("%d/%d spent %d nsecs in read\n",
+    pid, tid, timestamp - self->t);
+}
+\end{lstlisting}
+
+DTrace offers a variety of instrumentation types, called \emph{providers} in DTrace, \lstinline{syscall} from the previous example being one of them.
+Interesting for our research is the \emph{pid} provider which enables the instrumentation of arbitrary instructions in a specified process.
+The \emph{pid} provider can be used to log function entrys and exits of every function in a program.
+
+\Cite{Rosenberg2016} builds upon DTrace to build a \gls{rv} framework.
+It produces automaton based monitors in the D language from specifications written in \gls{ltl}.
+To do so it connects atomic propositions of the formula with observable events that are represented as probes in DTrace.
+Whenever a probe is invoked it updates the state of the automaton as specified with the action statements of that probe.
 
 \subsection{LLVM}
 \label{sec:related:traces:llvm}
