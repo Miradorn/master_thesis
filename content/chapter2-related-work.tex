@@ -287,12 +287,12 @@ DTrace includes a language to specify instrumentations called D.
 
 To use DTrace one has to specify \emph{probes} in the D language.
 A \emph{probe} consists of probe descriptions, a predicate and action statements.
-The probe descriptions specifies the kind of instrumentation it provides and the modules and functions the probe should be applied to.
+Probe descriptions specifiy the kind of instrumentation requested and the modules and functions the probe should be applied to.
 The predicate can be used to skip the invocation of the probe if certain conditions are not met.
-Action statements contain code that is executed hwen the probe is called.
+Action statements contain code that is executed when the probe is called.
 
 \Cref{listing:dtrace_spec} shows a DTrace specification with two probes.
-The first probe is invoked everytime the instrumetned program calls the \lstinline{read} function provided by the operating system and assigns the current timestamp to a variable.
+The first probe is invoked everytime the instrumented program calls the \lstinline{read} function provided by the operating system and assigns the current timestamp to a variable.
 The second probe is invoked everytime the \lstinline{read} function returns and logs the time used by the \lstinline{read} function before returning.
 The predicate of the second probe checks if the variable \lstinline{t} has been assigned.
 

@@ -577,7 +577,7 @@ Timing functions are able to manipulate the timestamp of events.
 Without timing functions all events produced in an evaluation engine would have a timestamp that is equal to the timestamp of some input event.
 Furthermore, all functions that are not timing functions can at most produce one new event per input event, else two of the events would have to have the same timestamp which is forbidden in our definition of streams.
 
-Timing functions can produce events at every timestamp and produce multiple events per input event.
+Timing functions can produce events at any timestamp and produce multiple events per input event.
 \Cref{table:timing_functions} lists all implemented timing functions.
 
 \begin{longtable}{lp{3cm}lp{6cm}}
@@ -585,10 +585,10 @@ Timing functions can produce events at every timestamp and produce multiple even
   \toprule \\
   \endhead{}
   \(\mathit{timestamps}\)               & Events & Events  & Emits the timestamp of each input event as the value of an output event. Can also be categorized as a complete function since it only reads the timestamp. \\
-  \(\mathit{delayEventByCount}\)        & Events & Events  & Delays each event of an eventstream by a specified number of events. For example it can be used to change the timestamp of each event to the timestamp of the next event received.\\
+  \(\mathit{delayEventByCount}\)        & Events & Events  & Delays each event of an eventstream by a specified number of events. For example this function can be used to change the timestamp of each event to the timestamp of the next event received.\\
   \(\mathit{delayEventByTime}\)         & Events & Events  & Delays each event of an eventstream by a specified time. \\
   \(\mathit{delaySignalByTime}\)        & Events & Events  & Delays each change of a signal by a specified time. \\
-  \(\mathit{inPast}\)                   & Events & Signal  & Emits a boolean signal which holds the value \emph{true} whenever an event happened on the input before in a time specified.\\
+  \(\mathit{inPast}\)                   & Events & Signal  & Emits a Boolean signal which holds the value \emph{true} whenever an event happened on the input before a time specified.\\
   \caption{List of timing functions}
 \label{table:timing_functions}
 \end{longtable}

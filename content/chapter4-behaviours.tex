@@ -404,17 +404,17 @@ Therefore the proof does hold without change for \Cref{theorem:equivalence_greed
 \section{Timing functions}
 \label{sec:behaviours:timing_functions}
 
-As stated before timing functions add complexity.
-But, as we will see, the reasoning from previous sections still hold for evaluation engines which include timing functions.
-The two characteristics of timing functions are, that they can produce events with timestamps that is not equal to the timestamp of any input event and that they can produce multiple output events for every input event.
+As stated before timing functions add additional complexity.
+However, as we will see, the reasoning from previous sections still hold for evaluation engines which include timing functions.
+The two characteristics of timing functions are, that they can produce events with timestamps that are not equal to any timestamp of an input event and that they can produce multiple output events for every input event.
 
-The proof for equivalence of asynchronous evaluation engines does not depend on the fact, that events only carry timestamps that are present on input events.
-Therefore this characteristic of timing functions doesn't interfere with our theory.
+The proof for equivalence of asynchronous evaluation engines does not depend on the fact that events only carry timestamps that are present on input events.
+Therefore, this characteristic of timing functions does not interfere with the results stated.
 
-That a timing function can generate multiple outputs for input is more critical.
+That a timing function can generate multiple outputs for a given input is more critical.
 The proof requires that evaluation engines terminate eventually when the input trace is finite.
 If each node of an evaluation engine can only generate at most one event per input, the number of total events that can be produced is bound by the size of the input trace, the number of nodes and the number of edges of the evaluation engine.
-If a timing function is allowed to generate infinitely many outputs for an input the evaluation engine would never terminate.
+If a timing function is allowed to generate infinitely many outputs for a given input the evaluation engine would never terminate.
 For now we choose to not allow such a function.
 
 For future work we like to note that the fact that we only consider fair schedules which will schedule each enabled node eventually.

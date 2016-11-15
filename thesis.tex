@@ -46,11 +46,15 @@
 % \cleardoublepage
 
 \pagestyle{plain}       % display just page numbers
+\input{content/declaration.tex}    % INCLUDE: the abstracts (english and german)
+\cleardoublepage
+
+\pagestyle{plain}       % display just page numbers
 \input{content/abstract}    % INCLUDE: the abstracts (english and german)
 \cleardoublepage
 %%
-\input{content/acknowledgement} % INCLUDE: acknowledgement
-\cleardoublepage
+% \input{content/acknowledgement} % INCLUDE: acknowledgement
+% \cleardoublepage
 %%
 \setcounter{tocdepth}{2}    % define depth of toc
 \tableofcontents        % display table of contents

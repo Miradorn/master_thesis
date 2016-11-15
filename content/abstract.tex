@@ -5,8 +5,38 @@
 \label{sec:abstract}
 \vspace*{-10mm}
 
+This thesis studies the problem of software reliability using monitors specified with a stream runtime verification language.
+In particular, we study the problem of evaluating specifications against finite streams of data.
+The specifications we consider are written in the \gls{tessla} specification language, come from the field of Runtime Verification and describe correct behavior of running software systems.
 
-\vspace*{20mm}
+Whether a run of a given system is correct is evaluated over trace data that is collected while the system is executing.
+This data trace is represented as a collection of streams.
+The specification states that this collection of input streams must fulfill specified conditions.
+
+The first contribution of this thesis is the implementation of a \gls{tessla} evaluation engine, using an asynchronous and distributed approach to combine streams.
+The engines we propose can check whether the traces produced by the running system satisfy the given specification.
+The asynchronous nature of the engines we propose allows our solutions to scale to several parallel execution components for the evaluation engine.
+
+The second contribution of this thesis is a proof of correctness of the implemented engines, based on the possible execution orders between the parallel asynchronous components.
+We show that even the most asynchronous implementation produces the same verdicts as the ideal fully synchronize engine.
+
+
+
+\clearpage
 
 {\usekomafont{chapter}Abstract (Deutsch)}\label{sec:abstract-diff} \\
 
+Diese Arbeit untersucht das Problem der Softwarezuverlässigkeit unter Nutzung von Monitoren, die mit einer strombasierten Runtime Verification sprache spezifiziert werden.
+Im speziellen untersuchen wir die Auswertung von Spezifikationen über endliche Datenströme.
+Die berücksichtigten Spezifikationen sind in der \gls{tessla} spezifikationssprache geschrieben, kommen aus dem Feld der Runtime Verification und beschreiben korrektes Verhalten von laufenden Softwaresystemen.
+
+Ob ein Lauf eines gegebenen Systems korrekt ist wird über Tracedaten ausgewertet, die während der Ausführung des Programms gesammelt werden.
+Diese Tracedaten werden als eine Menge von Datenströmen repräsentiert.
+Eine Spezifikation verlangt, dass diese Menge von Datenströmen gegebene Bedingungen erfüllt.
+
+Das erste Ergebnis dieser Arbeit ist die Implementierung eines \gls{tessla} Evaluierungs\-systems, welches einen asynchronen, verteilten Ansatz zur Kombination von Datenströmen benutzt.
+Das System, welches wir vorstellen, ist in der Lage zu erkennen, ob die Tracedaten eines laufenden Systems eine Spezifikation erfüllen.
+Die asynchrone Natur des Systems erlaubt es, das Evaluierungssystem auf mehrere, parallel ausführende Recheneinheiten zu skalieren.
+
+Ein zweites Ergebnis dieser Arbeit ist ein Beweis der Korrektheit des implementierten Systems, basierend auf den möglichen Ausführungsreihenfolgen der parallel laufenden komponenten.
+Wir zeigen, dass selbst ein maximal asynchron ausgeführtes System zu demselben Urteil, wie ein ideales, synchrones System, kommt.
