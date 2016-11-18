@@ -239,13 +239,13 @@ During the collection errors of different categories were deliberately introduce
 The generated traces are organized in a hierarchy: if an event is produced as the effect of another event, for example a function call that leads to another function call, the second event is a child of the first.
 Furthermore the traces contain the beginning and end of each event as a timestamp, making the traces suitable for \gls{tessla}.
 Unfortunately it seems that the generated trace data has a problem: since events are produced in a distributed system the timestamps are faulty, for example some events started before their parent event.
-Furthermore \gls{tessla} doesn't have a mechanism to express nested events as of now, meaning the traces would need to be manipulated before they could be used.
+Furthermore \gls{tessla} does not have a mechanism to express nested events as of now, meaning the traces would need to be manipulated before they could be used.
 
 As a final benchmark we evaluated the \gls{crv}~\citep{Reger2016}.
 \Gls{crv} has collected a set of benchmarks especially developed for the usage in monitoring algorithms.
 It consists of three tracks: Java, C and offline.
-While the C and offline track would have been very interesting the benchmarks don't contain any realtime properties.
-Since the realtime fragment is an important part of \gls{tessla} we decided that the benchmark wasn't appropriate either.
+While the C and offline track would have been very interesting the benchmarks do not contain any realtime properties.
+Since the realtime fragment is an important part of \gls{tessla} we decided that the benchmark was not appropriate either.
 
 \subsection{Tools to Generate Traces}
 

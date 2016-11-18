@@ -19,7 +19,7 @@ Examples for this are \gls{rmor} \citep{Havelund2008}, \gls{lola} \citep{DAngelo
 
 The project \Gls{tessla}\citep{Decker2016} presents ways to specify and evaluate properties over streams of events including timing information.
 To achieve this it introduces a language to expressively describe the conditions one or more streams should fulfill by applying transformations on them.
-The evaluation of \gls{tessla} a specification is done in two steps: first the specification is compiled by a compiler written at the \gls{isp} of the University of Lübeck.
+The evaluation of a \gls{tessla} specification is done in two steps: first the specification is compiled by a compiler written at the \gls{isp} of the University of Lübeck.
 The output is a canonical representation of the transformations on the streams in the specification.
 In the second step the compiled specification is connected with a system that produces traces that are treated as the input streams of the specification.
 
@@ -31,12 +31,12 @@ Standalone monitors on the other hand will have a much smaller impact on the mon
 But as a consequence there will be a bigger delay between the occurence of events in the program and their evaluation in the monitor.
 Furthermore interweaved monitors can optionally react to detected errors.
 They could change the control flow of the original system or alert a third party and eliminate cascading errors.
-Standalone monitors can't directly modify the program but can still produce warnings and alerts that can then be reacted to.
+Standalone monitors cannot directly modify the program but can still produce warnings and alerts that can then be reacted to.
 
 While online monitoring can be used to actively react to error conditions, either automatically or by notification of a third party, offline monitoring can be thought of as an extension to software testing~\cite{DAngelo2005}.
 
 At the beginning of this thesis there was one implementation of a runtime for \gls{tessla} specifications that is based on \glspl{fpga} that have to be manually reconfigured for each new specification.
-While this is a very performant approach for actual monitoring it isn't feasible for testing and prototyping.
+While this is a very performant approach for actual monitoring it is not feasible for testing and prototyping.
 This leads to the wish to implement a software based \gls{tessla} runtime which can be executed independent of hardware restrictions.
 
 Furthermore most \gls{rv} approaches are specific to one programming language or environment and combine ways of generating the data, which is used for monitoring, and the monitoring itself.
@@ -73,7 +73,7 @@ To generate test data for the implementation the third part was developed.
 For testing purposes a proof of concept implementation was sufficient.
 This proof of concept was succesfully used to instrument multiple programs written in C and one in Swift.
 Instrumented programs emit trace data about calls of specified functions without any manual work required.
-At this point the instrumentation is only able to instrument function calls and isn't optimized in any way, leading to a big performance impact if it is used excessively.
+At this point the instrumentation is only able to instrument function calls and is not optimized in any way, leading to a big performance impact if it is used excessively.
 Nonetheless it shows great potential of the underlying system that it uses to perform the instrumentation and is therefore an interesting and important part of this thesis.
 
 \section{Thesis Structure}

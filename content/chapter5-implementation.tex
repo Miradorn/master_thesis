@@ -22,7 +22,7 @@ Note that in the following sections terminology from \Cref{sec:related,sec:defin
 
 Erlang was originally developed 1987 as a language to program systems with limited resources which had to be highly fault tolerant.
 The primary purpose of the language were phone switches, which have to handle large amounts of connections at the same time.
-Since the switches weren't deployed at a central location but wherever they are needed crashes would entail long downtimes of the system.
+Since the switches were not deployed at a central location but wherever they are needed crashes would entail long downtimes of the system.
 Also, since customers expect permanent service, the platform had to provide a way to update the software without downtimes.
 Erlang and the \gls{otp} platform are built on top of these requirements.
 
@@ -204,7 +204,7 @@ This approach avoids the problems of the old architecture by moving concerns out
 The new approach to sending messages between nodes is to send each generated event as one message.
 This will lead to an overall increase in messages but simplifies the handling of each individual message.
 In the new architecture, nodes contain a buffer for each parent node as part of their state.
-A node saves all events received from that parent, that weren't part of a front upto that point in time, in this buffer.
+A node saves all events received from that parent, that were not part of a front upto that point in time, in this buffer.
 The process of handling new messages and computing the partial fronts implemented in the new version of \emph{GenComputation} is the following:
 
 \begin{enumerate}

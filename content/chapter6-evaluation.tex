@@ -48,14 +48,14 @@ The amount of data send between processes can even lead to negative performance 
 This behaviour was one of the main reasons to switch to a new approach.
 To test if reduced \gls{ram} usage would lead to better performance and eliminate crashes, the old architecture was changed in a small way: Each stream was limited to only hold the last 20 events, all older events were thrown away.
 Since the specification used for benchmarking only works on the most recent event of each stream, this would not alter the conclusion of the engine.
-For example a specification computing the average of the last 21 events wouldn't work with this adaption.
+For example a specification computing the average of the last 21 events would not work with this adaption.
 See \Cref{sec:evaluation:runtime_benchmarks:num_events} for a benchmark of \gls{ram} usage.
 The obvious reduction of \gls{ram} usage of the adapted first approach motivated the decision to refactor the runtime to use the new approach.
 
 \Cref{fig:chap_eval:runtime_num_cores} shows how the adapted first approach and second approach are both performing much better than the original one.
 The graph of the adapted first version shows, that it suffers from a too high number of cores.
 It is suspected that this comes from the fact that the messages between the processes are still quite big.
-The new version does not only has the best performance with a single core, it also scales with more cores and doesn't suffer under a high number of cores.
+The new version does not only has the best performance with a single core, it also scales with more cores and does not suffer under a high number of cores.
 While not tested we expect the new approach to scale very well with even more cores, especially for more complex specifications and more input events.
 
 \subsection{Number of Events}
@@ -90,7 +90,7 @@ The complete data can be found in \Cref{table:tessla_server_v1_events_ram_usage_
 \label{fig:chap_eval:runtime_ram_usage}
 \end{figure}
 
-Again it can be seen how the old version doesn't scale well and uses an exponential amount of memory with a growing number of events.
+Again it can be seen how the old version does not scale well and uses an exponential amount of memory with a growing number of events.
 The adapted and the new version both require a very small memory overhead and are nearly constant in their memory consumption.
 The new version uses a bit more memory, we suspect this comes from the fact that more messages have to be sent between the processes and each message carries a bit of overhead.
 
@@ -142,7 +142,7 @@ One interesting metric is the intrusiveness of the instrumentation, describing h
 For this the parameter \(c\) of the example program is set to 100, so that around 1\% of all function calls are instrumented.
 
 One thing that can be recognized is that the impact of instrumentation is not predictable when using compiler optimizations.
-Aggressive compiler optimizations can remove function calls or inline values if the optimization doesn't change the program behaviour.
+Aggressive compiler optimizations can remove function calls or inline values if the optimization does not change the program behaviour.
 When instrumentation calls are added no such optimization can happen, since otherwise the behaviour of the program would be altered, namely the logging would be removed when the function calls are removed.
 
 Therefore we compare the instrumented and non-instrumented code for all optimization levels.
@@ -181,7 +181,7 @@ At some point no more speed up will happen, since no calls to the instrumented f
 \label{sec:evaluation:runtime_examples}
 
 Additionally to the theoretic benchmarks it was also important to evaluate the runtime against some more practical examples and test a bigger amount of node types.
-While the specifications for the benchmarks from the previous section did use some node types and showed that these types perform the correct computations (else the benchmarks wouldn't have worked), they only used a subset of all available types.
+While the specifications for the benchmarks from the previous section did use some node types and showed that these types perform the correct computations (else the benchmarks would not have worked), they only used a subset of all available types.
 Thus the following examples concentrate on a wider range of different nodes.
 
 To do so traces from real world examples were collected, either with the developed instrumentation pass or by adjusting existing logs to fit the needs of \gls{tessla}.

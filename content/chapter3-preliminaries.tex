@@ -5,7 +5,7 @@
 In this chapter we will define concepts that are used in \Cref{sec:behaviours} to reason about the implemented runtime.
 
 While the \gls{tessla} specification itself defines a set of semantics, for this thesis we will slightly alter some of it and add some new definitions based on them.
-This is necessary to reason about the specifics how the runtime is built (Note that \gls{tessla} doesn't define an operational semantic, therefore we will define our own) and how it behaves.
+This is necessary to reason about the specifics how the runtime is built (Note that \gls{tessla} does not define an operational semantic, therefore we will define our own) and how it behaves.
 
 \section{Time}
 \label{sec:definitions:time}
@@ -67,7 +67,7 @@ A causal transducer is one, where the output depends only on consumed inputs and
   then \( \forall \vec{\imath'} \in \Phi^* \text{ with } (\vec{\imath} \circ \vec{\imath'}, \vec{o'}) \in t \)
   it holds, that \( \vec{o} \sqsubseteq \vec{o'} \)
 
-  A transducer that isn't casual is called \emph{clairvoyant}.
+  A transducer that is not casual is called \emph{clairvoyant}.
 \end{definition}
 
 
@@ -146,7 +146,7 @@ In the following \(\sigma_i\) is used to get the element at position \(i\) and \
 \label{sec:definitions:timed_transducer}
 
 For the second kind of equivalence we need to introduce \emph{timed sequences}, originally introduced as timed words in~\cite{Alur1994}, and \emph{timed transducers}.
-Note that timed sequences don't have to be monotonically increasing like in the original definition.
+Note that timed sequences do not have to be monotonically increasing like in the original definition.
 Quite on the contrary the unorderdness of outputs is an important key principle to much of the later work as you will see.
 
 Let \(\mathbb{T}\) be a timing model that is isomorphic to \(\mathbb{R}\).
@@ -248,7 +248,7 @@ Since the values are associated with timestamps the outputs can be reordered by 
         &\hspace{6em} \text{with } \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_2}),\vec{o_2} \circ \vec{o_2'} )) \\
         &\hspace{10em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_2}),\vec{o_3})) && (\star\star)\\
         &\hspace{2em} \mathit{maxTime}(\vec{o_1})\ \text{has to be smaller than }\mathit{maxTime}(\vec{o_2}), \\
-        &\hspace{2em} \text{else } (\star)\ \text{couldn't hold, therefore, combined with boundedness and }(\star\star): \\
+        &\hspace{2em} \text{else } (\star)\ \text{could not hold, therefore, combined with boundedness and }(\star\star): \\
         &\hspace{4em} \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_2} )) \\
         &\hspace{8em} = \mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_3})) \\
         &\text{which concludes }\mathit{timed}(\mathit{upto}(\mathit{maxTime}(\vec{o_1}),\vec{o_1} \circ \vec{o_1'} ))\\
@@ -319,7 +319,7 @@ Since the values are associated with timestamps the outputs can be reordered by 
       \end{itemize}
   \end{itemize}
   \(\Rightarrow t_1 \not\equiv_a t_3\)\\
-  If \(t_3\) weren't bounded (and therefore not finite) there would be no way to know, if it was equivalent to \(t_1\), because it could always produce a missing event at a later time.
+  If \(t_3\) were not bounded (and therefore not finite) there would be no way to know, if it was equivalent to \(t_1\), because it could always produce a missing event at a later time.
 
   Because of \Cref{lemma:observational_equivalence_equivalence_relationship} \(\Rightarrow t_2 \not\equiv_a t_3\).
 
@@ -335,7 +335,7 @@ Events are the atomic unit of information that all computations are based on.
 There are three types of events: external, output and internal events.
 
 The set of all events is denoted as \(E\).
-Each event carries a value, which can be \emph{nothing} or a value of a type (types are formally defined in the \gls{tessla} specification, but aren't important for this thesis), a timestamp and the stream it's perceived on (for example a function call of a specific function or the name of an output stream).
+Each event carries a value, which can be \emph{nothing} or a value of a type (types are formally defined in the \gls{tessla} specification, but are not important for this thesis), a timestamp and the stream it's perceived on (for example a function call of a specific function or the name of an output stream).
 
 The value of an event can be queried with the function \(\upsilon\), its timestamp with \(\mathit{time}\) and its stream with \(\mathit{stream}\).
 
@@ -379,14 +379,14 @@ An example function is \(\mathit{add}(S_D,S_D) \rightarrow S_D\): It takes two s
 The produced stream can either be assigned to a named identifier (think: a variable) or consumed by another function (function composition).
 
 Functions can be divided into three categories: pure, unpure and timing.
-Pure functions, also called stateless, are evaluated only on the values their inputs have at the timestamp they are evaluated, therefore they don't have to remember a state and will only return events.
+Pure functions, also called stateless, are evaluated only on the values their inputs have at the timestamp they are evaluated, therefore they do not have to remember a state and will only return events.
 Unpure, or stateful, functions are evaluated over the values if its inputs at that timestamp and a state and will return not only new events but also an updated state.
 As an example a function \emph{eventCount} has to \emph{remember} how many events already happened on it's input stream and increment that counter on every new event.
 Timing functions are evaluated not only on the value of events but also on their timestamp and can also manipulate it:
 While non timing functions will consume events at a specific timestamp and emit events with that timestamp, timing functions can emit events with a changed timestamp.
-In this thesis we will only look at past time functions, meaning functions can only delay timestamps, therefore can't depend on future values.
+In this thesis we will only look at past time functions, meaning functions can only delay timestamps, therefore cannot depend on future values.
 
-Timing functions complicate the reasoning about schedules and causality and therefore aren't included in \Cref{sec:behaviours:without_timing}.
+Timing functions complicate the reasoning about schedules and causality and therefore are not included in \Cref{sec:behaviours:without_timing}.
 In \Cref{sec:behaviours:timing_functions} the conclusions of earlier sections will be extended to include timing functions.
 
 \section{Nodes}
@@ -420,7 +420,7 @@ When fed with inputs (or \emph{traces}) the engine will produce outputs.
 The relationship between inputs and outputs that is produced can be seen as a timed transducer.
 The input to an evaluation engine has to have strictly increasing timestamps.
 This is needed to have a known progress which can be distributed through the system.
-If inputs weren't ordered by their timestamp for example the absense of input events on a specific stream couldn't be detected because events could be present at a later position of the input trace.
+If inputs were not ordered by their timestamp for example the absense of input events on a specific stream could not be detected because events could be present at a later position of the input trace.
 Especially for offline monitoring this obviously is no problem because the traces can simply be reordered into a strictly increasing sequence, except when multiple input events are at the same timestamp.
 This can be solved in two ways: either increase the timing precision when generating the traces or manipulate the timestamps in the traces by adding a minimal offset to them if they are equal to another timestamp.
 
@@ -449,7 +449,7 @@ Nodes can only be scheduled when they are enabled, meaning they have events on t
 When a node is scheduled, it will compute the minimal timestamp of all buffered events.
 The function implemented by the node is then evaluated at that timestamp, which is called the \emph{evaluation timestamp}.
 This is important to understand the completeness criteria: It means that when the function is evaluated there is at least one event with that timestamp on one input.
-The inverse of that statement shows why this is important: a function is never evaluated at a timestamp where no event is present, therefore the system can't arbitrarily produce new timestamps.
+The inverse of that statement shows why this is important: a function is never evaluated at a timestamp where no event is present, therefore the system cannot arbitrarily produce new timestamps.
 
 Nodes having signals as inputs always have to remember the last occured change of them in their state.
 When such a node is scheduled, the function will work on the remembered value if no new change is present at the evaluation timestamp for the signal.
@@ -560,7 +560,7 @@ For example, if the values of the inputs of an \(\mathit{add}\) are switched at 
   \(\mathit{mul}\)              & Signal \(\times\) Signal  & Signal  & Multiplies the first input by the second.\\
   \(\mathit{or}\)               & Signal \(\times\) Signal  & Signal  & Performs a Boolean or over both inputs.\\
   \(\mathit{sub}\)              & Signal \(\times\) Signal  & Signal  & Subtracts the second input from the first.\\
-  \(\mathit{filter}\)           & Events \(\times\) Signal  & Events  & Emits events whenever an event occurs on the first input with the value of that event if the second input has the value true. It is not output complete because it doesn't emit events when the second input is false. \\
+  \(\mathit{filter}\)           & Events \(\times\) Signal  & Events  & Emits events whenever an event occurs on the first input with the value of that event if the second input has the value true. It is not output complete because it does not emit events when the second input is false. \\
   \(\mathit{ifThen}\)           & Events \(\times\) Signal  & Events  & Emits an event with the value of the second input everytime an event occurs on the first input. It is not output complete because it only emits outputs when an event occured on the first input. \\
   \(\mathit{ifThenElse}\)       & Signal \(\times\) Signal \newline \(\times\) Signal  & Signal  & Emits the value of the second input inf the first is true, else of the third input.\\
   \(\mathit{sample}\)           & Signal \(\times\) Events  & Events  & Same as \(\mathit{ifThen}\) with switched arguments. \\
@@ -638,7 +638,7 @@ The history of an evaluation engine is defined at every step (read: after every 
 \label{sec:definitions:transitions}
 
 A transition describes what happens when the evaluation engine schedules a node:
-Events from the the inputs of a node are removed (at least one), output events can be generated (but don't have to) and distributed and the internal state of nodes are updated.
+Events from the the inputs of a node are removed (at least one), output events can be generated (but do not have to) and distributed and the internal state of nodes are updated.
 Because the function of a node is evaluated at the evaluation timestamp, which is the minimal timestamp of all events on the heads of inputs, the events which are removed are exactly the ones that have the evaluation timestamp.
 To look at it in another way: a transition models the computation of a node and the progressing of the stream it produces towards the evaluation timestamp, which has to be bigger than the previous progress, since input queues are strictly ordered by their timestamp and the events with the minimal timestamps are removed after the computation.
 Therefore when we say `Node \(a\) is scheduled' we mean that a transition is taken which models the computation of that node.
@@ -688,7 +688,7 @@ The run \(\langle (\lambda, s_0), (\tau_1, s_1) \rangle\) means, that the engine
   The closeness \(\delta\) of a run \(r_1\) to a run \(r_2\) is a pair \(\delta(r_1,r_2) = (x,y)\), where \(x\) is the index before the first position where the two runs differ and y is the number of steps between the index of the first difference and the position where \(r_2\) takes the transition that \(r_1\) took after step \(x\).
   The closeness of runs is ordered element-wise: \((x,y) > (x',y') \leftrightarrow ((x > x') \lor (x = x' \land y < y))\).
   Therefore two runs with length \(d\) are equal, if their closeness is \(d,0\), which is the maximal closeness two runs of length \(d\) can have at all.
-  Note that two runs have no closeness if they don't contain the same transitions.
+  Note that two runs have no closeness if they do not contain the same transitions.
 \end{definition}
 
 \begin{exmp}[name = Closeness of Runs]
@@ -733,13 +733,13 @@ As stated, the definition for enabledness works for all output complete function
 It is possible that an output incomplete functions will never produce a new output:
 Think of a \(\mathit{FilterNode}\) where the second input is always \(\mathit{false}\).
 Even if new input events are added to the first input and the second input is known to be \(\mathit{false}\) upto any timestamp, the children of the node will never receive new events for that input queue.
-Therefore no children can ever again compute, because they don't have an event buffered on all inputs.
+Therefore no children can ever again compute, because they do not have an event buffered on all inputs.
 
 There are two ways to fix this:\\
 All input queues could be extended with a progress timestamp, which denotes how far the parent node has progressed.
 Now everytime a node \(n\) with children \(N_c\) evaluates its function at a new evaluation timestamp the inputs of all nodes in \(N_c\) representing the stream of \(n\) would be updated to have that evaluation timestamp as their new progress, even if no new event was produced at that timestamp.
 
-The other way, which is used in this thesis, doesn't alter the input queues:
+The other way, which is used in this thesis, does not alter the input queues:
 First we need a new type of events: \emph{progress events}.
 A progress event holds no value and exists only to notify a node that a specific input has progressed upto the timestamp of the progress event.
 We will write a progress event as \(e^p_\pi\) where \(\pi\) is the timestamp of it.
@@ -748,9 +748,9 @@ Now whenever a node performs its computation at an evaluation timestamp and no n
 When a node is scheduled and one of the consumed events is a progress event, what happens depends on the function of the node. Some examples are:
 
 \begin{itemize}
-  \item An \(\mathit{AddNode}\) has at an evaluation timestamp a progress event as the first input and no event as the second input, which means there is an event buffered on input queue two, else the node wouldn't have been scheduled, and that event has a bigger timestamp than the evaluation timestamp, else its timestamp would have been the evaluation timestamp. The node can't produce a new change for its output, since all new information is, that input one hasn't changed upto the new timestamp. Therefore the node will distribute a progress event with the evaluation timestmap to its children.
+  \item An \(\mathit{AddNode}\) has at an evaluation timestamp a progress event as the first input and no event as the second input, which means there is an event buffered on input queue two, else the node would not have been scheduled, and that event has a bigger timestamp than the evaluation timestamp, else its timestamp would have been the evaluation timestamp. The node cannot produce a new change for its output, since all new information is, that input one has not changed upto the new timestamp. Therefore the node will distribute a progress event with the evaluation timestmap to its children.
   \item If the \(\mathit{AddNode}\) would have received a progress event on input one and a new change on input two at the same timestamp, it could emit a new change. The new event would have the value of the last change on the first input, which the node has to hold in its state, added with the value of the new change on the second input.
-  \item A \(\mathit{MergeNode}\) has a progress event as the first input at an evaluation timestamp and no event on the second input. By the same reasoning as in the first example, the node can't produce a new output and therefore will produce a progress event.
+  \item A \(\mathit{MergeNode}\) has a progress event as the first input at an evaluation timestamp and no event on the second input. By the same reasoning as in the first example, the node ca not produce a new output and therefore will produce a progress event.
 \end{itemize}
 
 These examples show that progress events alters the categorization of \gls{tessla} functions: output complete functions could produce no new normal output, if inputs are progress events.
@@ -776,15 +776,15 @@ For the comparision of runs some more definitions are needed.
 \end{lemma}
 
 \begin{proof}
-  As a first step we will show, that the transitions \(\tau_1\) and \(\tau_2\) can be exchanged because their enabledness doesn't depend on each other.
+  As a first step we will show, that the transitions \(\tau_1\) and \(\tau_2\) can be exchanged because their enabledness does not depend on each other.
 
   Because \(b = \mathit{node}(\tau_2)\) is no descendant of \(a = \mathit{node}(\tau_1)\), the stream \(\sigma\) with \(\mathit{node}(\sigma) = \mathit{node}(\tau_1)\) can be no input of \(b\).
-  Therefore the enabledness of \(b\) can't be changed by \(\tau_1\), taken directly from the definition of enabledness.
-  So \(b\) has to be enabled before \(\tau_1\) was taken in \(r_1\) or else it couldn't be enabled afterwards and \(\tau_2\) couldn't be taken in the next step.
+  Therefore the enabledness of \(b\) cannot be changed by \(\tau_1\), taken directly from the definition of enabledness.
+  So \(b\) has to be enabled before \(\tau_1\) was taken in \(r_1\) or else it could not be enabled afterwards and \(\tau_2\) could not be taken in the next step.
   Therefore \(r_2\) also fulfills the requirements of a valid run up to and including the steps \((\tau_2,s_i')(\tau_1,s_j)\).
 
   As a second step we have to show, that the state \(s_j\) will stay the same, no matter the order of the two transitions and only the state \(s_i\) may be changed to \(s_i'\) in \(r_2\).
-  If this holds, the subsequent states can't change either, since they are deterministically built by applying the same transitions.
+  If this holds, the subsequent states cannot change either, since they are deterministically built by applying the same transitions.
   Now if all subsequent states stay the same, all subsequent transitions will stay enabled, since enabledness of a node only depends on the state.
   \Cref{fig:chap4:sec_run:exchange_transitions} visualizes the exchange of the transitions and the argument why the state stays the same.
 
@@ -823,14 +823,14 @@ For the comparision of runs some more definitions are needed.
 \begin{lemma}[name = Duration of Enabledness]\label{lemma:enabled_till_scheduled}
   A node which is enabled stays enabled at least until it is scheduled.
   Formally: If a node \(n\) is enabled at step \(i\) in a run \(r\) it will stay enabled at least until the first step \(j > i\) with \(r(j) = (\tau,s), \mathit{node}(\tau) = n\).
-  Note that it doesn't have to be disabled after step \(j\), because there could have been multiple events buffered on it's inputs.
+  Note that it does not have to be disabled after step \(j\), because there could have been multiple events buffered on it's inputs.
 \end{lemma}
 
 \begin{proof}
   Let \(n\) be a node enabled at step \(i\) in a run \(r\).
   Let \((\tau_x,s_x) = r(x), x = i + 1\).
   If \(\mathit{node}(\tau_x) \neq n\), then the only influence that \(\tau_x\) can have on the node state \(\widetilde{n}\) of \(n\) is by appending produced events to one of the input queues, as per the definition of application of a transition.
-  Since \(\tau_x\) can't remove events from the input queues in \(\widetilde{n}\) and on all input queues was at least one event buffered before the transition was applied, else \(n\) wouldn't have been enabled at step \(i\), \(\widetilde{n}\) will have at least as many input events buffered on every input as in the step before.
+  Since \(\tau_x\) cannot remove events from the input queues in \(\widetilde{n}\) and on all input queues was at least one event buffered before the transition was applied, else \(n\) would not have been enabled at step \(i\), \(\widetilde{n}\) will have at least as many input events buffered on every input as in the step before.
   This means that \(n\) is still enabled at step \(x\), and by induction at every later step until a transition with \(n\) as its node is taken.
 \end{proof}
 
@@ -842,7 +842,7 @@ For the comparision of runs some more definitions are needed.
   Let \(n\) be an enabled node at step \(i\) with the node state \(\widetilde{n}\).
   First let's assume that no parent of \(n\) are scheduled after step \(i\) and before \(n\) becomes disabled.
   Since the input queues of \(n\) are filled by previous transitions and only finite number of events are produced at every step, all of the queues can only have a finite number of events buffered at step \(i\).
-  Since no parents of \(n\) are scheduled, the queues can't get fuller.
+  Since no parents of \(n\) are scheduled, the queues cannot get fuller.
   Because all nodes represent functions, and all functions have to consume at least one input event (compare \Cref{sec:definitions:tessla_functions}), everytime \(n\) is scheduled at least one input queue of \(n\) will have one event less buffered after it performed its computation.
   Therefore the worst case is when \(n\) only consumes one event per computation.
   The maximum number of time \(n\) can be scheduled is therefore bounded by the sum of the number of events on all input queues at step \(i\).
