@@ -200,7 +200,7 @@ It remains to show that greedy schedules are fair.
   When \(a\) receives an external event, it will be the only enabled source, else no input would be fed to an input at that step.
   Therefore \(a\) will be scheduled the next time no internal nodes are enabled.
 \end{proof}
-
+\clearpage
 
 \subsection{Fair Evaluation Engines}
 \label{sec:behaviours:behaviour_without_timing:fair}
@@ -321,7 +321,7 @@ If such a closer run always exist, we will show that the run with closeness \((l
 
   While the order of outputs in the tuples of the behaviour will change when two transitions producing outputs are exchanged, observational equivalence is not influenced, since it is defined over reordered outputs.
 
-  Let's test if \(r_2''\) is observational equivalent to \(r_2'\):
+  Let us test if \(r_2''\) is observational equivalent to \(r_2'\):
   We will compare how the behaviour of the run \(r_2'\) changes when the transition \(\tau_1\) is exchanged with \(\tau_2'\).
   The comparision is based on the different cases the transitions can encode.
   Some of the cases are not feasible, they are listed for the sake of completeness and to explain why they cannot happen.
@@ -374,7 +374,7 @@ In the next section we will do this for all fair schedules.
 \subsection{Equivalence of Greedy and Fair Evaluation Engines}
 \label{sec:behaviours:equivalence_without_timing:greedy_fair}
 
-Let's recap what fairness of a schedule means: Whenever a node becomes enabled in a run it has to be scheduled eventually.
+Let us recap what fairness of a schedule means: Whenever a node becomes enabled in a run it has to be scheduled eventually.
 What makes fair schedules harder to reason about than greedy ones is that for one they do not have to be deterministic and furthermore that it's possible that an enabled node is not scheduled for a very long time.
 
 Before reasoning about equivalence of greedy and fair schedules let's look at a kind of fair schedule that can be seen as worst case.
@@ -387,7 +387,7 @@ Such a run needs obviously more reordering than a greedy one to become observati
 
 This example shows what the difference is when reordering a fair run in contrast to a greedy run: basically more transitions have to be reordered since outputs can be produced later.
 
-Let's revisit the cases from \Cref{proof:equiv_greedy_engines}:
+Let us revisit the cases from \Cref{proof:equiv_greedy_engines}:
 Actually the \Cref{sec:behaviours:without_timing:greedy:non_greedy_1,sec:behaviours:without_timing:greedy:non_greedy_2} cannot happen for greedy runs.
 If in a run \(r_1\) a transition \(\tau_1\), which produces an output, has to be exchanged with an earlier transition \(\tau_2\), that consumed an external event, to become closer to a greedy run \(r_2\), \(r_1\) could not have been greedy in the first place:
 Greedy schedules ensure by construction that all outputs that can be produced based on consumed external events are produced before the next external event is consumed.
