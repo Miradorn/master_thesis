@@ -205,7 +205,8 @@ For later theoretic work we have to restrict timed transducers.
     &\hspace{2em}\text{then }\exists k' > k\ \text{with}\\
     &\hspace{4em}(\sigma_{[0,k']}, \vec{o} \circ \vec{o'}) \in t\\
     &\hspace{4em}\text{and} \forall k'' > k'\ \text{with } (\sigma_{[0,k'']}, \vec{o}\circ\vec{o'}\circ\vec{o''}) \in t\ \text{it holds, that}\\
-    &\hspace{6em}\mathit{upto}(\mathit{maxTime}(\vec{o}), \mathit{timed}(\vec{o}\circ\vec{o'})) = \mathit{upto}(\mathit{maxTime}(\vec{o}), \mathit{timed}(\vec{o}\circ\vec{o'}\circ\vec{o''}))
+    &\hspace{6em}\mathit{upto}(\mathit{maxTime}(\vec{o}), \mathit{timed}(\vec{o}\circ\vec{o'}))  \\
+    &\hspace{6em}= \mathit{upto}(\mathit{maxTime}(\vec{o}), \mathit{timed}(\vec{o}\circ\vec{o'}\circ\vec{o''}))
   \end{align*}
 \end{definition}
 Based on the definitions we can define an equivalence relationship on bounded timed transducers.
@@ -230,6 +231,8 @@ Since the values are associated with timestamps the outputs can be reordered by 
 \begin{lemma}[name=Observational Equivalence is an Equivalence Relationship for Bounded Transducers]\label{lemma:observational_equivalence_equivalence_relationship}
   \(\equiv_o\) is symmetric, reflexive and transitive for bounded timed transducers.
 \end{lemma}
+\clearpage
+
 \begin{proof}
   Let \(t_1, t_2, t_3\) be bounded timed transducers.
   Symmetry follows directly from the definition.\\
@@ -653,6 +656,7 @@ The empty transition, meaning no input was consumed and no output produced, is l
 Note that all transitions, which produces events have to consume at least one event (therefore no events can be created from nowhere) and that it's possible that no event was produced based on the consumed events (see \Cref{sec:definitions:tessla_functions}).
 Furthermore with timing functions it's possible to create multiple events in one transition.
 For example think of an \(\mathit{EchoNode}\), which duplicates an input after a specified amount of time.
+\clearpage
 
 \begin{definition}[name = Application of a Transition on a State]\label{def:application_transition}
   Given global state \(s_0\) and transition \(\tau = (\widetilde{E}, \widetilde{E'}) = (\{e_1,e_2,\dots,e_i\}, \{e_1',e_2',\dots,e_i'\})\) with \(n = \mathit{node}(\tau_1)\) and \(N_c\) the set of all nodes that are children of \(n\).
@@ -720,6 +724,7 @@ Based on that definition we will see the problems that output incomplete functio
 \end{definition}
 
 Now it is possible to restrict runs to a subset where each run models a rational evaluation of a specification.
+\clearpage
 
 \begin{definition}[name = Valid Run]\label{def:valid_run}
   A run \(r\) is called \emph{valid}, if
